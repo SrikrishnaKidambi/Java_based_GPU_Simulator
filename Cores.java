@@ -31,6 +31,12 @@ public class Cores{
             case "MV": registers[rd] = registers[rs1] + registers[0]; break;
             case "ADDI": registers[rd] = registers[rs1] + rs2; break;
             case "MULI": registers[rd] = registers[rs1] * rs2; break;
+            case "AND" : registers[rd] = registers[rs1] & registers[rs2]; break;
+            case "OR" : registers[rd] = registers[rs1] | registers[rs2]; break;
+            case "XOR" : registers[rd] = registers[rs1] ^ registers[rs2]; break;
+            case "ANDI" : registers[rd] = registers[rs1] & rs2; break;
+            case "ORI" : registers[rd] = registers[rs1] | rs2; break;
+            case "XORI" : registers[rd] = registers[rs1] ^ rs2; break;  
         }
         if(registers[0]!=0){
             registers[0]=0;
