@@ -20,8 +20,23 @@ public class Test {
         // System.out.println();
         Simulator sim=new Simulator();
         String[] program={"Add X1 X2 X3","BNE X2 X3 Exit","ADDi X2 X3 100","Exit:","Mul X4 X3 X2"};
-        sim.initializeProgram(program);
+        String[] program2 = {
+            "LI X1 10",
+            "LI X2 20",
+            "Beq X1 X2 Label1",
+            "LI X3 30",
+            "Label1:",
+            "LA X4 100",
+            "LW X5 16(X4)",
+            "JAL X6 Function",
+            "J End",
+            "Function:",
+            "Add X7 X1 X2",
+            "End:"
+        };
+        sim.initializeProgram(program2);
         sim.runProgram();
         sim.printResult();
+        
     }
 }

@@ -20,6 +20,10 @@ public class Simulator{
         cores[2].registers[3]=2;
         cores[3].registers[2]=1;
         cores[3].registers[3]=2;
+
+        //testing for memory
+        Memory.memory[100]=30;
+        Memory.memory[104]=20;
         labelMapping=new HashMap<>();
         opcodes=new HashSet<>(Set.of("ADD","SUB","MUL","MV","ADDI","MULI","AND","OR","XOR","ANDI","ORI","XORI","BNE","BEQ","JAL","JALR","LW","SW"));
     }
