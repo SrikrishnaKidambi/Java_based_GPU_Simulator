@@ -13,7 +13,7 @@ public class Cores{
     public void execute(String[] program){
         String[] decodedInstruction = program[pc].split(" ");
         String opcode=decodedInstruction[0].toUpperCase();
-        System.out.println(opcode);
+        //System.out.println(opcode);
         int rd= Integer.parseInt(decodedInstruction[1].substring(1));
         int rs1=Integer.parseInt(decodedInstruction[2].substring(1));
         int rs2;
@@ -23,7 +23,7 @@ public class Cores{
         else{
             rs2=Integer.parseInt(decodedInstruction[3].substring(0));
         }
-        System.out.println(rd+" "+rs1+" "+rs2);
+        //System.out.println(rd+" "+rs1+" "+rs2);
         switch(opcode){
             case "ADD": registers[rd] = registers[rs1] + registers[rs2]; break;
             case "SUB": registers[rd] = registers[rs1] - registers[rs2]; break;
@@ -36,7 +36,7 @@ public class Cores{
             case "XOR" : registers[rd] = registers[rs1] ^ registers[rs2]; break;
             case "ANDI" : registers[rd] = registers[rs1] & rs2; break;
             case "ORI" : registers[rd] = registers[rs1] | rs2; break;
-            case "XORI" : registers[rd] = registers[rs1] ^ rs2; break;  
+            case "XORI" : registers[rd] = registers[rs1] ^ rs2; break;
         }
         if(registers[0]!=0){
             registers[0]=0;
