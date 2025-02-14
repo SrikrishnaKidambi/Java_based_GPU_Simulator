@@ -1,3 +1,8 @@
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 public class Simulator{
     public Simulator(){
         memory=new Memory();
@@ -15,14 +20,32 @@ public class Simulator{
         cores[2].registers[3]=2;
         cores[3].registers[2]=1;
         cores[3].registers[3]=2;
+        labelMapping=new HashMap<>();
+        opcodes=new HashSet<>(Set.of("ADD","SUB","MUL","MV","ADDI","MULI","AND","OR","XOR","ANDI","ORI","XORI","BNE","BEQ","JAL","JALR","LW","SW"));
     }
+
+    //function for mapping all the labels with proper instruction number. 
+    private void mapAllTheLabels(String[] program){
+        for(int i=0;i<program.length;i++){
+            String[] decodedInstruction = program[i].split(" ");
+            if(!opcodes.contains(decodedInstruction[0].toUpperCase())){
+                String label=decodedInstruction[0].replace(":", "");
+                labelMapping.put(label,i);
+            }
+        }
+    }
+
     public void initializeProgram(String[] program){
         this.program_Seq=program;
     }
     public void runProgram(){
+        mapAllTheLabels(program_Seq);
         while(this.clock<program_Seq.length){
             for(int i=0;i<4;i++){
-                this.cores[i].execute(program_Seq);
+                if(cores[i].pc>=program_Seq.length){
+                    break;
+                }
+                this.cores[i].execute(program_Seq,labelMapping,memory);
             }  
             this.clock++; 
         }
@@ -40,4 +63,6 @@ public class Simulator{
     private int clock;
     private Cores[] cores;
     public String[] program_Seq;
+    public Map<String,Integer> labelMapping;
+    public Set<String> opcodes;
 }

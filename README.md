@@ -3,6 +3,16 @@ This is a project to simulate the GPU architecture .
 
 ### Minutes of Meeting:
 
+#### Date : 14-02-2025
+
+Members : Srikrishna, Sai Krishna
+
+Decisions : Parsing the instructions seperately based on op codes. Using Hash map for mapping the labels to corresponding instructions.
+The above implementation was done together.
+Work Division : Srikrishna : Implementation of BEQ, JAL, LW, Li.
+                Sai Krishna : Implementation of BNE, JALR, SW.
+
+
 #### Date : 08-02-2025
 Members : Srikrishna, Sai Krishna
 Work Division : Srikrishna : Cores class and arithmetic operators implementation

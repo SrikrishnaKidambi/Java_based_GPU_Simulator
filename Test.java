@@ -19,7 +19,7 @@ public class Test {
         // }
         // System.out.println();
         Simulator sim=new Simulator();
-        String[] program={"Add X1 X2 X3","ADDi X2 X3 100"};
+        String[] program={"Add X1 X2 X3","BNE X2 X3 Exit","ADDi X2 X3 100","Exit:","Mul X4 X3 X2"};
         sim.initializeProgram(program);
         sim.runProgram();
         sim.printResult();
