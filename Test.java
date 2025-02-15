@@ -28,6 +28,7 @@ public class Test {
             "Label1:",
             "LA X4 100",
             "LW X5 16(X4)",
+            "SW X2 12(X4)",
             "JAL X6 Function",
             "J End",
             "Function:",
@@ -37,6 +38,6 @@ public class Test {
         sim.initializeProgram(program2);
         sim.runProgram();
         sim.printResult();
-        
+        Memory.printMemory();
     }
 }
