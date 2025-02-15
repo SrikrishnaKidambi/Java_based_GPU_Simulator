@@ -9,7 +9,7 @@ Members : Srikrishna, Sai Krishna
 
 Decisions : Parsing the instructions seperately based on op codes. Using Hash map for mapping the labels to corresponding instructions.
 The above implementation was done together.
-Work Division : Srikrishna : Implementation of BEQ, JAL, LW, Li, J, LA.
+Work Division : Srikrishna : Implementation of BEQ, JAL, LW, Li, J.
                 Sai Krishna : Implementation of BNE, JALR, SW, JR.
 
 
