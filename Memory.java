@@ -5,7 +5,7 @@ public class Memory {
     }
     public static void printMemory(){
         System.out.println("Printing the memory:");
-        for(int i=0;i<1024;i++){
+        for(int i=0;i<4;i++){
             System.out.print(memory[i]+" ");
             
         }
