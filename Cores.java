@@ -186,7 +186,7 @@ public class Cores{
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
                   String labelName5;
                   labelName5=decodedInstruction[3];
-                  if(registers[rd]<registers[rs1]){
+                  if(registers[rd]>=registers[rs1]){
                       pc=labelMapping.get(labelName5).intValue();
                   }
                   break;
