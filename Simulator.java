@@ -24,10 +24,26 @@ public class Simulator{
         //testing for memory
         // Memory.memory[100]=30;
         // Memory.memory[104]=20;
-        Memory.memory[0]=2;
-        Memory.memory[1]=4;
-        Memory.memory[2]=1;
-        Memory.memory[3]=5;
+        Memory.memory[0] = 42;
+        Memory.memory[1] = 17;
+        Memory.memory[2] = 89;
+        Memory.memory[3] = 23;
+        Memory.memory[4] = 56;
+        Memory.memory[5] = 91;
+        Memory.memory[6] = 34;
+        Memory.memory[7] = 75;
+        Memory.memory[8] = 12;
+        Memory.memory[9] = 68;
+        Memory.memory[10] = 5;
+        Memory.memory[11] = 99;
+        Memory.memory[12] = 31;
+        Memory.memory[13] = 47;
+        Memory.memory[14] = 83;
+        Memory.memory[15] = 28;
+        Memory.memory[16] = 60;
+        Memory.memory[17] = 14;
+        Memory.memory[18] = 71;
+        Memory.memory[19] = 39;
         labelMapping=new HashMap<>();
         opcodes=new HashSet<>(Set.of("ADD","SUB","MUL","MV","ADDI","MULI","AND","OR","XOR","ANDI","ORI","XORI","BNE","BEQ","JAL","JALR","LW","SW","LA","LI","BGE","BLT","J","JR"));
     }

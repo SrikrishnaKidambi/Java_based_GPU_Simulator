@@ -50,7 +50,7 @@ public class Test {
         		"bubbleSort:",       // 9 
         		"addi x10 x0 0",     // 10
         		"addi x11 x0 0",     // 11 
-        		"addi x12 x0 4",     // 12 
+        		"addi x12 x0 20",     // 12 
         		"LoopOuter:",        // 13 
         		"addi x14 x12 -1",   // 14 
         		"bge x10 x14 Exit",  // 15 
