@@ -35,6 +35,7 @@ public class Simulator{
             if(!opcodes.contains(decodedInstruction[0].toUpperCase())){
                 String label=decodedInstruction[0].replace(":", "");
                 labelMapping.put(label,i);
+                System.out.println("label: "+label+ " and pc: "+i);
             }
         }
     }

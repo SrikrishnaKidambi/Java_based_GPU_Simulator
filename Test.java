@@ -31,6 +31,7 @@ public class Test {
             "JAL X6 Function",
             "J End",
             "Function:",
+            "mv x2 x3",
             "Add X7 X1 X2",
             "End:"
         };

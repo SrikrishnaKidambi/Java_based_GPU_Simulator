@@ -58,13 +58,10 @@ public class Cores{
                     //Ex: mv x1 x2
                     rd= Integer.parseInt(decodedInstruction[1].substring(1));
                     rs1=Integer.parseInt(decodedInstruction[2].substring(1));
-                    if(decodedInstruction[3].charAt(0)=='X'){
-                        rs2=Integer.parseInt(decodedInstruction[3].substring(1));
-                    }
-                    else{
-                        rs2=Integer.parseInt(decodedInstruction[3].substring(0));
-                    } 
-                    registers[rd] = registers[rs1] + registers[0]; break;
+                    
+                    System.out.println(rd+" "+rs1);
+                    registers[rd] = registers[rs1] ;
+                    break;
             case "ADDI":
                     //Ex: addi x1 x2 8
                     rd= Integer.parseInt(decodedInstruction[1].substring(1));
@@ -213,6 +210,7 @@ public class Cores{
                     registers[rd]=pc+1;
                     String labelName2;
                     labelName2=decodedInstruction[2];
+                    System.out.println("label: "+labelName2);
                     pc=labelMapping.get(labelName2).intValue();
                     break;
             case "J":
