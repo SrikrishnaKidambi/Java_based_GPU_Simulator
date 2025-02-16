@@ -80,6 +80,7 @@ public class Test {
         sim.runProgram();
         System.out.println("Final result:");
         sim.printResult();
+        //comment for git integration
         
         Memory.printMemory();
     }
