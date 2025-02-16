@@ -4,8 +4,10 @@ public class Memory {
         memory=new int[1024];
     }
     public static void printMemory(){
+        System.out.println("Printing the memory:");
         for(int i=0;i<1024;i++){
             System.out.print(memory[i]+" ");
+            
         }
         System.out.println();
     }
