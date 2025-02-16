@@ -185,7 +185,7 @@ public class Cores{
                         }
                     }
                     int immediate=Integer.parseInt(decodedInstruction[2].substring(0,paramStart));
-                    if(immediate<-2048 && immediate>2047){
+                    if(immediate<-2048 || immediate>2047){
                         System.out.println("The immediate value can only be between -2048 and 2047");
                         System.exit(0);
                         break;
@@ -198,6 +198,27 @@ public class Cores{
                         break;
                     }
                     registers[rd]=Memory.memory[registers[rs1]+immediate];
+                    break;
+            case "SW":
+                    // syntax of instruction: sw x10 4(x5)
+                    // this means that from the register x10 take the value and store it in the memory location of x5 with an offset of 4.
+                    rs2=Integer.parseInt(decodedInstruction[1].substring(1));
+                    String[] offsetAndRegBase=decodedInstruction[2].split("[()]");  //considering ( and ) as two seperate delimiters.
+                    System.out.println("The immediate value is "+offsetAndRegBase[0]);
+                    System.out.println("The index of the register that store the base address of the memory is "+offsetAndRegBase[1].substring(1));
+                    int immediate_val=Integer.parseInt(offsetAndRegBase[0]);
+                    int registerBaseAddressLoc=Integer.parseInt(offsetAndRegBase[1].substring(1));
+
+                    if(immediate_val<-2048 || immediate_val>2047){
+                        System.out.println("Immediate value cannot be less than -2048 or greater than 2047");
+                        System.exit(0);
+                    }
+                    immediate_val=immediate_val/4;
+                    if((registers[registerBaseAddressLoc]+immediate_val)>1024 || (registers[registerBaseAddressLoc]+immediate_val)<0){
+                        System.out.println("Memory out of bounds");
+                        System.exit(0);
+                    }
+                    Memory.memory[registers[registerBaseAddressLoc]+immediate_val]=registers[rs2];
                     break;
             case "LI":
                     //Ex: li x1 8
