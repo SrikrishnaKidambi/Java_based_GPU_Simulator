@@ -180,6 +180,16 @@ public class Cores{
                       pc=labelMapping.get(labelName4).intValue();
                   }
                   break;
+          case "BGE":
+                  //Ex: bge x1 x2 label
+                  rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                  rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+                  String labelName5;
+                  labelName5=decodedInstruction[3];
+                  if(registers[rd]<registers[rs1]){
+                      pc=labelMapping.get(labelName5).intValue();
+                  }
+                  break;
           case "LW":
                   //Ex: lw x1 8(x2) where 8 is the offset/immediate value and x2 is the base register
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
