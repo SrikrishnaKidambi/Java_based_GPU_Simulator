@@ -39,7 +39,7 @@ public class Simulator{
             if(!opcodes.contains(decodedInstruction[0].toUpperCase())){
                 String label=decodedInstruction[0].trim().replace(":", "");
                 labelMapping.put(label,i);
-                System.out.println("label: "+label+ " and pc: "+i);
+                // System.out.println("label: "+label+ " and pc: "+i);
             }
         }
     }
@@ -65,8 +65,8 @@ public class Simulator{
                 }
                 this.cores[i].execute(program_Seq,labelMapping,memory);
             } 
-            printResult();
-            Memory.printMemory();
+            // printResult();
+            // Memory.printMemory();
             this.clock++; 
             if(this.clock>=program_Seq.length) {
             	System.out.println("terminated");
