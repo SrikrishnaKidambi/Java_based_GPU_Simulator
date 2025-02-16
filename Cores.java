@@ -57,8 +57,7 @@ public class Cores{
             case "MV":
                     //Ex: mv x1 x2
                     rd= Integer.parseInt(decodedInstruction[1].substring(1));
-                    rs1=Integer.parseInt(decodedInstruction[2].substring(1));
-                    
+                    rs1=Integer.parseInt(decodedInstruction[2].substring(1));             
                     System.out.println(rd+" "+rs1);
                     registers[rd] = registers[rs1] ;
                     break;
@@ -168,6 +167,16 @@ public class Cores{
                     labelName1=decodedInstruction[3];
                     if(registers[rd]==registers[rs1]){
                         pc=labelMapping.get(labelName1).intValue();
+                    }
+                    break;
+            case "BGE" :
+                    //Ex: bge x1 x2 label
+                    rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                    rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+                    String labelName5;
+                    labelName5=decodedInstruction[3];
+                    if(registers[rd]>=registers[rs1]){
+                        pc=labelMapping.get(labelName5).intValue();
                     }
                     break;
             case "LW":
