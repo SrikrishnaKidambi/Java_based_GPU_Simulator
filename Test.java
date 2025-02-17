@@ -95,13 +95,27 @@ public class Test {
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
 			while((line = br.readLine())!=null){
-				programArray.add(line);
+				if(line.equals(" ") || line.equals("")) {
+					continue;
+				}
+				int colonIdx=line.indexOf(":");
+				if(colonIdx!=-1) {    // this indicates that label is present in the line
+					programArray.add(line.substring(0,colonIdx+1));
+					if(!line.substring(colonIdx+1).equals("")) {
+						programArray.add(line.substring(colonIdx+1));
+					}
+					continue;
+				}
+				programArray.add(line.trim());
 			}
 			br.close();
 		}catch(IOException e){
 			e.printStackTrace();
 		}
 		for(String instruction: programArray){
+			if(instruction==" ") {
+				System.out.println("Space included");
+			}
 			System.out.println(instruction);
 		}
 		
