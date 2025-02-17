@@ -97,13 +97,14 @@ public class Test {
 			while((line = br.readLine())!=null){
 				programArray.add(line);
 			}
+			br.close();
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-
 		for(String instruction: programArray){
 			System.out.println(instruction);
 		}
+		
 	}
 	public static ArrayList<String> programArray= new ArrayList<>();
 }
