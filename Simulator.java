@@ -44,6 +44,12 @@ public class Simulator{
         Memory.memory[17] = 14;
         Memory.memory[18] = 71;
         Memory.memory[19] = 39;
+        // core 0 is initialized above
+        for (int i = 0; i < 20; i++) {
+            Memory.memory[i + 1 * 256] = Memory.memory[i]; // Core 1
+            Memory.memory[i + 2 * 256] = Memory.memory[i]; // Core 2
+            Memory.memory[i + 3 * 256] = Memory.memory[i]; // Core 3
+        }
         labelMapping=new HashMap<>();
         opcodes=new HashSet<>(Set.of("ADD","SUB","MUL","MV","ADDI","MULI","AND","OR","XOR","ANDI","ORI","XORI","BNE","BEQ","JAL","JALR","LW","SW","LA","LI","BGE","BLT","J","JR"));
     }
@@ -75,6 +81,7 @@ public class Simulator{
         printLabels();
         boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
         while(!isDone){
+            isInstruction=true;
             for(int i=0;i<4;i++){
                 if(cores[i].pc>=program_Seq.length){
                     break;
@@ -83,10 +90,8 @@ public class Simulator{
             } 
             // printResult();
             // Memory.printMemory();
-            this.clock++; 
-            if(this.clock>=program_Seq.length) {
-            	System.out.println("terminated");
-            }
+            if(isInstruction)
+                this.clock++; 
             isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
         }
     }
@@ -98,7 +103,7 @@ public class Simulator{
             }
             System.out.println();
         }
-        System.out.println("The value of clock is:"+this.clock);
+        System.out.println("The number of clock cycles taken are:"+this.clock);
     }
 
 
@@ -108,4 +113,5 @@ public class Simulator{
     public String[] program_Seq;
     public Map<String,Integer> labelMapping;
     public Set<String> opcodes;
+    public static boolean isInstruction;
 }
