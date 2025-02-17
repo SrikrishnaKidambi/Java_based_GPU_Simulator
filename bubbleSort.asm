@@ -1,5 +1,5 @@
 .data
-.word 1, 5, 4 ,3
+.word 1,  5, 4 ,3
 .word 7, 11, 6, 10, 8
 
     la x16, 0 #This is a comment
