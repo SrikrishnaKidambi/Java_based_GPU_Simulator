@@ -146,15 +146,15 @@ public class Test {
 //				programArray.remove(line);
 			}
 			if(isDataSegmentParsing){
-				String[] parsedLine = line.split("#")[0].replace(",", "").split(" ");
+				String[] parsedLine = line.split("#")[0].replace(",", "").trim().split("\\s+");
 				String dataType = parsedLine[0];
 				switch (dataType) {
 					case ".word":
 						for(int i=1 ; i<parsedLine.length;i++){
-							Memory.memory[i+Memory.addressCounter-1 + 0*256] = Integer.parseInt(parsedLine[i]); // core 0
-							Memory.memory[i+Memory.addressCounter-1 + 1*256] = Integer.parseInt(parsedLine[i]); // core 1
-							Memory.memory[i+Memory.addressCounter-1 + 2*256] = Integer.parseInt(parsedLine[i]); // core 2 
-							Memory.memory[i+Memory.addressCounter-1 + 3*256] = Integer.parseInt(parsedLine[i]); // core 3
+							Memory.memory[i+Memory.addressCounter-1 + 0*256] = Integer.parseInt(parsedLine[i].trim()); // core 0
+							Memory.memory[i+Memory.addressCounter-1 + 1*256] = Integer.parseInt(parsedLine[i].trim()); // core 1
+							Memory.memory[i+Memory.addressCounter-1 + 2*256] = Integer.parseInt(parsedLine[i].trim()); // core 2 
+							Memory.memory[i+Memory.addressCounter-1 + 3*256] = Integer.parseInt(parsedLine[i].trim()); // core 3
 						}
 						Memory.addressCounter+=parsedLine.length-1;
 						break;

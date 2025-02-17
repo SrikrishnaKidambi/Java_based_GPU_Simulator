@@ -34,7 +34,7 @@ public class Cores{
 		  System.err.println("Error occured is:"+e.getMessage());
 	  }
       
-      String[] decodedInstruction = parsedInstruction.trim().replace(",","").split(" ");  //neglecting the commas that are put between registers.
+      String[] decodedInstruction = parsedInstruction.trim().replace(",","").split("\\s+");  //neglecting the commas that are put between registers.
       String opcode=decodedInstruction[0].toUpperCase();
       // System.out.println(opcode);
       int rd,rs1;
