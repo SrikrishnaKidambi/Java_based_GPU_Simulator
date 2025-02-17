@@ -1,3 +1,8 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
 public class Test {
     public static void main(String[] args) {
         // Cores core1= new Cores(1);
@@ -35,7 +40,7 @@ public class Test {
 //             "Add X7 X1 X2",
 //             "End:"
 //         };
-        
+        readAssemblyFile();
         String[] bubbleSortProgram={
         		"la x16, 0 #This is a comment",          // 0  
         		"li x31 1",          // 1 
@@ -84,4 +89,21 @@ public class Test {
         
         Memory.printMemory();
     }
+	public static void readAssemblyFile(){
+		String filePath= "bubbleSort.asm";
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(filePath));
+			String line;
+			while((line = br.readLine())!=null){
+				programArray.add(line);
+			}
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+
+		for(String instruction: programArray){
+			System.out.println(instruction);
+		}
+	}
+	public static ArrayList<String> programArray= new ArrayList<>();
 }
