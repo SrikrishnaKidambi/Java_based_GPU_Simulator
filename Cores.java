@@ -1,4 +1,3 @@
-
 //importing necessary libraries
 import java.util.*;
 
@@ -205,19 +204,20 @@ public class Cores{
                       }
                   }
                   int immediate=Integer.parseInt(decodedInstruction[2].substring(0,paramStart));
-                  if(immediate<-2048 || immediate>2047){
-                      System.out.println("The immediate value can only be between -2048 and 2047");
+                  if(immediate<-512 || immediate>512){
+                      System.out.println("The immediate value can only be between -512 and 512"); // as the total memory the core can access is 1024 bytes so using immediate I can go 512bytes up and 512 bytes down
                       System.exit(0);
                       break;
                   }
                   immediate=immediate/4;
                   rs1=Integer.parseInt(decodedInstruction[2].substring(paramStart+2,paramEnd));
-                  if(registers[rs1]+immediate>=1024 || registers[rs1]+immediate<0){
-                      System.out.println("The memory address is out of bounds");
+                  System.out.println("The memory requested is "+registers[rs1]+immediate);
+                  if(registers[rs1]+immediate>=256 || registers[rs1]+immediate<0){
+                      System.out.println("The memory address requested is not accessible by the core");
                       System.exit(0);
                       break;
                   }
-                  registers[rd]=Memory.memory[registers[rs1]+immediate];
+                  registers[rd]=Memory.memory[registers[rs1]+immediate+256*this.coreID];
                   break;
           case "SW":
                   // syntax of instruction: sw x10 4(x5)
@@ -229,22 +229,28 @@ public class Cores{
                   int immediate_val=Integer.parseInt(offsetAndRegBase[0]);
                   int registerBaseAddressLoc=Integer.parseInt(offsetAndRegBase[1].substring(1));
 
-                  if(immediate_val<-2048 || immediate_val>2047){
-                      System.out.println("Immediate value cannot be less than -2048 or greater than 2047");
+                  if(immediate_val<-512 || immediate_val>512){
+                      System.out.println("Immediate value cannot be less than -512 or greater than 512");
                       System.exit(0);
                   }
                   immediate_val=immediate_val/4;
-                  if((registers[registerBaseAddressLoc]+immediate_val)>=1024 || (registers[registerBaseAddressLoc]+immediate_val)<0){
+                  if((registers[registerBaseAddressLoc]+immediate_val)>=256 || (registers[registerBaseAddressLoc]+immediate_val)<0){
                       System.out.println("Memory out of bounds");
                       System.exit(0);
                   }
                   System.out.println("Storing the value:"+registers[rs2]);
-                  Memory.memory[registers[registerBaseAddressLoc]+immediate_val]=registers[rs2];
+                  Memory.memory[registers[registerBaseAddressLoc]+immediate_val+256*this.coreID]=registers[rs2];
                   break;
           case "LI":
                   //Ex: li x1 8
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
-                  registers[rd]=Integer.parseInt(decodedInstruction[2]);
+                  int addressVal=Integer.parseInt(decodedInstruction[2]);
+                  if(addressVal>=256 || addressVal<0){
+                    System.out.println("Cannot access the requested memory location");
+                    System.exit(0);
+                    break;
+                  }
+                  registers[rd]=addressVal;
                   break;
           case "JAL":
                   //Ex: jal x1 label
@@ -280,9 +286,15 @@ public class Cores{
                   //can extend in future if we add two segments text and data
                   //this is load adress instruction
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
-                  registers[rd]=Integer.parseInt(decodedInstruction[2]);
+                  int addressVal1=Integer.parseInt(decodedInstruction[2]);
+                  if(addressVal1>=256 || addressVal1<0){
+                    System.out.println("Cannot access the requested memory location");
+                    System.exit(0);
+                    break;
+                  }
+                  registers[rd]=addressVal1;
                   break;
-          default:
+          default: Simulator.isInstruction=false;
       }
 
       //hardwiring x0 to 0.
@@ -290,6 +302,10 @@ public class Cores{
           registers[0]=0;
       }
       System.out.println("The current program counter value is "+pc);
+      for(int i=0;i<32;i++){
+        System.out.print(registers[i]+" ");
+      }
+      System.out.println();
       pc++;
   }
 }
