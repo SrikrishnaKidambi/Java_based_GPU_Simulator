@@ -16,7 +16,7 @@ public class Cores{
 
   public void execute(String[] program,Map<String,Integer>labelMapping,Memory mem){
       
-      String[] decodedInstruction = program[pc].trim().split(" ");
+      String[] decodedInstruction = program[pc].trim().replace(",","").split(" ");
       String opcode=decodedInstruction[0].toUpperCase();
       // System.out.println(opcode);
       int rd,rs1;

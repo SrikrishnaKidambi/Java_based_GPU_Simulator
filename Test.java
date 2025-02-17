@@ -42,7 +42,7 @@ public class Test {
         		"jal x1 bubbleSort", // 2 
          		"j Over",
         		"Swap:",             // 3
-        		"	mv x22 x26",        // 4
+        		"	mv x22, x26",        // 4
         		"	mv x26 x25",        // 5
         		"	mv x25 x22",        // 6 
         		"sw x25 0(x20)",     // 7 
