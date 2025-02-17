@@ -41,7 +41,7 @@ public class Test {
 //             "End:"
 //         };
         readAssemblyFile();
-        String[] bubbleSortProgram={
+        String[] textSegment={
         		"la x16, 0 #This is a comment",          // 0  
         		"li x31 1",          // 1 
         		"jal x1 bubbleSort", // 2 
@@ -81,7 +81,7 @@ public class Test {
         };
         System.out.println("Memory before executing");
         Memory.printMemory();
-        sim.initializeProgram(bubbleSortProgram);
+        sim.initializeProgram(textSegment);
         sim.runProgram();
         System.out.println("Final result:");
         sim.printResult();
@@ -118,7 +118,37 @@ public class Test {
 			}
 			System.out.println(instruction);
 		}
-		
+		parseAssemblyCode();
+	}
+	public static void parseAssemblyCode(){
+		//data segment is restricted to be written only on top of the assembly code
+		boolean isDataSegmentParsing=false;
+		for(String line: programArray){
+			if(line.equals(".data")){
+				isDataSegmentParsing=true;
+			}
+			if(isDataSegmentParsing){
+				String[] parsedLine = line.replace(",", "").split(" ");
+				String dataType = parsedLine[0];
+				switch (dataType) {
+					case ".word":
+						for(int i=1 ; i<parsedLine.length;i++){
+							Memory.memory[i+Memory.addressCounter-1 + 0*256] = Integer.parseInt(parsedLine[i]); // core 0
+							Memory.memory[i+Memory.addressCounter-1 + 1*256] = Integer.parseInt(parsedLine[i]); // core 1
+							Memory.memory[i+Memory.addressCounter-1 + 2*256] = Integer.parseInt(parsedLine[i]); // core 2 
+							Memory.memory[i+Memory.addressCounter-1 + 3*256] = Integer.parseInt(parsedLine[i]); // core 3
+						}
+						Memory.addressCounter+=parsedLine.length-1;
+						break;
+				
+					default:
+						break;
+				}
+			}
+			if(line.equals(".text")){
+				isDataSegmentParsing=false;
+			}
+		}
 	}
 	public static ArrayList<String> programArray= new ArrayList<>();
 }
