@@ -6,6 +6,13 @@ This is a project to simulate the GPU architecture .
 #### Date : 14-02-2025
 
 Members : Srikrishna, Sai Krishna
+Tasks : Parsing the entire assembly code including text segment and data segment. Allowing the user to have the data segment only at the top of the program. Above parsing was implemented together from two different devices. Minor bug fixes and error handling.
+
+Decisions : Decided to use Java swing for the GUI support. 
+
+#### Date : 14-02-2025
+
+Members : Srikrishna, Sai Krishna
 
 Decisions : Parsing the instructions seperately based on op codes. Using Hash map for mapping the labels to corresponding instructions.
 The above implementation was done together.
