@@ -91,14 +91,17 @@ public class Simulator{
         }
     }
     public void printResult(){
-        for(int i=0;i<1;i++){
+        for(int i=0;i<4;i++){
             System.out.println("Core :"+i);
             for(int j=0;j<32;j++){
                 System.out.print(cores[i].registers[j]+" ");
             }
             System.out.println();
         }
+        System.out.println("The value of clock is:"+this.clock);
     }
+
+
     private Memory memory;
     private int clock;
     private Cores[] cores;

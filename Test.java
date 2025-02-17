@@ -11,7 +11,7 @@ public class Test {
         // core1.execute(program);
         // for(int ele: core1.registers){
         //     System.out.print(ele+" ");
-        // }
+        // }      
         // System.out.println();
         // core1.execute(program);
         // for(int ele: core1.registers){
@@ -42,9 +42,9 @@ public class Test {
         		"jal x1 bubbleSort", // 2 
          		"j Over",
         		"Swap:",             // 3
-        		"mv x22 x26",        // 4
-        		"mv x26 x25",        // 5
-        		"mv x25 x22",        // 6 
+        		"	mv x22 x26",        // 4
+        		"	mv x26 x25",        // 5
+        		"	mv x25 x22",        // 6 
         		"sw x25 0(x20)",     // 7 
         		"sw x26 0(x21)",     // 8 
         		"bubbleSort:",       // 9 

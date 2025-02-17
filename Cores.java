@@ -212,7 +212,7 @@ public class Cores{
                   }
                   immediate=immediate/4;
                   rs1=Integer.parseInt(decodedInstruction[2].substring(paramStart+2,paramEnd));
-                  if(registers[rs1]+immediate>1024 || registers[rs1]+immediate<0){
+                  if(registers[rs1]+immediate>=1024 || registers[rs1]+immediate<0){
                       System.out.println("The memory address is out of bounds");
                       System.exit(0);
                       break;
@@ -234,7 +234,7 @@ public class Cores{
                       System.exit(0);
                   }
                   immediate_val=immediate_val/4;
-                  if((registers[registerBaseAddressLoc]+immediate_val)>1024 || (registers[registerBaseAddressLoc]+immediate_val)<0){
+                  if((registers[registerBaseAddressLoc]+immediate_val)>=1024 || (registers[registerBaseAddressLoc]+immediate_val)<0){
                       System.out.println("Memory out of bounds");
                       System.exit(0);
                   }
