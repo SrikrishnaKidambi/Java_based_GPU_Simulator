@@ -41,7 +41,7 @@ public class Test {
 //             "End:"
 //         };
         readAssemblyFile();
-        String[] textSegment={
+        String[] test={
         		"la x16, 0 #This is a comment",          // 0  
         		"li x31 1",          // 1 
         		"jal x1 bubbleSort", // 2 
@@ -51,11 +51,12 @@ public class Test {
         		"	mv x26 x25",        // 5
         		"	mv x25 x22",        // 6 
         		"sw x25 0(x20)",     // 7 
-        		"sw x26 0(x21)",     // 8 
+        		"sw x26 0(x21)", // 8 
         		"bubbleSort:",       // 9 
         		"addi x10 x0 0",     // 10
         		"addi x11 x0 0",     // 11 
         		"addi x12 x0 20",     // 12 
+        		"",
         		"LoopOuter:",        // 13 
         		"addi x14 x12 -1",   // 14 
         		"bge x10 x14 Exit",  // 15 
@@ -79,6 +80,20 @@ public class Test {
         		"addi x29 x0 0",     // 33
 				"Over:",
         };
+        String[] textSegment=parseAssemblyCode();
+        if(textSegment.equals(test)) {
+        	System.out.println("Pasring is done well");
+        }else {
+        	System.out.println("Parsing is not done well");
+        	System.out.println("Printing parsed text segment");
+        	for(int i=0;i<textSegment.length;i++) {
+        		System.out.println(textSegment[i]);
+        		if(textSegment[i].equals("")) {
+        			System.out.println("Empty strings or spaces are present");
+        		}
+        	}
+        	System.out.println();
+        }
         System.out.println("Memory before executing");
         Memory.printMemory();
         sim.initializeProgram(textSegment);
@@ -118,17 +133,20 @@ public class Test {
 			}
 			System.out.println(instruction);
 		}
-		parseAssemblyCode();
+		
 	}
-	public static void parseAssemblyCode(){
+	public static String[] parseAssemblyCode(){
 		//data segment is restricted to be written only on top of the assembly code
 		boolean isDataSegmentParsing=false;
+		boolean isParsingTextSegment=false;
+		
 		for(String line: programArray){
 			if(line.equals(".data")){
 				isDataSegmentParsing=true;
+//				programArray.remove(line);
 			}
 			if(isDataSegmentParsing){
-				String[] parsedLine = line.replace(",", "").split(" ");
+				String[] parsedLine = line.split("#")[0].replace(",", "").split(" ");
 				String dataType = parsedLine[0];
 				switch (dataType) {
 					case ".word":
@@ -140,15 +158,34 @@ public class Test {
 						}
 						Memory.addressCounter+=parsedLine.length-1;
 						break;
-				
 					default:
 						break;
 				}
+//				programArray.remove(line);
 			}
 			if(line.equals(".text")){
 				isDataSegmentParsing=false;
+				isParsingTextSegment=true;
+			}
+			if(isParsingTextSegment && !isDataSegmentParsing && !line.equals(".text")) {
+				programCode.add(line);
 			}
 		}
+		System.out.println("The array list of text segment");
+		for(String instruction: programCode){
+			if(instruction==" ") {
+				System.out.println("Space included");
+			}
+			System.out.println(instruction);
+		}
+		String[] program=new String[programCode.size()];
+		int i=0;
+		for(String line:programCode) {
+			program[i]=line;
+			i++;
+		}
+		return program;
 	}
 	public static ArrayList<String> programArray= new ArrayList<>();
+	public static ArrayList<String> programCode=new ArrayList<>();
 }
