@@ -3,12 +3,12 @@
     jal x1, bubbleSort
     j Over
 
-Swap:
-    mv x22, x26
-    mv x26, x25
-    mv x25, x22
-    sw x25, 0(x20)
-    sw x26, 0(x21)
+Swap:mv x22, x26
+     mv x26, x25
+     mv x25, x22
+     sw x25, 0(x20)
+     sw x26, 0(x21)
+    
 
 bubbleSort:
     addi x10, x0, 0
