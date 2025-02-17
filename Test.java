@@ -37,7 +37,7 @@ public class Test {
 //         };
         
         String[] bubbleSortProgram={
-        		"la x16 0",          // 0  
+        		"la x16, 0 #This is a comment",          // 0  
         		"li x31 1",          // 1 
         		"jal x1 bubbleSort", // 2 
          		"j Over",

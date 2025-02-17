@@ -13,9 +13,28 @@ public class Cores{
       registers[0]=0;
   }
 
+  private String instructionParser(String instruction) {
+	  int hashSymbolIdx=instruction.indexOf("#");
+	  if(hashSymbolIdx!=-1) {
+		  if(hashSymbolIdx>=0 && instruction.charAt(hashSymbolIdx-1)!=' ') {
+			  throw new IllegalArgumentException("Invalid comment. Space is missing after the instruction");
+		  }
+		  return instruction.substring(0,hashSymbolIdx).trim();
+	  }
+	  return instruction.trim();
+  }
+  
   public void execute(String[] program,Map<String,Integer>labelMapping,Memory mem){
+	  
+	  String instruction=program[pc];
+	  String parsedInstruction = null;
+	  try {
+		  parsedInstruction=instructionParser(instruction);
+	  }catch(IllegalArgumentException e) {
+		  System.err.println("Error occured is:"+e.getMessage());
+	  }
       
-      String[] decodedInstruction = program[pc].trim().replace(",","").split(" ");
+      String[] decodedInstruction = parsedInstruction.trim().replace(",","").split(" ");  //neglecting the commas that are put between registers.
       String opcode=decodedInstruction[0].toUpperCase();
       // System.out.println(opcode);
       int rd,rs1;
@@ -211,7 +230,7 @@ public class Cores{
                   }
                   immediate=immediate/4;
                   rs1=Integer.parseInt(decodedInstruction[2].substring(paramStart+2,paramEnd));
-                  System.out.println("The memory requested is "+registers[rs1]+immediate);
+//                  System.out.println("The memory requested is "+registers[rs1]+immediate);
                   if(registers[rs1]+immediate>=256 || registers[rs1]+immediate<0){
                       System.out.println("The memory address requested is not accessible by the core");
                       System.exit(0);
@@ -224,8 +243,8 @@ public class Cores{
                   // this means that from the register x10 take the value and store it in the memory location of x5 with an offset of 4.
                   rs2=Integer.parseInt(decodedInstruction[1].substring(1));
                   String[] offsetAndRegBase=decodedInstruction[2].split("[()]");  //considering ( and ) as two seperate delimiters.
-                  System.out.println("The immediate value is "+offsetAndRegBase[0]);
-                  System.out.println("The index of the register that store the base address of the memory is "+offsetAndRegBase[1].substring(1));
+//                  System.out.println("The immediate value is "+offsetAndRegBase[0]);
+//                  System.out.println("The index of the register that store the base address of the memory is "+offsetAndRegBase[1].substring(1));
                   int immediate_val=Integer.parseInt(offsetAndRegBase[0]);
                   int registerBaseAddressLoc=Integer.parseInt(offsetAndRegBase[1].substring(1));
 
@@ -238,7 +257,7 @@ public class Cores{
                       System.out.println("Memory out of bounds");
                       System.exit(0);
                   }
-                  System.out.println("Storing the value:"+registers[rs2]);
+//                  System.out.println("Storing the value:"+registers[rs2]);
                   Memory.memory[registers[registerBaseAddressLoc]+immediate_val+256*this.coreID]=registers[rs2];
                   break;
           case "LI":
@@ -258,7 +277,7 @@ public class Cores{
                   registers[rd]=pc+1;
                   String labelName2;
                   labelName2=decodedInstruction[2];
-                  System.out.println("Label: "+labelName2);
+//                  System.out.println("Label: "+labelName2);
                   pc=labelMapping.get(labelName2).intValue();
                   break;
           case "JALR":
@@ -273,7 +292,7 @@ public class Cores{
                   //Ex: j label which is equivalent to jal x0 label
                   String labelName3;
                   labelName3=decodedInstruction[1];
-                  System.out.println("Label in instruction j:"+labelName3);
+//                  System.out.println("Label in instruction j:"+labelName3);
                   pc=labelMapping.get(labelName3).intValue();
                   break;
           case "JR":
@@ -301,11 +320,11 @@ public class Cores{
       if(registers[0]!=0){
           registers[0]=0;
       }
-      System.out.println("The current program counter value is "+pc);
-      for(int i=0;i<32;i++){
-        System.out.print(registers[i]+" ");
-      }
-      System.out.println();
+//      System.out.println("The current program counter value is "+pc);
+//      for(int i=0;i<32;i++){
+//        System.out.print(registers[i]+" ");
+//      }
+//      System.out.println();
       pc++;
   }
 }
