@@ -1,20 +1,17 @@
 .data
-base: .word 12 4 5 45 6 7 18 4 96 100 112 151 464 57 23 458 7 25 55 99
+base: .word 12 1 7 3 5 8 1 4 10 6 9 2 9 10 8 0 5 14 13 16
 str1: .string "\nThe sorted array is: \n"
 str: .string " "
 
 .text
-lw x16 base # stores the base address of the array
+la x16 base # stores the base address of the array
 li x31 4 # x31 has the value 4
-jal ra bubbleSort
+jal x1 bubbleSort
 call printArray
 
 
-    #addi x11 x11 1
-    #j End
 bubbleSort:
     addi x10 x0 0 # i = 0
-    
     addi x12 x0 20 # n = 20
     LoopOuter:
         addi x11 x0 0 # j = 0
@@ -41,7 +38,7 @@ bubbleSort:
             addi x10 x10 1
             j LoopOuter
     Exit:
-        jr ra
+        jr x1
 
 printArray:
     la a0 str1

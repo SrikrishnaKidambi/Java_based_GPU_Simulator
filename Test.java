@@ -233,7 +233,7 @@ public class Test {
 		String[] program=new String[programCode.size()];
 		int i=0;
 		for(String line:programCode) {
-			program[i]=line;
+			program[i]=line.replace("\t", "").trim();
 			i++;
 		}
 		printStringMapping();
