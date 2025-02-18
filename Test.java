@@ -151,12 +151,12 @@ public class Test {
 				switch (dataType) {
 					case ".word":
 						for(int i=1 ; i<parsedLine.length;i++){
-							Memory.memory[i+Memory.addressCounter-1 + 0*256] = Integer.parseInt(parsedLine[i].trim()); // core 0
-							Memory.memory[i+Memory.addressCounter-1 + 1*256] = Integer.parseInt(parsedLine[i].trim()); // core 1
-							Memory.memory[i+Memory.addressCounter-1 + 2*256] = Integer.parseInt(parsedLine[i].trim()); // core 2 
-							Memory.memory[i+Memory.addressCounter-1 + 3*256] = Integer.parseInt(parsedLine[i].trim()); // core 3
+							Memory.memory[i*4+0-4+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 0
+							Memory.memory[i*4+1-4+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 1
+							Memory.memory[i*4+2-4+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 2 
+							Memory.memory[i*4+3-4+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 3
 						}
-						Memory.addressCounter+=parsedLine.length-1;
+						Memory.addressCounter+=4*(parsedLine.length-1);
 						break;
 					default:
 						break;

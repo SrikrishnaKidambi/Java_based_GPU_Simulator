@@ -228,7 +228,6 @@ public class Cores{
                       System.exit(0);
                       break;
                   }
-                  immediate=immediate/4;
                   rs1=Integer.parseInt(decodedInstruction[2].substring(paramStart+2,paramEnd));
 //                  System.out.println("The memory requested is "+registers[rs1]+immediate);
                   if(registers[rs1]+immediate>=256 || registers[rs1]+immediate<0){
@@ -236,7 +235,7 @@ public class Cores{
                       System.exit(0);
                       break;
                   }
-                  registers[rd]=Memory.memory[registers[rs1]+immediate+256*this.coreID];
+                  registers[rd]=Memory.memory[registers[rs1]+immediate+this.coreID];
                   break;
           case "SW":
                   // syntax of instruction: sw x10 4(x5)
@@ -252,13 +251,12 @@ public class Cores{
                       System.out.println("Immediate value cannot be less than -512 or greater than 512");
                       System.exit(0);
                   }
-                  immediate_val=immediate_val/4;
                   if((registers[registerBaseAddressLoc]+immediate_val)>=256 || (registers[registerBaseAddressLoc]+immediate_val)<0){
                       System.out.println("Memory out of bounds");
                       System.exit(0);
                   }
 //                  System.out.println("Storing the value:"+registers[rs2]);
-                  Memory.memory[registers[registerBaseAddressLoc]+immediate_val+256*this.coreID]=registers[rs2];
+                  Memory.memory[registers[registerBaseAddressLoc]+immediate_val+this.coreID]=registers[rs2];
                   break;
           case "LI":
                   //Ex: li x1 8

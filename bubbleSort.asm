@@ -2,8 +2,8 @@
 .word 1, 5, 4 ,3 # THis is a 
 .word 7, 11, 6, 10, 8
 .text
-    la x16, 0 #This is a comment
-    li x31, 1
+    la x16, 0 #Base register
+    li x31, 4
     jal x1, bubbleSort
     j Over
 
@@ -31,7 +31,7 @@ LoopInner:
     mul x19, x11, x31
     add x20, x16, x19
     lw x25, 0(x20)
-    addi x21, x20, 1
+    addi x21, x20, 4
     lw x26, 0(x21)
     
     blt x26, x25, Swap
