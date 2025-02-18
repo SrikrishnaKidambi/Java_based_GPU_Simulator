@@ -146,7 +146,7 @@ public class Test {
 //				programArray.remove(line);
 			}
 			if(isDataSegmentParsing){
-				String[] parsedLine = line.split("#")[0].replace(",", "").trim().split("\\s+");
+				String[] parsedLine = line.split("#")[0].replace(",", " ").trim().split("\\s+");
 				String dataType = parsedLine[0];
 				switch (dataType) {
 					case ".word":

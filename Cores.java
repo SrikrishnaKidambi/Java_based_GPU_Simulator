@@ -34,7 +34,7 @@ public class Cores{
 		  System.err.println("Error occured is:"+e.getMessage());
 	  }
       
-      String[] decodedInstruction = parsedInstruction.trim().replace(",","").split("\\s+");  //neglecting the commas that are put between registers.
+      String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
       String opcode=decodedInstruction[0].toUpperCase();
       // System.out.println(opcode);
       int rd,rs1;
@@ -113,6 +113,17 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] & registers[rs2]; break;
+          case "REM":
+                  //Ex: rem x1 x2 x3
+                  rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                  rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+                  if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
+                      rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                  }
+                  else{
+                      rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                  } 
+                  registers[rd] = registers[rs1] % registers[rs2]; break;
           case "OR" :
                   //Ex: or x1 x2 x3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));

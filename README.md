@@ -3,7 +3,7 @@ This is a project to simulate the GPU architecture .
 
 ### Minutes of Meeting:
 
-#### Date : 14-02-2025
+#### Date : 18-02-2025
 
 Members : Srikrishna, Sai Krishna
 Tasks : Parsing the entire assembly code including text segment and data segment. Allowing the user to have the data segment only at the top of the program. Above parsing was implemented together from two different devices. Minor bug fixes and error handling.

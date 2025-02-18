@@ -1,9 +1,9 @@
 .data
-.word 1, 5, 4 ,3 # THis is a 
+.word 1,5, 4 ,3 # THis is a comment
 .word 7, 11, 6, 10, 8
 .text
     la x16, 0 #Base register
-    li x31, 4
+    li x31,4
     jal x1, bubbleSort
     j Over
 
