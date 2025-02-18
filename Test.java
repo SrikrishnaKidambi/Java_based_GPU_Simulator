@@ -2,6 +2,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Test {
     public static void main(String[] args) {
@@ -109,11 +113,18 @@ public class Test {
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
+			boolean textSegmentStarts=false;
 			while((line = br.readLine())!=null){
+				if(line.equals(".text")){
+					textSegmentStarts=true;
+				}
 				if(line.equals(" ") || line.equals("")) {
 					continue;
 				}
-				int colonIdx=line.indexOf(":");
+				int colonIdx=-1;
+				if(textSegmentStarts){
+					colonIdx=line.indexOf(":");
+				}			
 				if(colonIdx!=-1) {    // this indicates that label is present in the line
 					programArray.add(line.substring(0,colonIdx+1));
 					if(!line.substring(colonIdx+1).equals("")) {
@@ -147,7 +158,21 @@ public class Test {
 			}
 			if(isDataSegmentParsing){
 				String[] parsedLine = line.split("#")[0].replace(",", " ").trim().split("\\s+");
-				String dataType = parsedLine[0];
+				String dataType="";
+				boolean hasVarName=false;
+				if(dataTypeNames.contains(parsedLine[0])){
+					dataType = parsedLine[0];
+				}
+				else{
+					hasVarName=true;
+					try{
+						dataType = parsedLine[1];
+					}
+					catch(Exception e){
+						System.out.println("Exception occured: ------------------------");
+						System.out.println(parsedLine[0]);
+					}
+				}
 				switch (dataType) {
 					case ".word":
 						for(int i=1 ; i<parsedLine.length;i++){
@@ -158,6 +183,22 @@ public class Test {
 						}
 						Memory.addressCounter+=4*(parsedLine.length-1);
 						break;
+					case ".string":
+						if(hasVarName){
+							String originalString="";
+							for(int i=2;i<parsedLine.length;i++){
+								if(i==2){
+									originalString+=parsedLine[i].substring(1)+" ";
+								}
+								else if(i==parsedLine.length-1){
+									originalString+=parsedLine[i].substring(0,parsedLine[i].length()-1);
+								}
+								else{
+									originalString+=parsedLine[i]+" ";
+								}
+							}
+							stringVariableMapping.put(parsedLine[0].replace(":", ""), originalString);
+						}
 					default:
 						break;
 				}
@@ -184,8 +225,16 @@ public class Test {
 			program[i]=line;
 			i++;
 		}
+		printStringMapping();
 		return program;
+	}
+	public static void printStringMapping(){
+		for(Map.Entry<String,String> ele: stringVariableMapping.entrySet()){
+			System.out.println("Var name: "+ele.getKey()+" and string: "+ele.getValue());
+		}
 	}
 	public static ArrayList<String> programArray= new ArrayList<>();
 	public static ArrayList<String> programCode=new ArrayList<>();
+	public static Set<String> dataTypeNames= new HashSet<>(Set.of(".word" , ".string",".data",".text"));
+	public static Map<String,String> stringVariableMapping = new HashMap<>();
 }
