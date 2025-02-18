@@ -19,7 +19,7 @@ Swap:mv x22, x26
 bubbleSort:
     addi x10, x0, 0
     addi x11, x0, 0
-    addi x12, x0, 20
+    addi x12, x0, 4
 
 LoopOuter:
     addi x14, x12, -1
