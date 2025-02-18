@@ -128,9 +128,9 @@ public class Test {
 			e.printStackTrace();
 		}
 		for(String instruction: programArray){
-			if(instruction==" ") {
-				System.out.println("Space included");
-			}
+//			if(instruction==" ") {
+//				System.out.println("Space included");
+//			}
 			System.out.println(instruction);
 		}
 		
@@ -173,9 +173,9 @@ public class Test {
 		}
 		System.out.println("The array list of text segment");
 		for(String instruction: programCode){
-			if(instruction==" ") {
-				System.out.println("Space included");
-			}
+//			if(instruction==" ") {
+//				System.out.println("Space included");
+//			}
 			System.out.println(instruction);
 		}
 		String[] program=new String[programCode.size()];

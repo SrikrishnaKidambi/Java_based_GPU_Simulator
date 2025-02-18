@@ -51,7 +51,7 @@ public class Simulator{
         //     Memory.memory[i + 3 * 256] = Memory.memory[i]; // Core 3
         // }
         labelMapping=new HashMap<>();
-        opcodes=new HashSet<>(Set.of("ADD","SUB","MUL","MV","ADDI","MULI","AND","OR","XOR","ANDI","ORI","XORI","BNE","BEQ","JAL","JALR","LW","SW","LA","LI","BGE","BLT","J","JR","REM"));
+        opcodes=new HashSet<>(Set.of("ADD","SUB","MUL","MV","ADDI","MULI","AND","OR","XOR","ANDI","ORI","XORI","BNE","BEQ","JAL","JALR","LW","SW","LA","LI","BGE","BLT","J","JR"));
     }
 
     //function for mapping all the labels with proper instruction number. 
