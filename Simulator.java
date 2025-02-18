@@ -57,7 +57,7 @@ public class Simulator{
     //function for mapping all the labels with proper instruction number. 
     private void mapAllTheLabels(String[] program){
         for(int i=0;i<program.length;i++){
-            String[] decodedInstruction = program[i].split(" ");
+            String[] decodedInstruction = program[i].trim().split(" ");
             if(!opcodes.contains(decodedInstruction[0].toUpperCase())){
                 String label=decodedInstruction[0].trim().replace(":", "");
                 labelMapping.put(label,i);
