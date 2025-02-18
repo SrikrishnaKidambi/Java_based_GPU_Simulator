@@ -67,6 +67,7 @@ public class Simulator{
     }
 
     public void printLabels(){
+    	System.out.println("Printing the labels ---------------------------:");
         for(Map.Entry<String,Integer> ele:labelMapping.entrySet()){
             System.out.println("Label:"+ele.getKey()+" Value:"+ele.getValue());
         }
@@ -79,6 +80,7 @@ public class Simulator{
     public void runProgram(){
         mapAllTheLabels(program_Seq);
         printLabels();
+        System.out.println("Program execution started");
         boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
         while(!isDone){
             isInstruction=true;
@@ -92,7 +94,12 @@ public class Simulator{
             // Memory.printMemory();
             if(isInstruction)
                 this.clock++; 
+//            System.out.println("The value of pc in core 0 is :"+cores[0].pc);
+//            System.out.println("The value of pc in core 1 is :"+cores[1].pc);
+//            System.out.println("The value of pc in core 2 is :"+cores[2].pc);
+//            System.out.println("The value of pc in core 3 is :"+cores[3].pc);
             isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
+            
         }
     }
     public void printResult(){

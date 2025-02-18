@@ -1,11 +1,11 @@
 .data
-.word 1,5, 4 ,3 # THis is a comment
-.word 7, 11, 6, 10, 8
+arr: .word 1,5, 4 ,3 # THis is a comment
+
 str1: .string "Hello how are you"
 str2: .string "Dammunte pattuko Shikavat"
 .text
-    la x16, 0 #Base register
-    li x31,4
+    la x16, arr #Base register
+    li X31,4
     jal x1, bubbleSort
     j Over
 
@@ -19,7 +19,7 @@ Swap:mv x22, x26
 bubbleSort:
     addi x10, x0, 0
     addi x11, x0, 0
-    addi x12, x0, 20
+    addi x12, x0, 4
 
 LoopOuter:
     addi x14, x12, -1
@@ -49,3 +49,4 @@ Exit:
     addi x29, x0, 0
 
 Over:
+    

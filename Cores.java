@@ -15,8 +15,8 @@ public class Cores{
 
   private String instructionParser(String instruction) {
 	  int hashSymbolIdx=instruction.indexOf("#");
-	  if(hashSymbolIdx!=-1) {
-		  if(hashSymbolIdx>=0 && instruction.charAt(hashSymbolIdx-1)!=' ') {
+	  if(hashSymbolIdx!=-1 && hashSymbolIdx==0) {
+		  if(hashSymbolIdx>0 && instruction.charAt(hashSymbolIdx-1)!=' ') {
 			  throw new IllegalArgumentException("Invalid comment. Space is missing after the instruction");
 		  }
 		  return instruction.substring(0,hashSymbolIdx).trim();
@@ -28,6 +28,7 @@ public class Cores{
 	  
 	  String instruction=program[pc];
 	  String parsedInstruction = null;
+	  String a_0=""; // variable used for loading the string to be printed using ecall
 	  try {
 		  parsedInstruction=instructionParser(instruction);
 	  }catch(IllegalArgumentException e) {
@@ -241,12 +242,13 @@ public class Cores{
                   }
                   rs1=Integer.parseInt(decodedInstruction[2].substring(paramStart+2,paramEnd));
 //                  System.out.println("The memory requested is "+registers[rs1]+immediate);
-                  if(registers[rs1]+immediate>=256 || registers[rs1]+immediate<0){
+                  if(registers[rs1]+immediate+this.coreID>=1024 || registers[rs1]+immediate+this.coreID<0){
                       System.out.println("The memory address requested is not accessible by the core");
                       System.exit(0);
                       break;
                   }
                   registers[rd]=Memory.memory[registers[rs1]+immediate+this.coreID];
+//                  Memory.printMemory();
                   break;
           case "SW":
                   // syntax of instruction: sw x10 4(x5)
@@ -262,7 +264,7 @@ public class Cores{
                       System.out.println("Immediate value cannot be less than -512 or greater than 512");
                       System.exit(0);
                   }
-                  if((registers[registerBaseAddressLoc]+immediate_val)>=256 || (registers[registerBaseAddressLoc]+immediate_val)<0){
+                  if((registers[registerBaseAddressLoc]+immediate_val+this.coreID)>=1024 || (registers[registerBaseAddressLoc]+immediate_val+this.coreID)<0){
                       System.out.println("Memory out of bounds");
                       System.exit(0);
                   }
@@ -310,18 +312,32 @@ public class Cores{
                   pc=registers[jumpToVal]-1;
                   break;
           case "LA":
-                  //Ex: la x1 8 where 8 is memory location in the memory array
-                  //can extend in future if we add two segments text and data
-                  //this is load adress instruction
+                  //Ex: la x1 base contains the base address of the array.   
+                  //this is load address instruction
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
-                  int addressVal1=Integer.parseInt(decodedInstruction[2]);
-                  if(addressVal1>=256 || addressVal1<0){
-                    System.out.println("Cannot access the requested memory location");
-                    System.exit(0);
-                    break;
+                  String variableName=decodedInstruction[2];
+                  if((decodedInstruction[1].equals("a0") || decodedInstruction[1].equals("x10") || decodedInstruction[1].equals("X10")) && Test.stringVariableMapping.containsKey(variableName)) {
+                	  a_0=Test.stringVariableMapping.get(variableName);
+                	  break;
                   }
-                  registers[rd]=addressVal1;
+                  int addressVal1=Test.numberVariableMapping.get(variableName);
+//                  System.out.println("Loading the value: "+addressVal1);
+                  registers[rd]=addressVal1;                  
                   break;
+          case "ECALL":
+        	  	  int a7=registers[17];  // register x17 is used for identification of the data type of the value to be printed.
+        	  	  switch(a7) {
+        	  	  		case 1:
+        	  	  			int a0=registers[10];
+        	  	  			System.out.print(a0);
+        	  	  			break;
+        	  	  		case 4:
+        	  	  			System.out.print(a_0);
+        	  	  			break;
+        	  	  		default:
+        	  	  			break;
+        	  	  }
+        	  	  
           default: Simulator.isInstruction=false;
       }
 
@@ -329,7 +345,9 @@ public class Cores{
       if(registers[0]!=0){
           registers[0]=0;
       }
+//      System.out.println("The value of x21 register for the core is:"+registers[20]+" "+this.coreID);
 //      System.out.println("The current program counter value is "+pc);
+//      System.out.println("The instruction that is being executed is:"+decodedInstruction[0]);
 //      for(int i=0;i<32;i++){
 //        System.out.print(registers[i]+" ");
 //      }

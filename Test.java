@@ -88,13 +88,13 @@ public class Test {
         if(textSegment.equals(test)) {
         	System.out.println("Pasring is done well");
         }else {
-        	System.out.println("Parsing is not done well");
+//        	System.out.println("Parsing is not done well");
         	System.out.println("Printing parsed text segment");
         	for(int i=0;i<textSegment.length;i++) {
         		System.out.println(textSegment[i]);
-        		if(textSegment[i].equals("")) {
-        			System.out.println("Empty strings or spaces are present");
-        		}
+//        		if(textSegment[i].equals("")) {
+//        			System.out.println("Empty strings or spaces are present");
+//        		}
         	}
         	System.out.println();
         }
@@ -109,7 +109,7 @@ public class Test {
         Memory.printMemory();
     }
 	public static void readAssemblyFile(){
-		String filePath= "bubbleSort.asm";
+		String filePath= "bubbleSort3.asm";
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
@@ -175,13 +175,24 @@ public class Test {
 				}
 				switch (dataType) {
 					case ".word":
-						for(int i=1 ; i<parsedLine.length;i++){
-							Memory.memory[i*4+0-4+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 0
-							Memory.memory[i*4+1-4+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 1
-							Memory.memory[i*4+2-4+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 2 
-							Memory.memory[i*4+3-4+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 3
+						int startIdx;
+						if(hasVarName) {
+							startIdx=2;
+							numberVariableMapping.put(parsedLine[0].replace(":", ""), Memory.addressCounter);
+						}else {
+							startIdx=1;
 						}
-						Memory.addressCounter+=4*(parsedLine.length-1);
+						for(int i=startIdx ; i<parsedLine.length;i++){
+							Memory.memory[i*4+0-4*startIdx+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 0
+							Memory.memory[i*4+1-4*startIdx+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 1
+							Memory.memory[i*4+2-4*startIdx+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 2 
+							Memory.memory[i*4+3-4*startIdx+Memory.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 3
+						}
+						Memory.addressCounter+=4*(parsedLine.length-startIdx);
+						if(Memory.addressCounter>=1024) {
+							System.out.println("Memory is being accessed out of bounds");
+							System.exit(0);
+						}
 						break;
 					case ".string":
 						if(hasVarName){
@@ -226,6 +237,7 @@ public class Test {
 			i++;
 		}
 		printStringMapping();
+		printIntegerMapping();
 		return program;
 	}
 	public static void printStringMapping(){
@@ -233,8 +245,15 @@ public class Test {
 			System.out.println("Var name: "+ele.getKey()+" and string: "+ele.getValue());
 		}
 	}
+	public static void printIntegerMapping() {
+		System.out.println("Printing the values og indices mapped:");
+		for(Map.Entry<String, Integer> ele:numberVariableMapping.entrySet()) {
+			System.out.println("Var name: "+ele.getKey()+" and index: "+ele.getValue());
+		}
+	}
 	public static ArrayList<String> programArray= new ArrayList<>();
 	public static ArrayList<String> programCode=new ArrayList<>();
 	public static Set<String> dataTypeNames= new HashSet<>(Set.of(".word" , ".string",".data",".text"));
 	public static Map<String,String> stringVariableMapping = new HashMap<>();
+	public static Map<String,Integer> numberVariableMapping=new HashMap<>();
 }
