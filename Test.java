@@ -109,7 +109,7 @@ public class Test {
         Memory.printMemory();
     }
 	public static void readAssemblyFile(){
-		String filePath= "bubbleSort4.asm";
+		String filePath= "bubbleSort2.asm";
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
