@@ -7,8 +7,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
 public class Test {
     public static void main(String[] args) {
+//    	SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
+    	SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
         // Cores core1= new Cores(1);
         // String[] program={"Add X1 X2 X3","ADDi X2 X3 100"};
         // core1.registers[3]=3;
