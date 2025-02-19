@@ -109,7 +109,7 @@ public class Test {
         Memory.printMemory();
     }
 	public static void readAssemblyFile(){
-		String filePath= "bubbleSort2.asm";
+		String filePath= "bubbleSort4.asm";
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
@@ -138,12 +138,12 @@ public class Test {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		for(String instruction: programArray){
-//			if(instruction==" ") {
-//				System.out.println("Space included");
-//			}
-			System.out.println(instruction);
-		}
+		// for(String instruction: programArray){
+		// 	if(instruction==" ") {
+		// 		System.out.println("Space included");
+		// 	}
+		// 	System.out.println(instruction);
+		// }
 		
 	}
 	public static String[] parseAssemblyCode(){
@@ -208,7 +208,8 @@ public class Test {
 									originalString+=parsedLine[i]+" ";
 								}
 							}
-							stringVariableMapping.put(parsedLine[0].replace(":", ""), originalString);
+							System.out.print(originalString);
+							stringVariableMapping.put(parsedLine[0].replace(":", ""), originalString.replace("\\n","\n"));
 						}
 					default:
 						break;
@@ -236,8 +237,8 @@ public class Test {
 			program[i]=line.replace("\t", "").trim();
 			i++;
 		}
-		printStringMapping();
-		printIntegerMapping();
+		// printStringMapping();
+		// printIntegerMapping();
 		return program;
 	}
 	public static void printStringMapping(){
@@ -246,7 +247,7 @@ public class Test {
 		}
 	}
 	public static void printIntegerMapping() {
-		System.out.println("Printing the values og indices mapped:");
+		System.out.println("Printing the values of indices mapped:");
 		for(Map.Entry<String, Integer> ele:numberVariableMapping.entrySet()) {
 			System.out.println("Var name: "+ele.getKey()+" and index: "+ele.getValue());
 		}

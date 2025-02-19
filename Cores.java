@@ -5,6 +5,7 @@ public class Cores{
   public int[] registers;
   public int pc;
   public int coreID;
+  private String a_0=""; // variable used for loading the string to be printed using ecall
 
   public Cores(int coreID){
       this.coreID=coreID;
@@ -28,7 +29,6 @@ public class Cores{
 	  
 	  String instruction=program[pc];
 	  String parsedInstruction = null;
-	  String a_0=""; // variable used for loading the string to be printed using ecall
 	  try {
 		  parsedInstruction=instructionParser(instruction);
 	  }catch(IllegalArgumentException e) {
@@ -318,6 +318,7 @@ public class Cores{
                   String variableName=decodedInstruction[2];
                   if((decodedInstruction[1].equals("a0") || decodedInstruction[1].equals("x10") || decodedInstruction[1].equals("X10")) && Test.stringVariableMapping.containsKey(variableName)) {
                 	  a_0=Test.stringVariableMapping.get(variableName);
+                    //   System.out.println("The string that is printed due to ecall for variable name "+variableName+" is: " + a_0);
                 	  break;
                   }
                   int addressVal1=Test.numberVariableMapping.get(variableName);
@@ -325,13 +326,16 @@ public class Cores{
                   registers[rd]=addressVal1;                  
                   break;
           case "ECALL":
+                  // a0 -x10 and a7 - x17 please maintain these in the code
         	  	  int a7=registers[17];  // register x17 is used for identification of the data type of the value to be printed.
+                //   System.out.println("The value of a7 is "+a7);
         	  	  switch(a7) {
         	  	  		case 1:
         	  	  			int a0=registers[10];
         	  	  			System.out.print(a0);
         	  	  			break;
         	  	  		case 4:
+                            // System.out.println("Printing as per request of mogambo");
         	  	  			System.out.print(a_0);
         	  	  			break;
         	  	  		default:

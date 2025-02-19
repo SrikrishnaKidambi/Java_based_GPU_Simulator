@@ -1,6 +1,6 @@
 .data
 base: .word 12 1 7 3 5 8 1 4 10 6 9 2 9 10 8 0 5 14 13 16
-str1: .string "\nThe sorted array is: \n"
+str1: .string "\nThe sorted array is:\n"
 str: .string " "
 
 .text
@@ -41,19 +41,19 @@ bubbleSort:
         jr x1
 
 printArray:
-    la a0 str1
-    li a7 4
+    la x10 str1
+    li x17 4
     ecall
     addi x29 x0 0 #counter of the array
     Loop:
         beq x29 x12 Done
-        li a7 1
+        li x17 1
         lw x30 0(x16)
-        mv a0 x30
+        mv x10 x30
         ecall
         
-        la a0 str
-        li a7 4
+        la x10 str
+        li x17 4
         ecall
         
         addi x16 x16 4
