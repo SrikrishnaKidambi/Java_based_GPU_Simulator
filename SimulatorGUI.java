@@ -1,9 +1,16 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class SimulatorGUI {
 	private static JFrame frame=null;
@@ -15,6 +22,7 @@ public class SimulatorGUI {
 	private static String[][] registerData;
 	private static Test test;
 	private static JComboBox<String> displayTypeSelector;
+	private static JTextPane codeEditor;
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
 	}
@@ -26,6 +34,18 @@ public class SimulatorGUI {
 		JFrame frame=new JFrame("Dual Core Krishnas GPU SIMULATOR");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1000,600);
+
+		// Adding Menu Bar
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic('F'); // Allows access with Alt + F
+        
+        JMenuItem saveItem = new JMenuItem("Save");
+        saveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK)); // Ctrl + S
+        saveItem.addActionListener(e -> saveCodeToFile());
+        fileMenu.add(saveItem);
+        menuBar.add(fileMenu);
+        frame.setJMenuBar(menuBar);
 		
 		// implement the code editor and register view and navigation bar
 		JPanel codeEditorPanel=new JPanel();
@@ -39,7 +59,7 @@ public class SimulatorGUI {
 		JScrollPane consoleScroll=new JScrollPane(console);
 
 		// text area for writing the code
-		JTextPane codeEditor = new JTextPane();
+		codeEditor = new JTextPane();
 		codeEditor.setFont(new Font("Monospaced",Font.PLAIN,fontSize));
 		JScrollPane codeScrollPane= new JScrollPane(codeEditor);
 		codeEditorPanel.setLayout(new BorderLayout());
@@ -183,11 +203,11 @@ public class SimulatorGUI {
 		//Memory button
 		JButton memoryButton = new JButton("Memory");
 		memoryButton.setFocusPainted(false);
-		memoryButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		memoryButton.setMaximumSize(new Dimension(80, 50));
 		memoryButton.addActionListener(e -> openMemoryGUI());
 
 		//Add to panel
-		navigationPanel.add(Box.createVerticalStrut(20)); 
+		navigationPanel.add(Box.createVerticalStrut(5)); 
 		navigationPanel.add(memoryButton);
 
 		frame.setVisible(true);
@@ -227,5 +247,28 @@ public class SimulatorGUI {
 		}
 		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
 	}
-	
+	private static void saveCodeToFile() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Save ASM File");
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Assembly Files (*.asm)", "asm"));
+
+		int userSelection = fileChooser.showSaveDialog(null);
+
+		if (userSelection == JFileChooser.APPROVE_OPTION) {
+			File fileToSave = fileChooser.getSelectedFile();
+
+			// Ensure the file has a .asm extension
+			if (!fileToSave.getAbsolutePath().endsWith(".asm")) {
+				fileToSave = new File(fileToSave.getAbsolutePath() + ".asm");
+			}
+
+			try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave))) {
+				writer.write(codeEditor.getText()); 
+				JOptionPane.showMessageDialog(null, "File saved: " + fileToSave.getAbsolutePath());
+			} catch (IOException ex) {
+				JOptionPane.showMessageDialog(null, "Error saving file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
 }

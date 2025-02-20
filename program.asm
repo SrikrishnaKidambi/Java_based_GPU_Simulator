@@ -1,2 +1,2 @@
 .text
-addi x8 x9 -1
+addi x8 x9 1
