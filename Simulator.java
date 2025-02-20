@@ -22,6 +22,7 @@ public class Simulator{
                 String label=decodedInstruction[0].trim().replace(":", "");
                 if(labelMapping.containsKey(label) && label!="" && !label.contains("#")) {
                 	System.out.println("The label is that is already present is "+label+". yeah!!");
+                	SimulatorGUI.console.append(label+"has already been used. Hence stopping the execution of program");
                 	throw new IllegalArgumentException("Duplicate label found");
                 }
                 labelMapping.put(label,i);

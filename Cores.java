@@ -348,9 +348,9 @@ public class Cores{
         	  	  		default:
         	  	  			break;
         	  	  }
-        	  	  
+        	  	  break; 
           default: Simulator.isInstruction=false;
-          if(!labelMapping.containsKey(opcode.trim().replace(":", "")) && opcode!="ecall") {
+          if(!labelMapping.containsKey(opcode.trim().replace(":", "")) && !opcode.equals("")) {
         	  System.out.println(opcode.trim()+" is an invalid opcode");
         	  SimulatorGUI.console.append(opcode.trim()+" is an invalid opcode. So program execution is stopped!");
         	  throw new IllegalArgumentException(opcode.trim()+" is an invalid opcode");
