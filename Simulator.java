@@ -83,7 +83,7 @@ public class Simulator{
 
 
     private int clock;
-    private Cores[] cores;
+    public Cores[] cores;
     public String[] program_Seq;
     public Map<String,Integer> labelMapping;
     public Set<String> opcodes;

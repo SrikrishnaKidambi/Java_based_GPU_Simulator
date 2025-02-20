@@ -1,23 +1,9 @@
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.TimerTask;
-import java.util.Timer;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-
 
 public class SimulatorGUI {
 	private static JFrame frame=null;
@@ -25,6 +11,10 @@ public class SimulatorGUI {
 	private static int fontSize=14;
 	private static final int MAX_FONT_SIZE=30;
 	private static final int MIN_FONT_SIZE=10;
+	private static JTable registerTable;
+	private static String[][] registerData;
+	private static Test test;
+	private static JComboBox<String> displayTypeSelector;
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
 	}
@@ -90,8 +80,12 @@ public class SimulatorGUI {
 				}catch(Exception ex){
 					console.append("Error saving file: "+ex.getMessage()+"\n");
 				}
-				Test test=new Test();
+				test=new Test();
 				test.RunSimulator();
+				updateRegisters(0);
+				updateRegisters(1);
+				updateRegisters(2);
+				updateRegisters(3);
 			}
 			
 		});
@@ -114,7 +108,7 @@ public class SimulatorGUI {
 		JPanel consolePanel=new JPanel(new BorderLayout());
 		consolePanel.add(buttonPanel,BorderLayout.NORTH);
 		consolePanel.add(consoleScroll,BorderLayout.CENTER);
-		
+	
 		JSplitPane leftVerticalSplitPane=new JSplitPane(JSplitPane.VERTICAL_SPLIT,codeEditorPanel,consolePanel);
 		leftVerticalSplitPane.setDividerLocation((int)(0.65*600));
 		leftVerticalSplitPane.setResizeWeight(0.65);
@@ -130,6 +124,108 @@ public class SimulatorGUI {
 
 		frame.add(finalSplitPane);
 		
+		//Core selection options
+		String[] coresAvailable= {"Core 0","Core 1","Core 2","Core 3"};
+		JComboBox<String> coreSelector= new JComboBox<>(coresAvailable);
+		coreSelector.addActionListener(e -> updateRegisters(coreSelector.getSelectedIndex()));
+		JPanel coreSelectionPanel= new JPanel();
+		coreSelectionPanel.setLayout(new BoxLayout(coreSelectionPanel, BoxLayout.X_AXIS));
+		JLabel coreLabel= new JLabel("Choose a Core: ");
+		coreSelectionPanel.add(coreLabel);
+		coreSelectionPanel.add(Box.createHorizontalGlue());
+		coreSelectionPanel.add(coreSelector);
+		
+		//Register table
+		String[] columnNames= {"Name","Value"};
+		registerData = new String[32][2];
+
+		//Initialize the register table
+		for(int i=0;i<32;i++){
+			registerData[i][0] = "x"+i;
+			registerData[i][1] = "0x00000000";
+		}
+
+		registerTable = new JTable(registerData,columnNames);
+		registerTable.setEnabled(false);
+		registerTable.setRowHeight(25);
+
+		//selection options for display types
+		String[] displayTypes= {"Hex","Binary","Signed"};
+		displayTypeSelector = new JComboBox<>(displayTypes);
+		displayTypeSelector.addActionListener(e -> updateRegisters(coreSelector.getSelectedIndex()));
+		JPanel displayTypePanel= new JPanel();
+		displayTypePanel.setLayout(new BoxLayout(displayTypePanel, BoxLayout.X_AXIS));
+		JLabel dispLabel = new JLabel("Display type: ");
+		displayTypePanel.add(dispLabel);
+		displayTypePanel.add(Box.createHorizontalGlue());
+		displayTypePanel.add(displayTypeSelector);
+
+		//center align table data
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		registerTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		registerTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+
+		//Adjust the column width for visibility
+		registerTable.getColumnModel().getColumn(0).setPreferredWidth(80);
+		registerTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+
+		JScrollPane registersPanelScrollPane= new JScrollPane(registerTable,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		registersPanelScrollPane.setPreferredSize(new Dimension(200, 400));
+		registerPanel.setLayout(new BorderLayout());
+		registerPanel.add(coreSelectionPanel,BorderLayout.NORTH);
+		registerPanel.add(registersPanelScrollPane,BorderLayout.CENTER);
+		registerPanel.add(displayTypePanel,BorderLayout.SOUTH);
+
+		//navigation buttons
+		navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.Y_AXIS));
+		
+		//Memory button
+		JButton memoryButton = new JButton("Memory");
+		memoryButton.setFocusPainted(false);
+		memoryButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		memoryButton.addActionListener(e -> openMemoryGUI());
+
+		//Add to panel
+		navigationPanel.add(Box.createVerticalStrut(20)); 
+		navigationPanel.add(memoryButton);
+
 		frame.setVisible(true);
 	}
+	private static void updateRegisters(int coreID){
+		System.out.println("Switched to core "+coreID);
+
+		String selectedFormat = (String) displayTypeSelector.getSelectedItem();
+
+		for(int i=0;i<32;i++){
+			int value = test.sim.cores[coreID].registers[i];
+
+			switch(selectedFormat){
+				case "Hex":
+					registerData[i][1] = String.format("0x%08X", value & 0xFFFFFFFFL); //To handle the negative numbers we are using the bitwise and
+					break;
+				case "Binary":
+					registerData[i][1] = "0b" + String.format("%32s", Integer.toBinaryString(value)).replace(' ', '0');
+					break;
+				case "Signed":
+					registerData[i][1] = String.valueOf(value);
+			}
+			
+		}
+		registerTable.repaint();
+	}
+	private static void openSimulatorGUI() {
+		if (frame != null) {
+			frame.dispose();  // Close current window
+		}
+		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
+	}
+	
+	private static void openMemoryGUI() {
+		if (frame != null) {
+			frame.dispose();  // Close current window
+		}
+		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
+	}
+	
 }
