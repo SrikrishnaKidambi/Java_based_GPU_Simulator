@@ -11,7 +11,7 @@ public class Simulator{
             cores[i]=new Cores(i);
         }
         labelMapping=new HashMap<>();
-        opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall"));
+        opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall","rem"));
     }
 
     //function for mapping all the labels with proper instruction number. 
