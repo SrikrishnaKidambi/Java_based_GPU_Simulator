@@ -60,6 +60,10 @@ public class Simulator{
             String[] decodedInstruction = program[i].trim().split(" ");
             if(!opcodes.contains(decodedInstruction[0].toUpperCase())){
                 String label=decodedInstruction[0].trim().replace(":", "");
+                if(labelMapping.containsKey(label) && label!="" && !label.contains("#")) {
+                	System.out.println("The label is that is already present is "+label+". yeah!!");
+                	throw new IllegalArgumentException("Duplicate label found");
+                }
                 labelMapping.put(label,i);
                 // System.out.println("label: "+label+ " and pc: "+i);
             }
@@ -111,6 +115,9 @@ public class Simulator{
             System.out.println();
         }
         System.out.println("The number of clock cycles taken are:"+this.clock);
+        labelMapping.clear();
+        System.out.println("Printing the labels map after clearing:");
+        this.clock=0;
     }
 
 

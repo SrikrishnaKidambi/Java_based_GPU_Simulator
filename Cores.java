@@ -13,8 +13,9 @@ public class Cores{
       this.registers=new int[32];
       registers[0]=0;
   }
-
+  
   private String instructionParser(String instruction) {
+	  
 	  int hashSymbolIdx=instruction.indexOf("#");
 	  if(hashSymbolIdx!=-1 && hashSymbolIdx==0) {
 		  if(hashSymbolIdx>0 && instruction.charAt(hashSymbolIdx-1)!=' ') {
@@ -333,16 +334,19 @@ public class Cores{
         	  	  		case 1:
         	  	  			int a0=registers[10];
         	  	  			System.out.print(a0);
+        	  	  			SimulatorGUI.console.append(a0+"");
         	  	  			break;
         	  	  		case 4:
                             // System.out.println("Printing as per request of mogambo");
         	  	  			System.out.print(a_0);
+        	  	  			SimulatorGUI.console.append(a_0);
         	  	  			break;
         	  	  		default:
         	  	  			break;
         	  	  }
         	  	  
           default: Simulator.isInstruction=false;
+          
       }
 
       //hardwiring x0 to 0.

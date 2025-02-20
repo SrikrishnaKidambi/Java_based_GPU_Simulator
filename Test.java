@@ -10,9 +10,14 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 
 public class Test {
-    public static void main(String[] args) {
+	
+//	private static void initializeGUI() {
+//		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
+//	}
+	
+    public static void RunSimulator() {
 //    	SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
-    	SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
+//    	initializeGUI();
         // Cores core1= new Cores(1);
         // String[] program={"Add X1 X2 X3","ADDi X2 X3 100"};
         // core1.registers[3]=3;
@@ -90,7 +95,7 @@ public class Test {
         };
         String[] textSegment=parseAssemblyCode();
         if(textSegment.equals(test)) {
-        	System.out.println("Pasring is done well");
+        	System.out.println("Parsing is done well");
         }else {
 //        	System.out.println("Parsing is not done well");
         	System.out.println("Printing parsed text segment");
@@ -113,7 +118,7 @@ public class Test {
         Memory.printMemory();
     }
 	public static void readAssemblyFile(){
-		String filePath= "increment.asm";
+		String filePath= "bubbleSort2.asm";
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;

@@ -1,14 +1,27 @@
 import javax.swing.*;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.awt.*;
 
 
 public class SimulatorGUI {
-//	public static void main(String[] args) {
-//		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
-//	}
+	private static JFrame frame=null;
+	public static JTextArea console;
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
+	}
 	public static void makeGUI() {
+		if(frame!=null) {
+			frame.toFront();
+			return;
+		}
 		JFrame frame=new JFrame("Simulator Console");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1000,600);
@@ -18,9 +31,11 @@ public class SimulatorGUI {
 		JPanel registerPanel=new JPanel();
 		
 		// text area for printing the output.
-		JTextArea console=new JTextArea();
+		console=new JTextArea();
 		console.setEditable(false);
 		JScrollPane consoleScroll=new JScrollPane(console);
+		
+		
 		
 		// creating a panel for the buttons 
 		
@@ -31,7 +46,39 @@ public class SimulatorGUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				console.append("Running the program");  //printing the output after running the program
+				Test.RunSimulator();
+//				System.exit(0);
+//				Memory.memory = new int[];
+				
+//				try {
+//					JavaCompiler compiler=ToolProvider.getSystemJavaCompiler();
+//					if(compiler==null) {
+//						console.append("Java compiler is not available");
+//						return;
+//					}
+//					
+//					int res=compiler.run(null, null, null, "SimulatorGUI.java");
+//					if (res!=0) {
+//						console.append("Compilation failed.\n");
+//						return;
+//					}
+//					console.append("Compilation Successful.\n");
+//					
+//					ProcessBuilder procBuilder=new ProcessBuilder("java","SimulatorGUI");
+//					procBuilder.redirectErrorStream(true);
+//					Process process = procBuilder.start();
+//					
+//					BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//
+//					String line;
+//					while((line=reader.readLine())!=null) {
+//						console.append(line+"\n");
+//					}
+//					process.waitFor();
+//
+//				}catch(Exception ex) {
+//					console.append("The error obtained is:"+ex.getMessage()+"\n");
+//				}
 			}
 			
 		});

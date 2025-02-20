@@ -13,23 +13,22 @@ main:
     addi x11 x0 20 #number of elements in the array 
     addi x12 x0 0 #i=0
     addi x13 x0 0 #j=0
-    #This is an Dammunte pattukora Shikavatuuu Pattukunte vadilesta syndicate
     la x15 arr # load the base address of the array
     addi x14 x0 0 #i=0 in for loop for printarray
     addi x30 x0 0 #i=0 in for loop for the array printing before sorting
     la x31 arr
     la x28 arr
-    la a0 str1
-    li a7 4
+    la x10 str1
+    li x17 4
     ecall # printing the before array message 
     printBeforeSort:
         bge x30 x11 Loop1
         lw x29 0(x28)
-        mv a0 x29
-        li a7 1 
+        mv x10 x29
+        li x17 1 
         ecall
-        la a0 space
-        li a7 4
+        la x10 space
+        li x17 4
         ecall
         addi x30 x30 1
         addi x28 x28 4
@@ -58,21 +57,21 @@ swap:
     addi x13 x13 1
     j Loop2
 callPrintArray:
-    la a0 newline 
-    li a7 4
+    la x10 newline 
+    li x17 4
     ecall
-    la a0 str2 
-    li a7 4
+    la x10 str2 
+    li x17 4
     ecall
     j printArray
 printArray:
     bge x14 x11 Exit
     lw x16 0(x31)
-    mv a0 x16
-    li a7 1
+    mv x10 x16
+    li x17 1
     ecall 
-    la a0 space 
-    li a7 4
+    la x10 space 
+    li x17 4
     ecall
     addi x14 x14 1
     addi x31 x31 4
@@ -81,5 +80,6 @@ printArray:
 Exit:
     addi x0 x0 0
     
-
+#Exit:
+    #add x0 x0 x0
     
