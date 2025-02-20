@@ -1,6 +1,20 @@
 # Java_based_GPU_Simulator- Dual Core Krishnas
 This is a project to simulate the GPU architecture . 
+## Documentation:
+- This is Simulator built using Java.
+- Clone the repo.
+- To run the program in the teminal type:
+```terminal
+javac SimulatorGUI.java
+java SimulatorGUI
+```
+- Check the java output in teminal and GUI is also implemented for displaying the registers of cores and memory of the simulator.
+- Use the drop down to see the registers of each cores and the memory accessed by each core . You can also use the drop down to switch between the display type among hex, binary and signed.
+- We implemented the instructions "add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall".
+- We implemented the text and data segment .
 
+
+---
 ### Minutes of Meeting:
 
 #### Date : 19-02-2025
