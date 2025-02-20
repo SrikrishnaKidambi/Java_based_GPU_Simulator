@@ -36,7 +36,6 @@ public class SimulatorGUI {
 		JScrollPane consoleScroll=new JScrollPane(console);
 		
 		
-		
 		// creating a panel for the buttons 
 		
 		JPanel buttonPanel=new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -46,39 +45,8 @@ public class SimulatorGUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Test.RunSimulator();
-//				System.exit(0);
-//				Memory.memory = new int[];
-				
-//				try {
-//					JavaCompiler compiler=ToolProvider.getSystemJavaCompiler();
-//					if(compiler==null) {
-//						console.append("Java compiler is not available");
-//						return;
-//					}
-//					
-//					int res=compiler.run(null, null, null, "SimulatorGUI.java");
-//					if (res!=0) {
-//						console.append("Compilation failed.\n");
-//						return;
-//					}
-//					console.append("Compilation Successful.\n");
-//					
-//					ProcessBuilder procBuilder=new ProcessBuilder("java","SimulatorGUI");
-//					procBuilder.redirectErrorStream(true);
-//					Process process = procBuilder.start();
-//					
-//					BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//
-//					String line;
-//					while((line=reader.readLine())!=null) {
-//						console.append(line+"\n");
-//					}
-//					process.waitFor();
-//
-//				}catch(Exception ex) {
-//					console.append("The error obtained is:"+ex.getMessage()+"\n");
-//				}
+				Test test=new Test();
+				test.RunSimulator();
 			}
 			
 		});

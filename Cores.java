@@ -26,7 +26,7 @@ public class Cores{
 	  return instruction.trim();
   }
   
-  public void execute(String[] program,Map<String,Integer>labelMapping,Memory mem){
+  public void execute(String[] program,Map<String,Integer>labelMapping,Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
 	  
 	  String instruction=program[pc];
 	  String parsedInstruction = null;
@@ -248,7 +248,7 @@ public class Cores{
                       System.exit(0);
                       break;
                   }
-                  registers[rd]=Memory.memory[registers[rs1]+immediate+this.coreID];
+                  registers[rd]=mem.memory[registers[rs1]+immediate+this.coreID];
 //                  Memory.printMemory();
                   break;
           case "SW":
@@ -270,7 +270,7 @@ public class Cores{
                       System.exit(0);
                   }
 //                  System.out.println("Storing the value:"+registers[rs2]);
-                  Memory.memory[registers[registerBaseAddressLoc]+immediate_val+this.coreID]=registers[rs2];
+                  mem.memory[registers[registerBaseAddressLoc]+immediate_val+this.coreID]=registers[rs2];
                   break;
           case "LI":
                   //Ex: li x1 8
@@ -317,12 +317,12 @@ public class Cores{
                   //this is load address instruction
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   String variableName=decodedInstruction[2];
-                  if((decodedInstruction[1].equals("a0") || decodedInstruction[1].equals("x10") || decodedInstruction[1].equals("X10")) && Test.stringVariableMapping.containsKey(variableName)) {
-                	  a_0=Test.stringVariableMapping.get(variableName);
+                  if((decodedInstruction[1].equals("a0") || decodedInstruction[1].equals("x10") || decodedInstruction[1].equals("X10")) && stringVariableMapping.containsKey(variableName)) {
+                	  a_0=stringVariableMapping.get(variableName);
                     //   System.out.println("The string that is printed due to ecall for variable name "+variableName+" is: " + a_0);
                 	  break;
                   }
-                  int addressVal1=Test.numberVariableMapping.get(variableName);
+                  int addressVal1=nameVariableMapping.get(variableName);
 //                  System.out.println("Loading the value: "+addressVal1);
                   registers[rd]=addressVal1;                  
                   break;
@@ -334,12 +334,16 @@ public class Cores{
         	  	  		case 1:
         	  	  			int a0=registers[10];
         	  	  			System.out.print(a0);
-        	  	  			SimulatorGUI.console.append(a0+"");
+        	  	  			if(this.coreID==0) {
+        	  	  				SimulatorGUI.console.append(a0+"");
+        	  	  			}
         	  	  			break;
         	  	  		case 4:
                             // System.out.println("Printing as per request of mogambo");
         	  	  			System.out.print(a_0);
-        	  	  			SimulatorGUI.console.append(a_0);
+        	  	  			if(this.coreID==0) {
+        	  	  				SimulatorGUI.console.append(a_0);
+        	  	  			}
         	  	  			break;
         	  	  		default:
         	  	  			break;
