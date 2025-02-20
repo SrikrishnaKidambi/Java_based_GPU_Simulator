@@ -76,13 +76,14 @@ public class Simulator{
             System.out.println();
         }
         System.out.println("The number of clock cycles taken are:"+this.clock);
+        SimulatorGUI.console.append("\nThe number of clock cycles taken for execution are "+this.clock);
         labelMapping.clear();
         System.out.println("Printing the labels map after clearing:");
         this.clock=0;
     }
 
 
-    private int clock;
+    public int clock;
     public Cores[] cores;
     public String[] program_Seq;
     public Map<String,Integer> labelMapping;

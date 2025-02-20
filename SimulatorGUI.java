@@ -106,6 +106,7 @@ public class SimulatorGUI {
 				updateRegisters(1);
 				updateRegisters(2);
 				updateRegisters(3);
+//				console.append("The number of clock cycles taken for execution are "+test.sim.clock);
 			}
 			
 		});
