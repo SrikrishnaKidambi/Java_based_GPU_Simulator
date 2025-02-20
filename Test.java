@@ -166,6 +166,6 @@ public class Test {
 	public Set<String> dataTypeNames= new HashSet<>(Set.of(".word" , ".string",".data",".text"));
 	public Map<String,String> stringVariableMapping = new HashMap<>();
 	public Map<String,Integer> numberVariableMapping=new HashMap<>();
-	private Memory mem=new Memory();
+	public Memory mem=new Memory();
 	public Simulator sim;
 }

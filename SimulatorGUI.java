@@ -225,7 +225,7 @@ public class SimulatorGUI {
 		if (frame != null) {
 			frame.dispose();  // Close current window
 		}
-		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
+		SwingUtilities.invokeLater(()->new MemoryGUI(test.mem));
 	}
 	
 }

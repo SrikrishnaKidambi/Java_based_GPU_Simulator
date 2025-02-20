@@ -1,5 +1,5 @@
 .data 
-arr: .word 2 4 5 4 1 2 4 5 4 8 7 1 1 211 4 6 5 22 4 55
+arr: .word 2 4 5 4 1 2 4 5 4 8 7 1 1 211 4 6 5 22 4 55 4 6 8 7 4 5 1 2 3 6 5 1 
 str1: .string "Array before sorting: "
 str2: .string "Array after sorting: "
 str3: .string "Swap called at arr[j] and arr[j+1] "
@@ -10,7 +10,7 @@ space: .string " "
 
 main:
     addi x25 x0 19 # one subtracted from total number of elements in the array
-    addi x11 x0 20 #number of elements in the array 
+    addi x11 x0 32 #number of elements in the array 
     addi x12 x0 0 #i=0
     addi x13 x0 0 #j=0
     la x15 arr # load the base address of the array
