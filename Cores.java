@@ -37,12 +37,12 @@ public class Cores{
 	  }
       
       String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
-      String opcode=decodedInstruction[0].toUpperCase();
+      String opcode=decodedInstruction[0].trim();
       // System.out.println(opcode);
       int rd,rs1;
       int rs2;
       switch(opcode){
-          case "ADD":
+          case "add":
               //Ex: add x1 x2 x3
               rd= Integer.parseInt(decodedInstruction[1].substring(1));
               rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -53,7 +53,7 @@ public class Cores{
                   rs2=Integer.parseInt(decodedInstruction[3].substring(0));
               } 
               registers[rd] = registers[rs1] + registers[rs2]; break;
-          case "SUB":
+          case "sub":
               //Ex: sub x1 x2 x3
               rd= Integer.parseInt(decodedInstruction[1].substring(1));
               rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -64,7 +64,7 @@ public class Cores{
                   rs2=Integer.parseInt(decodedInstruction[3].substring(0));
               } 
               registers[rd] = registers[rs1] - registers[rs2]; break;
-          case "MUL":
+          case "mul":
                   //Ex: mul x1 x2 x3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -75,14 +75,14 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] * registers[rs2]; break;
-          case "MV":
+          case "mv":
                   //Ex: mv x1 x2
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 //                  System.out.print(rd + rs1);
                   registers[rd] = registers[rs1]; 
                   break;
-          case "ADDI":
+          case "addi":
                   //Ex: addi x1 x2 8
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -93,7 +93,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] + rs2; break;
-          case "MULI":
+          case "muli":
                   //Ex: muli x1 x2 3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -104,7 +104,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] * rs2; break;
-          case "AND" :
+          case "and" :
                   //Ex: and x1 x2 x3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -115,7 +115,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] & registers[rs2]; break;
-          case "REM":
+          case "rem":
                   //Ex: rem x1 x2 x3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -126,7 +126,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] % registers[rs2]; break;
-          case "OR" :
+          case "or" :
                   //Ex: or x1 x2 x3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -137,7 +137,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] | registers[rs2]; break;
-          case "XOR" :
+          case "xor" :
                   //Ex: xor x1 x2 x3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -148,7 +148,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] ^ registers[rs2]; break;
-          case "ANDI" :
+          case "andi" :
                   //Ex: andi x1 x2 8
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -159,7 +159,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] & rs2; break;
-          case "ORI" :
+          case "ori" :
                   //Ex: ori x1 x2 3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -170,7 +170,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   } 
                   registers[rd] = registers[rs1] | rs2; break;
-          case "XORI" :
+          case "xori" :
                   //Ex: xori x1 x2 3
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -181,7 +181,7 @@ public class Cores{
                       rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                   }
                   registers[rd] = registers[rs1] ^ rs2; break;  
-          case "BNE" :
+          case "bne" :
                   //Ex: bne x1 x2 label
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -191,7 +191,7 @@ public class Cores{
                       pc=labelMapping.get(labelName).intValue();
                   }
                   break;
-          case "BEQ" :
+          case "beq" :
                   //Ex: beq x1 x2 label
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -201,7 +201,7 @@ public class Cores{
                       pc=labelMapping.get(labelName1).intValue();
                   }
                   break;
-          case "BLT":
+          case "blt":
                   //Ex: blt x1 x2 label
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -211,7 +211,7 @@ public class Cores{
                       pc=labelMapping.get(labelName4).intValue();
                   }
                   break;
-          case "BGE":
+          case "bge":
                   //Ex: bge x1 x2 label
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -221,7 +221,7 @@ public class Cores{
                       pc=labelMapping.get(labelName5).intValue();
                   }
                   break;
-          case "LW":
+          case "lw":
                   //Ex: lw x1 8(x2) where 8 is the offset/immediate value and x2 is the base register
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   int paramStart=0;
@@ -251,7 +251,7 @@ public class Cores{
                   registers[rd]=mem.memory[registers[rs1]+immediate+this.coreID];
 //                  Memory.printMemory();
                   break;
-          case "SW":
+          case "sw":
                   // syntax of instruction: sw x10 4(x5)
                   // this means that from the register x10 take the value and store it in the memory location of x5 with an offset of 4.
                   rs2=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -272,7 +272,7 @@ public class Cores{
 //                  System.out.println("Storing the value:"+registers[rs2]);
                   mem.memory[registers[registerBaseAddressLoc]+immediate_val+this.coreID]=registers[rs2];
                   break;
-          case "LI":
+          case "li":
                   //Ex: li x1 8
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   int addressVal=Integer.parseInt(decodedInstruction[2]);
@@ -283,7 +283,7 @@ public class Cores{
                   }
                   registers[rd]=addressVal;
                   break;
-          case "JAL":
+          case "jal":
                   //Ex: jal x1 label
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
                   registers[rd]=pc+1;
@@ -292,7 +292,7 @@ public class Cores{
 //                  System.out.println("Label: "+labelName2);
                   pc=labelMapping.get(labelName2).intValue();
                   break;
-          case "JALR":
+          case "jalr":
                   // syntax : jalr x1 x2 x0 -> store the value of pc+4 in x1 and jump to x2+x0
                   rd=Integer.parseInt(decodedInstruction[1].substring(1));
                   rs1=Integer.parseInt(decodedInstruction[2].substring(1));
@@ -300,19 +300,19 @@ public class Cores{
                   registers[rd]=pc+1;
                   pc=registers[rs1]+registers[rs2]-1;
                   break;
-          case "J":
+          case "j":
                   //Ex: j label which is equivalent to jal x0 label
                   String labelName3;
                   labelName3=decodedInstruction[1];
 //                  System.out.println("Label in instruction j:"+labelName3);
                   pc=labelMapping.get(labelName3).intValue();
                   break;
-          case "JR":
+          case "jr":
                   //Ex: jr x2 -> this is equivalent to jalr x0 x2 x0
                   int jumpToVal=Integer.parseInt(decodedInstruction[1].substring(1));
                   pc=registers[jumpToVal]-1;
                   break;
-          case "LA":
+          case "la":
                   //Ex: la x1 base contains the base address of the array.   
                   //this is load address instruction
                   rd= Integer.parseInt(decodedInstruction[1].substring(1));
@@ -326,7 +326,7 @@ public class Cores{
 //                  System.out.println("Loading the value: "+addressVal1);
                   registers[rd]=addressVal1;                  
                   break;
-          case "ECALL":
+          case "ecall":
                   // a0 -x10 and a7 - x17 please maintain these in the code
         	  	  int a7=registers[17];  // register x17 is used for identification of the data type of the value to be printed.
                 //   System.out.println("The value of a7 is "+a7);
@@ -350,6 +350,11 @@ public class Cores{
         	  	  }
         	  	  
           default: Simulator.isInstruction=false;
+          if(!labelMapping.containsKey(opcode.trim().replace(":", "")) && opcode!="ecall") {
+        	  System.out.println(opcode.trim()+" is an invalid opcode");
+        	  SimulatorGUI.console.append(opcode.trim()+" is an invalid opcode. So program execution is stopped!");
+        	  throw new IllegalArgumentException(opcode.trim()+" is an invalid opcode");
+          }
           
       }
 
