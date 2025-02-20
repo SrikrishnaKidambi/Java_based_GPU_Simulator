@@ -5,23 +5,35 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.TimerTask;
 import java.util.Timer;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 
 
 public class SimulatorGUI {
+	private static JFrame frame=null;
+	public static JTextArea console;
 	private static int fontSize=14;
 	private static final int MAX_FONT_SIZE=30;
 	private static final int MIN_FONT_SIZE=10;
-//	public static void main(String[] args) {
-//		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
-//	}
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
+	}
 	public static void makeGUI() {
-		JFrame frame=new JFrame("DCK GPU SIMULATOR");
+		if(frame!=null) {
+			frame.toFront();
+			return;
+		}
+		JFrame frame=new JFrame("Dual Core Krishnas GPU SIMULATOR");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1000,600);
 		
@@ -32,7 +44,7 @@ public class SimulatorGUI {
 		navigationPanel.setPreferredSize(new Dimension(30,600));
 		
 		// text area for printing the output.
-		JTextArea console=new JTextArea();
+		console=new JTextArea();
 		console.setEditable(false);
 		JScrollPane consoleScroll=new JScrollPane(console);
 
@@ -61,6 +73,7 @@ public class SimulatorGUI {
 			}
 		});
 		
+		
 		// creating a panel for the buttons 
 		
 		JPanel buttonPanel=new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -77,6 +90,8 @@ public class SimulatorGUI {
 				}catch(Exception ex){
 					console.append("Error saving file: "+ex.getMessage()+"\n");
 				}
+				Test test=new Test();
+				test.RunSimulator();
 			}
 			
 		});

@@ -5,51 +5,11 @@ import java.util.Set;
 
 public class Simulator{
     public Simulator(){
-        memory=new Memory();
         clock=0;
         cores=new Cores[4];
         for(int i=0;i<4;i++){
             cores[i]=new Cores(i);
         }
-        //testing purpose
-//        cores[0].registers[2]=1;
-//        cores[0].registers[3]=2;
-//        cores[1].registers[2]=1;
-//        cores[1].registers[3]=2;
-//        cores[2].registers[2]=1;
-//        cores[2].registers[3]=2;
-//        cores[3].registers[2]=1;
-//        cores[3].registers[3]=2;
-
-        //testing for memory
-        // Memory.memory[100]=30;
-        // Memory.memory[104]=20;
-        // Memory.memory[0] = 42;
-        // Memory.memory[1] = 17;
-        // Memory.memory[2] = 89;
-        // Memory.memory[3] = 23;
-        // Memory.memory[4] = 56;
-        // Memory.memory[5] = 91;
-        // Memory.memory[6] = 34;
-        // Memory.memory[7] = 75;
-        // Memory.memory[8] = 12;
-        // Memory.memory[9] = 68;
-        // Memory.memory[10] = 5;
-        // Memory.memory[11] = 99;
-        // Memory.memory[12] = 31;
-        // Memory.memory[13] = 47;
-        // Memory.memory[14] = 83;
-        // Memory.memory[15] = 28;
-        // Memory.memory[16] = 60;
-        // Memory.memory[17] = 14;
-        // Memory.memory[18] = 71;
-        // Memory.memory[19] = 39;
-        // // core 0 is initialized above
-        // for (int i = 0; i < 20; i++) {
-        //     Memory.memory[i + 1 * 256] = Memory.memory[i]; // Core 1
-        //     Memory.memory[i + 2 * 256] = Memory.memory[i]; // Core 2
-        //     Memory.memory[i + 3 * 256] = Memory.memory[i]; // Core 3
-        // }
         labelMapping=new HashMap<>();
         opcodes=new HashSet<>(Set.of("ADD","SUB","MUL","MV","ADDI","MULI","AND","OR","XOR","ANDI","ORI","XORI","BNE","BEQ","JAL","JALR","LW","SW","LA","LI","BGE","BLT","J","JR","ECALL"));
     }
@@ -60,6 +20,10 @@ public class Simulator{
             String[] decodedInstruction = program[i].trim().split(" ");
             if(!opcodes.contains(decodedInstruction[0].toUpperCase())){
                 String label=decodedInstruction[0].trim().replace(":", "");
+                if(labelMapping.containsKey(label) && label!="" && !label.contains("#")) {
+                	System.out.println("The label is that is already present is "+label+". yeah!!");
+                	throw new IllegalArgumentException("Duplicate label found");
+                }
                 labelMapping.put(label,i);
                 // System.out.println("label: "+label+ " and pc: "+i);
             }
@@ -77,7 +41,7 @@ public class Simulator{
     public void initializeProgram(String[] program){
         this.program_Seq=program;
     }
-    public void runProgram(){
+    public void runProgram(Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
         mapAllTheLabels(program_Seq);
         printLabels();
         System.out.println("Program execution started");
@@ -88,7 +52,7 @@ public class Simulator{
                 if(cores[i].pc>=program_Seq.length){
                     break;
                 }
-                this.cores[i].execute(program_Seq,labelMapping,memory);
+                this.cores[i].execute(program_Seq, labelMapping, mem, stringVariableMapping, nameVariableMapping);
             } 
             // printResult();
             // Memory.printMemory();
@@ -111,10 +75,12 @@ public class Simulator{
             System.out.println();
         }
         System.out.println("The number of clock cycles taken are:"+this.clock);
+        labelMapping.clear();
+        System.out.println("Printing the labels map after clearing:");
+        this.clock=0;
     }
 
 
-    private Memory memory;
     private int clock;
     private Cores[] cores;
     public String[] program_Seq;
