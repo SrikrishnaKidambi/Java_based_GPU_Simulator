@@ -83,10 +83,10 @@ public class SimulatorGUI {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				console.append("Running the program");  //printing the output after running the program
+//				console.append("Running the program.\n");  //printing the output after running the program
 				try{
 					java.nio.file.Files.write(java.nio.file.Paths.get("program.asm"),codeEditor.getText().getBytes());
-					console.append("Assembly code saved to program.asm\n");
+//					console.append("Assembly code saved to program.asm\n");
 				}catch(Exception ex){
 					console.append("Error saving file: "+ex.getMessage()+"\n");
 				}

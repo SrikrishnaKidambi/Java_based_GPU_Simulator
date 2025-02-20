@@ -9,7 +9,7 @@ space: .string " "
 .text 
 
 main:
-    subi x25 x0 19 # one subtracted from total number of elements in the array
+    addi x25 x0 19 # one subtracted from total number of elements in the array
     addi x11 x0 20 #number of elements in the array 
     addi x12 x0 0 #i=0
     addi x13 x0 0 #j=0
@@ -72,7 +72,7 @@ printArray:
     ecall 
     la x10 space 
     li x17 4
-    ecalli
+    ecall
     addi x14 x14 1
     addi x31 x31 4
     j printArray
