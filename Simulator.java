@@ -11,14 +11,14 @@ public class Simulator{
             cores[i]=new Cores(i);
         }
         labelMapping=new HashMap<>();
-        opcodes=new HashSet<>(Set.of("ADD","SUB","MUL","MV","ADDI","MULI","AND","OR","XOR","ANDI","ORI","XORI","BNE","BEQ","JAL","JALR","LW","SW","LA","LI","BGE","BLT","J","JR","ECALL"));
+        opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall"));
     }
 
     //function for mapping all the labels with proper instruction number. 
     private void mapAllTheLabels(String[] program){
         for(int i=0;i<program.length;i++){
             String[] decodedInstruction = program[i].trim().split(" ");
-            if(!opcodes.contains(decodedInstruction[0].toUpperCase())){
+            if(!opcodes.contains(decodedInstruction[0].toUpperCase()) && decodedInstruction[0].contains(":")){
                 String label=decodedInstruction[0].trim().replace(":", "");
                 if(labelMapping.containsKey(label) && label!="" && !label.contains("#")) {
                 	System.out.println("The label is that is already present is "+label+". yeah!!");

@@ -30,7 +30,7 @@ public class Test {
     
     
 	public void readAssemblyFile(){
-		String filePath= "increment.asm";
+		String filePath= "bubbleSort2.asm";
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
