@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 public class Test {
 		
     public void RunSimulator() {
-        Simulator sim=new Simulator();
+        sim=new Simulator();
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();
         System.out.println("Printing parsed text segment");
@@ -30,7 +30,7 @@ public class Test {
     
     
 	public void readAssemblyFile(){
-		String filePath= "increment.asm";
+		String filePath= "program.asm";
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line;
@@ -167,4 +167,5 @@ public class Test {
 	public Map<String,String> stringVariableMapping = new HashMap<>();
 	public Map<String,Integer> numberVariableMapping=new HashMap<>();
 	private Memory mem=new Memory();
+	public Simulator sim;
 }
