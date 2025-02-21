@@ -59,11 +59,12 @@ public class SimulatorGUI {
 		// text area for printing the output.
 		console=new JTextArea();
 		console.setEditable(false);
+		console.setFont(new Font("Monospaced", Font.PLAIN, 14));
 		JScrollPane consoleScroll=new JScrollPane(console);
 
 		// text area for writing the code
 		codeEditor = new JTextPane();
-		codeEditor.setFont(new Font("Monospaced",Font.PLAIN,fontSize));
+		codeEditor.setFont(new Font("Consolas",Font.PLAIN,fontSize));
 		JScrollPane codeScrollPane= new JScrollPane(codeEditor);
 		codeEditorPanel.setLayout(new BorderLayout());
 		codeEditorPanel.add(codeScrollPane,BorderLayout.CENTER);
@@ -74,12 +75,12 @@ public class SimulatorGUI {
 					if (e.getKeyCode() == java.awt.event.KeyEvent.VK_EQUALS) { // Ctrl +
 						if (fontSize < MAX_FONT_SIZE) {
 							fontSize += 2;
-							codeEditor.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
+							codeEditor.setFont(new Font("Consolas", Font.PLAIN, fontSize));
 						}
 					} else if (e.getKeyCode() == java.awt.event.KeyEvent.VK_MINUS) { // Ctrl -
 						if (fontSize > MIN_FONT_SIZE) {
 							fontSize -= 2;
-							codeEditor.setFont(new Font("Monospaced", Font.PLAIN, fontSize));
+							codeEditor.setFont(new Font("Consolas", Font.PLAIN, fontSize));
 						}
 					}
 				}
@@ -222,7 +223,11 @@ public class SimulatorGUI {
 		String selectedFormat = (String) displayTypeSelector.getSelectedItem();
 
 		for(int i=0;i<32;i++){
-			int value = test.sim.cores[coreID].registers[i];
+			int value = 0;
+
+			if(test!= null){
+				value =test.sim.cores[coreID].registers[i];
+			} 
 
 			switch(selectedFormat){
 				case "Hex":
@@ -238,12 +243,7 @@ public class SimulatorGUI {
 		}
 		registerTable.repaint();
 	}
-	private static void openSimulatorGUI() {
-		if (frame != null) {
-			frame.dispose();  // Close current window
-		}
-		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
-	}
+	
 	
 	private static void openMemoryGUI() {
 		if (frame != null) {
