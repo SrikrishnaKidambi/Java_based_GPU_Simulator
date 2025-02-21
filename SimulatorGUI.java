@@ -32,6 +32,9 @@ public class SimulatorGUI {
 			return;
 		}
 		JFrame frame=new JFrame("Dual Core Krishnas GPU SIMULATOR");
+		//Setting app logo
+		ImageIcon icon = new ImageIcon("icon.jpg");
+		frame.setIconImage(icon.getImage());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1000,600);
 
