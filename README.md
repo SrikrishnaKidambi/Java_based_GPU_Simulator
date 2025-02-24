@@ -18,6 +18,11 @@ java SimulatorGUI
 ---
 ### Minutes of Meeting:
 
+#### Date : 24-02-2025
+
+Members : Srikrishna, Sai krishna
+Tasks : Understanding the brief overview of phase 2 and thinking about the brief method of implementation.
+
 #### Date : 19-02-2025
 
 Members : Srikrishna, Sai krishna
