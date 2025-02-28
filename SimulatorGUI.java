@@ -218,9 +218,11 @@ public class SimulatorGUI {
 		frame.setVisible(true);
 	}
 	private static void updateRegisters(int coreID){
-		System.out.println("Switched to core "+coreID);
+		
 
 		String selectedFormat = (String) displayTypeSelector.getSelectedItem();
+
+		System.out.println("Switched to core "+coreID + " and dispay type is: "+selectedFormat);
 
 		for(int i=0;i<32;i++){
 			int value = 0;
