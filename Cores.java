@@ -6,12 +6,14 @@ public class Cores{
   public int pc;
   public int coreID;
   private String a_0=""; // variable used for loading the string to be printed using ecall
+  public int cc;
 
   public Cores(int coreID){
       this.coreID=coreID;
       this.pc=0;
       this.registers=new int[32];
       registers[0]=0;
+      this.cc=0;
   }
   
   private String instructionParser(String instruction) {
@@ -29,6 +31,7 @@ public class Cores{
   public void execute(String[] program,Map<String,Integer>labelMapping,Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
 	  
 	  String instruction=program[pc];
+	  	  
 	  String parsedInstruction = null;
 	  try {
 		  parsedInstruction=instructionParser(instruction);
