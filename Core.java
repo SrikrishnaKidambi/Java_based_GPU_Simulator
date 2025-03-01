@@ -33,6 +33,9 @@ public class Core {
         return in;
     }
     private void ID_RF(InstructionState in){
+        if(in.isDummy){
+            return;
+        }
         String instruction=in.instruction;
         String parsedInstruction = null;
         try {
@@ -175,22 +178,83 @@ public class Core {
 			case "bne":
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
-            case "beq":
-                break;
             case "bge":
+                //Ex: bge x1 x2 label
+                in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+                in.labelName=decodedInstruction[3];
+                if(registers[in.rd]>=registers[in.rs1]){
+                    pc=labelMapping.get(in.labelName).intValue();
+                }
+                break;
+            case "beq":
+                //Ex: beq x1 x2 label
+                in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+                in.labelName=decodedInstruction[3];
+                if(registers[in.rd]==registers[in.rs1]){
+                    pc=labelMapping.get(in.labelName).intValue();
+                }
+                break;
+            case "lw":
+                //Ex: lw x1 8(x2) where 8 is the offset/immediate value and x2 is the base register
+                in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                int paramStart=0;
+                int paramEnd=0;
+                for(int i=0;i<decodedInstruction[2].length();i++){
+                    if(decodedInstruction[2].charAt(i)=='('){
+                        paramStart=i;
+                    }
+                    if(decodedInstruction[2].charAt(i)==')'){
+                        paramEnd=i;
+                        break;
+                    }
+                }
+                in.immediateVal=Integer.parseInt(decodedInstruction[2].substring(0,paramStart));
+                if(in.immediateVal<-512 || in.immediateVal>512){
+                    System.out.println("The immediate value can only be between -512 and 512"); // as the total memory the core can access is 1024 bytes so using immediate I can go 512bytes up and 512 bytes down
+                    System.exit(0);
+                    break;
+                }
+                in.rs1=Integer.parseInt(decodedInstruction[2].substring(paramStart+2,paramEnd));
+                break;
+            case "li":
+                //Ex: li x1 8
+                in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                in.immediateVal=Integer.parseInt(decodedInstruction[2]);
+                if(in.immediateVal>=256 || in.immediateVal<0){
+                  System.out.println("Cannot access the requested memory location");
+                  System.exit(0);
+                  break;
+                }
+                break;
+            case "jal":
+                //Ex: jal x1 label
+                in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                in.labelName=decodedInstruction[2];               
+                break;
+            case "j":
+                //Ex: j label which is equivalent to jal x0 label
+                in.labelName=decodedInstruction[1];
                 break;
             default:
                 break;
         }
     }
-    private void EX(){
-
+    private void EX(InstructionState in){
+        if(in.isDummy){
+            return;
+        }
     }
-    private void MEM(){
-
+    private void MEM(InstructionState in){
+        if(in.isDummy){
+            return;
+        }
     }
-    private void WB(){
-
+    private void WB(InstructionState in){
+        if(in.isDummy){
+            return;
+        }
     }
 
 	public int[] registers;
