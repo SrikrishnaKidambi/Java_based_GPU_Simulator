@@ -29,11 +29,40 @@ public class Core {
         }
         return instruction.trim();
     }
-    private String IF(String[] program){
-        return program[pc++];
+    private InstructionState IF(String[] program){
+        InstructionState in=new InstructionState(program[pc++]);
+        in.isDummy=false;
+        return in;
     }
-    private void ID_RF(String instruction){
+    private void ID_RF(InstructionState in){
+        String instruction=in.instruction;
+        String parsedInstruction = null;
+        try {
+            parsedInstruction=instructionParser(instruction);
+        }catch(IllegalArgumentException e) {
+            System.err.println("Error occured is:"+e.getMessage());
+        }
         
+        String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
+        in.opcode=decodedInstruction[0].trim();
+        switch (in.opcode) {
+            case "add":
+                
+                break;
+            case "sub":
+                break;
+            case "mul":
+                break;
+            case "mv":
+                break;
+            case "addi":
+                break;
+            case "muli":
+                break;
+        
+            default:
+                break;
+        }
     }
     private void EX(){
 
