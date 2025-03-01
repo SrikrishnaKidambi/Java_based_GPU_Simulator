@@ -421,7 +421,7 @@ public class Core {
     private void WB(InstructionState in){
         if(in.isDummy){
             return;
-        }
+        }   
     }
 
 	public int[] registers;
