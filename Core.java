@@ -422,6 +422,14 @@ public class Core {
     private void WB(InstructionState in){
         if(in.isDummy){
             return;
+        }
+        switch (in.opcode) {
+            case "add":
+                
+                break;
+        
+            default:
+                break;
         }   
     }
 
