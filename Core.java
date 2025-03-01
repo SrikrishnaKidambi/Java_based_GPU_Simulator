@@ -409,6 +409,15 @@ public class Core {
             return;
         }
 		
+        switch (in.opcode) {
+            case "lw":
+                in.result=mem.memory[in.result];
+                break;
+            case "sw":
+                mem.memory[in.result]=registers[in.rs2];
+            default:
+                break;
+        }
     }
     private void WB(InstructionState in){
         if(in.isDummy){
