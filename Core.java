@@ -292,14 +292,53 @@ public class Core {
         }
         switch (in.opcode) {
             case "add":
-                
+                in.result = registers[in.rs1] + registers[in.rs2];
                 break;
-        
+            case "sub":
+                in.result = registers[in.rs1] - registers[in.rs2];
+                break;
+            case "mul":
+                in.result = registers[in.rs1] * registers[in.rs2];
+                break;
+            case "mv":
+                in.result = registers[in.rs1];
+                break;
+            case "addi":
+                in.result = registers[in.rs1] + in.rs2;
+                break;
+            case "muli":
+                in.result = registers[in.rs1] * in.rs2;
+                break;
+            case "rem":
+                in.result = registers[in.rs1] % registers[in.rs2];
+                break;
+            case "lw":
+                if(registers[in.rs1]+in.immediateVal+this.coreID>=1024 || registers[in.rs1]+in.immediateVal+this.coreID<0){
+                    System.out.println("The memory address requested is not accessible by the core");
+                    System.exit(0);
+                    break;
+                }
+                in.result=registers[in.rs1]+in.immediateVal+this.coreID;
+                break;
+            case "li":
+                in.result=in.immediateVal;
+                break;
+            case "jal":
+                registers[in.rd]=pc;
+                pc=labelMapping.get(in.labelName).intValue();
+            case "j":
+                pc=labelMapping.get(in.labelName).intValue();
+                pc++;
+                break;
             default:
                 break;
         }
+        //hardwiring x0 to 0.
+        if(registers[0]!=0){
+            registers[0]=0;
+        }
     }
-    private void MEM(InstructionState in){
+    private void MEM(InstructionState in,Memory mem){
         if(in.isDummy){
             return;
         }
