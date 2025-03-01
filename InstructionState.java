@@ -1,8 +1,7 @@
 
 public class InstructionState {
 	
-	public InstructionState(String instruction) {
-		this.instruction=instruction;
+	public InstructionState() {
 		rd=-1;
 		rs1=-1;
 		rs2=-1;

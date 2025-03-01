@@ -2,19 +2,24 @@ import java.util.Map;
 
 public class Core {
 
-    public Core(int coreID,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+    public Core(int coreID){
         this.coreID=coreID;
         this.pc=0;
         this.registers=new int[32];
         registers[0]=0;
         this.cc=0;
-		this.labelMapping=labelMapping;
-		this.stringVariableMapping=stringVariableMapping;
-		this.nameVariableMapping=nameVariableMapping;
     }
 
-    public void execute(String[] program,Memory mem){
-
+    public void execute(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+        InstructionState in1=new InstructionState();
+        InstructionState in2=new InstructionState();
+        InstructionState in3=new InstructionState();
+        InstructionState in4=new InstructionState();
+        InstructionState in5=new InstructionState();
+        // ID_RF(in,labelMapping,stringVariableMapping,nameVariableMapping);
+        // EX(in,labelMapping,stringVariableMapping,nameVariableMapping);
+        // MEM(in, mem);
+        // WB(in);
     }
     private String instructionParser(String instruction) {
 	  
@@ -27,12 +32,15 @@ public class Core {
         }
         return instruction.trim();
     }
-    private InstructionState IF(String[] program){
-        InstructionState in=new InstructionState(program[pc++]);
+    private void IF(String[] program,InstructionState in){
+        if(in.isDummy){
+            return;
+        }
+        in.instruction=program[pc++];
         in.isDummy=false;
-        return in;
+        return;
     }
-    private void ID_RF(InstructionState in){
+    private void ID_RF(InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
         if(in.isDummy){
             return;
         }
@@ -215,12 +223,13 @@ public class Core {
 			case "la" :
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.labelName=decodedInstruction[2];  // this indicates variable name
-				in.immediateVal=nameVariableMapping.get(in.labelName);  // this indicates the value that has to be loaded into the register directly
+                System.out.println("The label name obtained is:"+in.labelName);
 				if((decodedInstruction[1].equals("a0") || decodedInstruction[1].equals("x10") || decodedInstruction[1].equals("X10")) && stringVariableMapping.containsKey(in.labelName)) {
 					a_0=stringVariableMapping.get(in.labelName);
 				  //   System.out.println("The string that is printed due to ecall for variable name "+variableName+" is: " + a_0);
 					break;
 				}
+                in.immediateVal=nameVariableMapping.get(in.labelName);  // this indicates the value that has to be loaded into the register directly
 				break;
             case "bge":
                 //Ex: bge x1 x2 label
@@ -294,7 +303,7 @@ public class Core {
                 break;
         }
     }
-    private void EX(InstructionState in){
+    private void EX(InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
         if(in.isDummy){
             return;
         }
@@ -496,8 +505,5 @@ public class Core {
     public int coreID;
     private String a_0=""; // variable used for loading the string to be printed using ecall
     public int cc;
-	Map<String,Integer>labelMapping;
-	Map<String,String>stringVariableMapping;
-	Map<String,Integer>nameVariableMapping;
 
 }

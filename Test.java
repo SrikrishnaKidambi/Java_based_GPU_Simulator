@@ -20,8 +20,9 @@ public class Test {
         	System.out.println(textSegment[i]);
         }
         System.out.println("Memory before executing");
-        mem.printMemory();
+        mem.printMemory();	
         sim.initializeProgram(textSegment);
+		printIntegerMapping();
         sim.runProgram(mem, stringVariableMapping, numberVariableMapping);
         System.out.println("Final result:");
         sim.printResult();      

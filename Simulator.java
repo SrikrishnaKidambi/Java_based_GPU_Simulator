@@ -6,9 +6,9 @@ import java.util.Set;
 public class Simulator{
     public Simulator(){
         clock=0;
-        cores=new Cores[4];
+        cores=new Core[4];
         for(int i=0;i<4;i++){
-            cores[i]=new Cores(i);
+            cores[i]=new Core(i);
         }
         labelMapping=new HashMap<>();
         opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall","rem"));
@@ -53,7 +53,7 @@ public class Simulator{
                 if(cores[i].pc>=program_Seq.length){
                     break;
                 }
-                this.cores[i].execute(program_Seq, labelMapping, mem, stringVariableMapping, nameVariableMapping);
+                this.cores[i].execute(program_Seq, mem,labelMapping,stringVariableMapping,nameVariableMapping);
             } 
             // printResult();
             // Memory.printMemory();
@@ -84,7 +84,7 @@ public class Simulator{
 
 
     public int clock;
-    public Cores[] cores;
+    public Core[] cores;
     public String[] program_Seq;
     public Map<String,Integer> labelMapping;
     public Set<String> opcodes;
