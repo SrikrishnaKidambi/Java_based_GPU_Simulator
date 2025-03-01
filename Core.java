@@ -216,6 +216,11 @@ public class Core {
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.labelName=decodedInstruction[2];  // this indicates variable name
 				in.immediateVal=nameVariableMapping.get(in.labelName);  // this indicates the value that has to be loaded into the register directly
+				if((decodedInstruction[1].equals("a0") || decodedInstruction[1].equals("x10") || decodedInstruction[1].equals("X10")) && stringVariableMapping.containsKey(in.labelName)) {
+					a_0=stringVariableMapping.get(in.labelName);
+				  //   System.out.println("The string that is printed due to ecall for variable name "+variableName+" is: " + a_0);
+					break;
+				}
 				break;
             case "bge":
                 //Ex: bge x1 x2 label
@@ -276,6 +281,9 @@ public class Core {
                 //Ex: j label which is equivalent to jal x0 label
                 in.labelName=decodedInstruction[1];
                 break;
+			case "ecall":
+				// nee time inka raledu bro
+				break;
             default:
 			Simulator.isInstruction=false;
 			if(!labelMapping.containsKey(in.opcode.trim().replace(":", "")) && !in.opcode.equals("")) {
@@ -330,6 +338,64 @@ public class Core {
                 pc=labelMapping.get(in.labelName).intValue();
                 pc++;
                 break;
+			case "and":
+                in.result=registers[in.rs1] & registers[in.rs2];
+				break;
+			case "or":
+                in.result=registers[in.rs1] | registers[in.rs2];
+				break;
+			case "xor":
+                in.result=registers[in.rs1] ^ registers[in.rs2];
+				break;
+			case "andi":
+                in.result=registers[in.rs1] & in.rs2;
+				break;
+			case "ori":
+                in.result=registers[in.rs1] | in.rs2;
+				break;
+			case "xori":
+                in.result=registers[in.rs1] ^ in.rs2;
+				break;
+			case "bne":
+				// pass the other conditional branch instructions in the same way for execution phase
+				break;
+			case "sw":
+				if((registers[in.rd]+in.immediateVal+this.coreID)>=1024 || (registers[in.rd]+in.immediateVal+this.coreID)<0){
+					System.out.println("Memory out of bounds");
+					System.exit(0);
+				}
+				in.result=registers[in.rd]+in.immediateVal+this.coreID;
+				break;
+			case "jalr": 
+				registers[in.rd]=pc+1;
+				pc=registers[in.rs1]+registers[in.rs2];
+				break;
+			case "la":
+				in.result=in.immediateVal;
+				break;
+			case "ecall":
+                  // a0 -x10 and a7 - x17 please maintain these in the code
+        	  	  int a7=registers[17];  // register x17 is used for identification of the data type of the value to be printed.
+                //   System.out.println("The value of a7 is "+a7);
+        	  	  switch(a7) {
+        	  	  		case 1:
+        	  	  			int a0=registers[10];
+        	  	  			System.out.print(a0);
+        	  	  			if(this.coreID==0) {
+        	  	  				SimulatorGUI.console.append(a0+"");
+        	  	  			}
+        	  	  			break;
+        	  	  		case 4:
+                            // System.out.println("Printing as per request of mogambo");
+        	  	  			System.out.print(a_0);
+        	  	  			if(this.coreID==0) {
+        	  	  				SimulatorGUI.console.append(a_0);
+        	  	  			}
+        	  	  			break;
+        	  	  		default:
+        	  	  			break;
+        	  	  }
+        	  	  break;
             default:
                 break;
         }
