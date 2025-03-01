@@ -1,18 +1,16 @@
 import java.util.Map;
 
 public class Core {
-    public int[] registers;
-    public int pc;
-    public int coreID;
-    private String a_0=""; // variable used for loading the string to be printed using ecall
-    public int cc;
 
-    public Core(int coreID){
+    public Core(int coreID,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
         this.coreID=coreID;
         this.pc=0;
         this.registers=new int[32];
         registers[0]=0;
         this.cc=0;
+		this.labelMapping=labelMapping;
+		this.stringVariableMapping=stringVariableMapping;
+		this.nameVariableMapping=nameVariableMapping;
     }
 
     public void execute(String[] program,Map<String,Integer>labelMapping,Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
@@ -59,7 +57,67 @@ public class Core {
                 break;
             case "muli":
                 break;
-        
+			case "and": 
+				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+				}else{
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+				}
+				break;
+			case "or": 
+				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+				}else{
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+				}
+				break;
+			case "xor": 
+				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+				}else{
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+				}
+				break;
+			case "andi": 
+				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+				}
+				else{
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+				} 
+				break;
+			case "ori": 
+				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+				}
+				else{
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+				} 
+				break;
+			case "xori": 
+				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+				}
+				else{
+					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+				} 
+				break;
+			case "bne":
+				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				
             default:
                 break;
         }
@@ -73,4 +131,14 @@ public class Core {
     private void WB(){
 
     }
+
+	public int[] registers;
+    public int pc;
+    public int coreID;
+    private String a_0=""; // variable used for loading the string to be printed using ecall
+    public int cc;
+	Map<String,Integer>labelMapping;
+	Map<String,String>stringVariableMapping;
+	Map<String,Integer>nameVariableMapping;
+
 }
