@@ -13,7 +13,7 @@ public class Core {
 		this.nameVariableMapping=nameVariableMapping;
     }
 
-    public void execute(String[] program,Map<String,Integer>labelMapping,Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+    public void execute(String[] program,Memory mem){
 
     }
     private String instructionParser(String instruction) {
