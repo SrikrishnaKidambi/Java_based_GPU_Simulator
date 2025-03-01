@@ -408,6 +408,7 @@ public class Core {
         if(in.isDummy){
             return;
         }
+		
         switch (in.opcode) {
             case "lw":
                 in.result=mem.memory[in.result];
