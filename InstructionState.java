@@ -1,0 +1,19 @@
+
+public class InstructionState {
+	
+	public InstructionState() {
+		rd=-1;
+		rs1=-1;
+		rs2=-1;
+		isDummy=true;
+	}
+	
+	public String opcode;
+	public int rd;
+	public int rs1;
+	public int rs2;
+	public String labelName;
+	public int immediateVal;
+	public boolean isDummy;
+	
+}
