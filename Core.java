@@ -423,6 +423,14 @@ public class Core {
         if(in.isDummy){
             return;
         }	
+        switch (in.opcode) {
+            case "add":
+                
+                break;
+        
+            default:
+                break;
+        }   
     }
 
 	public int[] registers;
