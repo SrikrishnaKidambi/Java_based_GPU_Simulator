@@ -290,6 +290,14 @@ public class Core {
         if(in.isDummy){
             return;
         }
+        switch (in.opcode) {
+            case "add":
+                
+                break;
+        
+            default:
+                break;
+        }
     }
     private void MEM(InstructionState in){
         if(in.isDummy){
