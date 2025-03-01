@@ -408,6 +408,7 @@ public class Core {
         if(in.isDummy){
             return;
         }
+		
     }
     private void WB(InstructionState in){
         if(in.isDummy){
