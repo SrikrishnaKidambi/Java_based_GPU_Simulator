@@ -178,6 +178,45 @@ public class Core {
 			case "bne":
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				in.labelName=decodedInstruction[3];
+				if(registers[in.rd]!=registers[in.rs1]){
+					pc=labelMapping.get(in.labelName).intValue();
+				}
+				break;
+			case "blt":
+				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				in.labelName=decodedInstruction[3];
+				if(registers[in.rd]<registers[in.rs1]){
+					pc=labelMapping.get(in.labelName).intValue();
+				}
+				break;
+			case "sw": 
+				// syntax of instruction: sw x10 4(x5)
+                // this means that from the register x10 take the value and store it in the memory location of x5 with an offset of 4.
+				in.rs2=Integer.parseInt(decodedInstruction[1].substring(1));
+				String[] offsetAndRegBase=decodedInstruction[2].split("[()]");
+				in.immediateVal=Integer.parseInt(offsetAndRegBase[0]);
+				in.rd=Integer.parseInt(offsetAndRegBase[1].substring(1));  //here the address of the register that has the base address of the memory location is being stored.
+				if(in.immediateVal<-512 || in.immediateVal>512){
+					System.out.println("Immediate value cannot be less than -512 or greater than 512");
+					System.exit(0);
+				}
+				break;
+			case "jalr":
+				// syntax : jalr x1 x2 x0 -> store the value of pc+4 in x1 and jump to x2+x0
+				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+				break;
+			case "jr" : 
+				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				break;
+			case "la" :
+				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.labelName=decodedInstruction[2];  // this indicates variable name
+				in.immediateVal=nameVariableMapping.get(in.labelName);  // this indicates the value that has to be loaded into the register directly
+				break;
             case "bge":
                 //Ex: bge x1 x2 label
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
@@ -238,6 +277,12 @@ public class Core {
                 in.labelName=decodedInstruction[1];
                 break;
             default:
+			Simulator.isInstruction=false;
+			if(!labelMapping.containsKey(in.opcode.trim().replace(":", "")) && !in.opcode.equals("")) {
+				System.out.println(in.opcode.trim()+" is an invalid opcode");
+				SimulatorGUI.console.append(in.opcode.trim()+" is an invalid opcode. So program execution is stopped!");
+				throw new IllegalArgumentException(in.opcode.trim()+" is an invalid opcode");
+			}
                 break;
         }
     }

@@ -16,5 +16,5 @@ public class InstructionState {
 	public String labelName;
 	public int immediateVal;
 	public boolean isDummy;
-	
+	public int result;
 }
