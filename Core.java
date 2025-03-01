@@ -340,6 +340,9 @@ public class Core {
                 pc=labelMapping.get(in.labelName).intValue();
                 pc++;
                 break;
+			case "jr":
+				pc=registers[in.rd];
+				break;
 			case "and":
                 in.result=registers[in.rs1] & registers[in.rs2];
 				break;
@@ -369,7 +372,7 @@ public class Core {
 				in.result=registers[in.rd]+in.immediateVal+this.coreID;
 				break;
 			case "jalr": 
-				registers[in.rd]=pc+1;
+				in.result=pc;
 				pc=registers[in.rs1]+registers[in.rs2];
 				break;
 			case "la":
@@ -420,7 +423,7 @@ public class Core {
     private void WB(InstructionState in){
         if(in.isDummy){
             return;
-        }
+        }	
         switch (in.opcode) {
             case "add":
                 registers[in.rd]=in.result;
@@ -455,6 +458,30 @@ public class Core {
             case "jal":
                 registers[in.rd]=in.result;
                 break;
+			case "and":
+				registers[in.rd]=in.result;
+				break;
+			case "or":
+				registers[in.rd]=in.result;
+				break;
+			case "xor":
+				registers[in.rd]=in.result;
+				break;
+			case "andi":
+				registers[in.rd]=in.result;
+				break;
+			case "ori":
+				registers[in.rd]=in.result;
+				break;
+			case "xori":
+				registers[in.rd]=in.result;
+				break;
+			case "la":
+				registers[in.rd]=in.result;
+				break;
+			case "jalr":
+				registers[in.rd]=in.result;
+				break;
             default:
                 break;
         }
