@@ -332,10 +332,10 @@ public class Core {
                 in.result=in.immediateVal;
                 break;
             case "jal":
-                registers[in.rd]=pc;
+                in.result=pc;
                 pc=labelMapping.get(in.labelName).intValue();
-				pc++;
-				break;
+                pc++;
+                break;
             case "j":
                 pc=labelMapping.get(in.labelName).intValue();
                 pc++;
@@ -404,10 +404,6 @@ public class Core {
             default:
                 break;
         }
-        //hardwiring x0 to 0.
-        if(registers[0]!=0){
-            registers[0]=0;
-        }
     }
     private void MEM(InstructionState in,Memory mem){
         if(in.isDummy){
@@ -430,7 +426,37 @@ public class Core {
         }	
         switch (in.opcode) {
             case "add":
-                
+                registers[in.rd]=in.result;
+                break;
+            case "sub":
+                registers[in.rd]=in.result;
+                break;
+            case "mul":
+                registers[in.rd]=in.result;
+                break;
+            case "mv":
+                registers[in.rd]=in.result;
+                break;
+            case "addi":
+                registers[in.rd]=in.result;
+                break;
+            case "muli":
+                registers[in.rd]=in.result;
+                break;
+            case "rem":
+                registers[in.rd]=in.result;
+                break;
+            case "beq":
+                //pass for all conditional jumps
+                break;
+            case "lw":
+                registers[in.rd]=in.result;
+                break;
+            case "li":
+                registers[in.rd]=in.result;
+                break;
+            case "jal":
+                registers[in.rd]=in.result;
                 break;
 			case "and":
 				registers[in.rd]=in.result;
@@ -458,6 +484,10 @@ public class Core {
 				break;
             default:
                 break;
+        }
+        //hardwiring x0 to 0.
+        if(registers[0]!=0){
+            registers[0]=0;
         }   
     }
 
