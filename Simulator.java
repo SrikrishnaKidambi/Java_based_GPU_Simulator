@@ -44,7 +44,7 @@ public class Simulator{
     public void initializeProgram(String[] program){
         this.program_Seq=program;
     }
-    public void runProgram(Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+    public void runProgram(Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         mapAllTheLabels(program_Seq);
         printLabels();
         System.out.println("Program execution started");
@@ -67,7 +67,7 @@ public class Simulator{
                 if(cores[i].pc>=program_Seq.length){
                     break;
                 }
-                this.cores[i].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
+                this.cores[i].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
             } 
             pipeLineQueue.poll();
             if(cores[0].pc<=program_Seq.length-1){
@@ -87,10 +87,10 @@ public class Simulator{
             
         }
         while(!pipeLineQueue.isEmpty()){
-            cores[0].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
-            cores[1].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
-            cores[2].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
-            cores[3].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
+            cores[0].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
+            cores[1].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
+            cores[2].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
+            cores[3].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
             pipeLineQueue.poll();
         }
     }
@@ -107,6 +107,10 @@ public class Simulator{
         labelMapping.clear();
         System.out.println("Printing the labels map after clearing:");
         this.clock=0;
+        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[0].totalStalls);
+        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[1].totalStalls);
+        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[2].totalStalls);
+        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[3].totalStalls);
     }
 
 

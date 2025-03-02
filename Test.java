@@ -5,13 +5,32 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 import javax.swing.SwingUtilities;
+import java.util.Iterator;
 
 public class Test {
 		
     public void RunSimulator() {
+		//initializing the latencies for the arithmetic instructions
+		latencies.put("add", 1);
+		latencies.put("sub", 1);
+		latencies.put("mul", 1);
+		latencies.put("rem", 1);
+		latencies.put("addi", 1);
+		latencies.put("muli", 1);
+		latencies.put("mv", 1);
+		System.out.println("Enter the latencies for the arithmetic instructions: ");
+		Iterator<Map.Entry<String, Integer>> iterator = latencies.entrySet().iterator();
+		Scanner scanner = new Scanner(System.in);
+		while(iterator.hasNext()){
+			Map.Entry<String,Integer> entry=iterator.next();
+			System.out.println("Enter the latency for the instruction "+entry.getKey()+ " : ");
+			int latency=scanner.nextInt();
+			latencies.put(entry.getKey(), latency); 
+		}
         sim=new Simulator();
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();
@@ -24,7 +43,7 @@ public class Test {
         sim.initializeProgram(textSegment);
 		printIntegerMapping();
 		
-        sim.runProgram(mem, stringVariableMapping, numberVariableMapping);
+        sim.runProgram(mem, stringVariableMapping, numberVariableMapping,latencies);
         System.out.println("Final result:");
         sim.printResult();      
         mem.printMemory();
@@ -163,6 +182,7 @@ public class Test {
 			System.out.println("Var name: "+ele.getKey()+" and index: "+ele.getValue());
 		}
 	}
+	public Map<String,Integer> latencies=new HashMap<>();
 	public ArrayList<String> programArray= new ArrayList<>();
 	public ArrayList<String> programCode=new ArrayList<>();
 	public Set<String> dataTypeNames= new HashSet<>(Set.of(".word" , ".string",".data",".text"));

@@ -11,7 +11,9 @@ public class Core {
         this.registers=new int[32];
         registers[0]=0;
         this.cc=0;
-        this.stalls=0;
+        this.controlStalls=0;
+        this.latencyStalls=0;
+        this.totalStalls=0;
     }
     // public void executeHelper(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
     //     // InstructionState in1=new InstructionState();
@@ -34,7 +36,7 @@ public class Core {
     //         // pipeLineQueue.add(new_in);
     //     }
     // }
-    public void execute(String[] program,Queue<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+    public void execute(String[] program,Queue<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         if(pipeLineQueue.size()>=1){
             InstructionState in1=pipeLineQueue.poll();
             WB(in1);
@@ -47,22 +49,29 @@ public class Core {
         }
         if(pipeLineQueue.size()>=3){
             InstructionState in3=pipeLineQueue.poll();
+            if(this.coreID==0){
+                System.out.println("Number of stalls:"+this.latencyStalls);
+            }
+            if(this.latencyStalls>0){
+                in3.isDummy=true;
+                this.latencyStalls--;
+            }
             EX(in3, labelMapping, stringVariableMapping, nameVariableMapping);
             pipeLineQueue.add(in3);
         }
         if(pipeLineQueue.size()>=4){
             InstructionState in4=pipeLineQueue.poll();
-            ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping);
+            ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
             pipeLineQueue.add(in4);
         }
         if(pipeLineQueue.size()>=5){
             InstructionState in5=pipeLineQueue.poll();
             if(this.coreID==0){
-                System.out.println("Number of stalls:"+this.stalls);
+                System.out.println("Number of stalls:"+this.controlStalls);
             }
-            if(this.stalls>0){
+            if(this.controlStalls>0){
                 in5.isDummy=true;
-                this.stalls--;
+                this.controlStalls--;
             }
             
             IF(program, in5);
@@ -97,7 +106,7 @@ public class Core {
         in.isDummy=false;
         return;
     }
-    private void ID_RF(Queue<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+    private void ID_RF(Queue<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         if(in.isDummy || in==null){
             return;
         }
@@ -113,6 +122,7 @@ public class Core {
         }        
         String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
         in.opcode=decodedInstruction[0].trim();
+        int latency=0;
         switch (in.opcode) {
             case "add":
                 //Ex: add x1 x2 x3
@@ -124,6 +134,12 @@ public class Core {
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
+                latency=latencies.get(in.opcode);
+                latencyStalls+=latency-1;
+                totalStalls+=latency-1;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "sub":
                 //Ex: sub x1 x2 x3
@@ -135,6 +151,12 @@ public class Core {
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
+                latency=latencies.get(in.opcode);
+                latencyStalls+=latency-1;
+                totalStalls+=latency-1;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "mul":
                 //Ex: mul x1 x2 x3
@@ -146,11 +168,23 @@ public class Core {
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
+                latency=latencies.get(in.opcode);
+                latencyStalls+=latency-1;
+                totalStalls+=latency-1;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "mv":
                 //Ex: mv x1 x2
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+                latency=latencies.get(in.opcode);
+                latencyStalls+=latency-1;
+                totalStalls+=latency-1;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "addi":
                 //Ex: addi x1 x2 8
@@ -162,6 +196,12 @@ public class Core {
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
+                latency=latencies.get(in.opcode);
+                latencyStalls+=latency-1;
+                totalStalls+=latency-1;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "muli":
                 //Ex: muli x1 x2 3
@@ -173,6 +213,12 @@ public class Core {
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
+                latency=latencies.get(in.opcode);
+                latencyStalls+=latency-1;
+                totalStalls+=latency-1;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "rem":
                 //Ex: rem x1 x2 x3
@@ -184,6 +230,12 @@ public class Core {
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
+                latency=latencies.get(in.opcode);
+                latencyStalls+=latency-1;
+                totalStalls+=latency-1;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
 			case "and": 
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -249,7 +301,11 @@ public class Core {
 				if(registers[in.rd]!=registers[in.rs1]){
 					pc=labelMapping.get(in.labelName).intValue();
 				}
-                this.stalls++;
+                this.controlStalls++;
+                totalStalls++;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "blt":
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -258,7 +314,11 @@ public class Core {
 				if(registers[in.rd]<registers[in.rs1]){
 					pc=labelMapping.get(in.labelName).intValue();
 				}
-                this.stalls++;
+                this.controlStalls++;
+                totalStalls++;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "sw": 
 				// syntax of instruction: sw x10 4(x5)
@@ -277,13 +337,21 @@ public class Core {
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
-                this.stalls++;
-                this.stalls++;
+                this.controlStalls++;
+                this.controlStalls++;
+                totalStalls+=2;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "jr" : 
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
-                this.stalls++;
-                this.stalls++;
+                this.controlStalls++;
+                this.controlStalls++;
+                totalStalls+=2;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "la" :
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -304,7 +372,11 @@ public class Core {
                 if(registers[in.rd]>=registers[in.rs1]){
                     pc=labelMapping.get(in.labelName).intValue();
                 }
-                this.stalls++;
+                this.controlStalls++;
+                totalStalls++;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "beq":
                 //Ex: beq x1 x2 label
@@ -314,7 +386,11 @@ public class Core {
                 if(registers[in.rd]==registers[in.rs1]){
                     pc=labelMapping.get(in.labelName).intValue();
                 }
-                this.stalls++;
+                this.controlStalls++;
+                totalStalls++;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "lw":
                 //Ex: lw x1 8(x2) where 8 is the offset/immediate value and x2 is the base register
@@ -354,14 +430,22 @@ public class Core {
                 in.labelName=decodedInstruction[2];
                 // pipeLineQueue.add(new InstructionState());
                 // pipeLineQueue.add(new InstructionState()); 
-                this.stalls++;
-                this.stalls++;              
+                this.controlStalls++;
+                this.controlStalls++;
+                totalStalls+=2;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);  
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);            
                 break;
             case "j":
                 //Ex: j label which is equivalent to jal x0 label
                 in.labelName=decodedInstruction[1];
-                this.stalls++;
-                this.stalls++;
+                this.controlStalls++;
+                this.controlStalls++;
+                totalStalls+=2;
+                if(coreID==0)
+                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
 			case "ecall":
             System.out.println("You entered ecall in ID/RF");
@@ -589,6 +673,7 @@ public class Core {
     public int coreID;
     private String a_0=""; // variable used for loading the string to be printed using ecall
     public int cc;
-    public int stalls;
-
+    public int controlStalls;
+    public int totalStalls;
+    public int latencyStalls;
 }
