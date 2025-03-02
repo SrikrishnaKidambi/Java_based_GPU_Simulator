@@ -2,7 +2,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 public class Simulator{
@@ -55,12 +54,12 @@ public class Simulator{
         InstructionState in4=new InstructionState();
         InstructionState in5=new InstructionState();
         in5.isDummy=false;
-        Queue<InstructionState>pipeLineQueue=new LinkedList<>();
-        pipeLineQueue.add(in1);
-        pipeLineQueue.add(in3);
-        pipeLineQueue.add(in2);
-        pipeLineQueue.add(in4);
-        pipeLineQueue.add(in5);
+        LinkedList<InstructionState>pipeLineQueue=new LinkedList<>();
+        pipeLineQueue.addLast(in1);
+        pipeLineQueue.addLast(in3);
+        pipeLineQueue.addLast(in2);
+        pipeLineQueue.addLast(in4);
+        pipeLineQueue.addLast(in5);
         while(!isDone){
             isInstruction=true;
             for(int i=0;i<4;i++){
@@ -69,11 +68,18 @@ public class Simulator{
                 }
                 this.cores[i].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
             } 
-            pipeLineQueue.poll();
+            System.out.println("The pc value just completed execution is:"+cores[0].pc);
+            System.out.println("The pc value just completed execution is:"+cores[1].pc);
+            System.out.println("The pc value just completed execution is:"+cores[2].pc);
+            System.out.println("The pc value just completed execution is:"+cores[3].pc);
+            // if(pipeLineQueue.isEmpty()){
+            //     break;
+            // }
+            pipeLineQueue.removeFirst();
             if(cores[0].pc<=program_Seq.length-1){
                 InstructionState new_in=new InstructionState();
                 new_in.isDummy=false;
-                pipeLineQueue.add(new_in);
+                pipeLineQueue.addLast(new_in);
             }
             // printResult();
             // Memory.printMemory();
@@ -87,11 +93,15 @@ public class Simulator{
             
         }
         while(!pipeLineQueue.isEmpty()){
+
             cores[0].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
             cores[1].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
             cores[2].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
             cores[3].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
-            pipeLineQueue.poll();
+            if(pipeLineQueue.removeFirst()==cores[0].lastInstruction){
+                System.out.println("Sriman thopu dammunte aapu");
+                break;
+            }
         }
     }
     public void printResult(){
@@ -108,9 +118,9 @@ public class Simulator{
         System.out.println("Printing the labels map after clearing:");
         this.clock=0;
         SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[0].totalStalls);
-        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[1].totalStalls);
-        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[2].totalStalls);
-        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[3].totalStalls);
+        SimulatorGUI.console.append("\nThe number of stalls of core 1 are: "+cores[1].totalStalls);
+        SimulatorGUI.console.append("\nThe number of stalls of core 2 are: "+cores[2].totalStalls);
+        SimulatorGUI.console.append("\nThe number of stalls of core 3 are: "+cores[3].totalStalls);
     }
 
 

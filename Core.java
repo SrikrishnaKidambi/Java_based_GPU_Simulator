@@ -1,6 +1,5 @@
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 
 public class Core {
@@ -30,42 +29,42 @@ public class Core {
     //     // pipeLineQueue.add(in5);
     //     while(this.pc<program.length){   
     //         execute(program,pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
-    //         // pipeLineQueue.poll();
+    //         // pipeLineQueue.removeFirst();
     //         // InstructionState new_in=new InstructionState();
     //         // new_in.isDummy=false;
     //         // pipeLineQueue.add(new_in);
     //     }
     // }
-    public void execute(String[] program,Queue<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
+    public void execute(String[] program,LinkedList<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         if(pipeLineQueue.size()>=1){
-            InstructionState in1=pipeLineQueue.poll();
+            InstructionState in1=pipeLineQueue.get(0);
             WB(in1);
-            pipeLineQueue.add(in1);
         }
         if(pipeLineQueue.size()>=2){
-            InstructionState in2=pipeLineQueue.poll();
+            InstructionState in2=pipeLineQueue.get(1);
             MEM(in2, mem);
-            pipeLineQueue.add(in2);
         }
         if(pipeLineQueue.size()>=3){
-            InstructionState in3=pipeLineQueue.poll();
             if(this.coreID==0){
                 System.out.println("Number of stalls:"+this.latencyStalls);
             }
-            if(this.latencyStalls>0){
-                in3.isDummy=true;
-                this.latencyStalls--;
+            // if(this.latencyStalls>0){
+            //     in3.isDummy=true;
+            //     this.latencyStalls--;
+            // }
+            for(int i=0;i<latencyStalls;i++){
+                pipeLineQueue.add(2+i, new InstructionState());
             }
+            latencyStalls=0;  //making the number of stalls due to latency to zero
+            InstructionState in3=pipeLineQueue.get(2);
             EX(in3, labelMapping, stringVariableMapping, nameVariableMapping);
-            pipeLineQueue.add(in3);
         }
         if(pipeLineQueue.size()>=4){
-            InstructionState in4=pipeLineQueue.poll();
+            InstructionState in4=pipeLineQueue.get(3);
             ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
-            pipeLineQueue.add(in4);
         }
         if(pipeLineQueue.size()>=5){
-            InstructionState in5=pipeLineQueue.poll();
+            InstructionState in5=pipeLineQueue.get(4);
             if(this.coreID==0){
                 System.out.println("Number of stalls:"+this.controlStalls);
             }
@@ -73,9 +72,13 @@ public class Core {
                 in5.isDummy=true;
                 this.controlStalls--;
             }
-            
+            if(this.pc==program.length){
+                in5.isDummy=true;
+            }
+            if(this.pc==program.length-1){
+                lastInstruction=in5;
+            }
             IF(program, in5);
-            pipeLineQueue.add(in5);
         }
         
         // ID_RF(in,labelMapping,stringVariableMapping,nameVariableMapping);
@@ -96,18 +99,19 @@ public class Core {
         return instruction.trim();
     }
     private void IF(String[] program,InstructionState in){
-        if(in.isDummy || in==null){
+        if(in.isDummy || in==null || in.IF_done==4){
             return;
         }
         if(coreID==0){
-            System.out.println("The value of pc in IF:"+this.pc+" for core:"+this.coreID);
+            System.out.println("The value of pc in IF:"+this.pc+" for opcode:"+in.opcode);
         }
         in.instruction=program[pc++];
         in.isDummy=false;
+        in.IF_done++;
         return;
     }
-    private void ID_RF(Queue<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
-        if(in.isDummy || in==null){
+    private void ID_RF(LinkedList<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
+        if(in.isDummy || in==null || in.IDRF_done==4){
             return;
         }
         String instruction=in.instruction;
@@ -118,7 +122,7 @@ public class Core {
             System.err.println("Error occured is:"+e.getMessage());
         }
         if(coreID==0){
-            System.out.println("The value of pc in ID/RF:"+this.pc+" for core:"+this.coreID);
+            System.out.println("The value of pc in ID/RF:"+this.pc+" for opcode:"+in.opcode);
         }        
         String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
         in.opcode=decodedInstruction[0].trim();
@@ -460,13 +464,14 @@ public class Core {
 			}
                 break;
         }
+        in.IDRF_done++;
     }
     private void EX(InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
-        if(in.isDummy || in==null){
+        if(in.isDummy || in==null || in.EX_done==4){
             return;
         }
         if(coreID==0){
-            System.out.println("The value of pc in EX:"+this.pc+" for core:"+this.coreID);
+            System.out.println("The value of pc in EX:"+this.pc+" for opcode:"+in.opcode);
         }        
         switch (in.opcode) {
             case "add":
@@ -576,13 +581,14 @@ public class Core {
             default:
                 break;
         }
+        in.EX_done++;
     }
     private void MEM(InstructionState in,Memory mem){
-        if(in.isDummy || in==null){
+        if(in.isDummy || in==null || in.MEM_done==4){
             return;
         }
         if(coreID==0){
-            System.out.println("The value of pc in MEM:"+this.pc+" for core:"+this.coreID);
+            System.out.println("The value of pc in MEM:"+this.pc+" for opcode:"+in.opcode);
         }		
         switch (in.opcode) {
             case "lw":
@@ -593,13 +599,14 @@ public class Core {
             default:
                 break;
         }
+        in.MEM_done++;
     }
     private void WB(InstructionState in){
-        if(in.isDummy || in==null){
+        if(in.isDummy || in==null || in.WB_done==4){
             return;
         }
         if(coreID==0){
-            System.out.println("The value of pc in WB:"+this.pc+" for core:"+this.coreID);
+            System.out.println("The value of pc in WB:"+this.pc+" for opcode:"+in.opcode);
         }        	
         switch (in.opcode) {
             case "add":
@@ -665,7 +672,8 @@ public class Core {
         //hardwiring x0 to 0.
         if(registers[0]!=0){
             registers[0]=0;
-        }   
+        }  
+        in.WB_done++; 
     }
 
 	public int[] registers;
@@ -676,4 +684,5 @@ public class Core {
     public int controlStalls;
     public int totalStalls;
     public int latencyStalls;
+    public InstructionState lastInstruction;
 }

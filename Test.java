@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import javax.swing.SwingUtilities;
 import java.util.Iterator;
 
 public class Test {
@@ -31,6 +30,7 @@ public class Test {
 			int latency=scanner.nextInt();
 			latencies.put(entry.getKey(), latency); 
 		}
+		scanner.close();
         sim=new Simulator();
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();
