@@ -1,4 +1,7 @@
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
+
 
 public class Core {
 
@@ -8,18 +11,69 @@ public class Core {
         this.registers=new int[32];
         registers[0]=0;
         this.cc=0;
+        this.stalls=0;
     }
-
-    public void execute(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
-        InstructionState in1=new InstructionState();
-        InstructionState in2=new InstructionState();
-        InstructionState in3=new InstructionState();
-        InstructionState in4=new InstructionState();
-        InstructionState in5=new InstructionState();
+    // public void executeHelper(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+    //     // InstructionState in1=new InstructionState();
+    //     // InstructionState in2=new InstructionState();
+    //     // InstructionState in3=new InstructionState();
+    //     // InstructionState in4=new InstructionState();
+    //     // InstructionState in5=new InstructionState();
+    //     // in5.isDummy=false;
+    //     // Queue<InstructionState>pipeLineQueue=new LinkedList<>();
+    //     // pipeLineQueue.add(in1);
+    //     // pipeLineQueue.add(in3);
+    //     // pipeLineQueue.add(in2);
+    //     // pipeLineQueue.add(in4);
+    //     // pipeLineQueue.add(in5);
+    //     while(this.pc<program.length){   
+    //         execute(program,pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
+    //         // pipeLineQueue.poll();
+    //         // InstructionState new_in=new InstructionState();
+    //         // new_in.isDummy=false;
+    //         // pipeLineQueue.add(new_in);
+    //     }
+    // }
+    public void execute(String[] program,Queue<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+        if(pipeLineQueue.size()>=1){
+            InstructionState in1=pipeLineQueue.poll();
+            WB(in1);
+            pipeLineQueue.add(in1);
+        }
+        if(pipeLineQueue.size()>=2){
+            InstructionState in2=pipeLineQueue.poll();
+            MEM(in2, mem);
+            pipeLineQueue.add(in2);
+        }
+        if(pipeLineQueue.size()>=3){
+            InstructionState in3=pipeLineQueue.poll();
+            EX(in3, labelMapping, stringVariableMapping, nameVariableMapping);
+            pipeLineQueue.add(in3);
+        }
+        if(pipeLineQueue.size()>=4){
+            InstructionState in4=pipeLineQueue.poll();
+            ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping);
+            pipeLineQueue.add(in4);
+        }
+        if(pipeLineQueue.size()>=5){
+            InstructionState in5=pipeLineQueue.poll();
+            if(this.coreID==0){
+                System.out.println("Number of stalls:"+this.stalls);
+            }
+            if(this.stalls>0){
+                in5.isDummy=true;
+                this.stalls--;
+            }
+            
+            IF(program, in5);
+            pipeLineQueue.add(in5);
+        }
+        
         // ID_RF(in,labelMapping,stringVariableMapping,nameVariableMapping);
         // EX(in,labelMapping,stringVariableMapping,nameVariableMapping);
         // MEM(in, mem);
         // WB(in);
+        
     }
     private String instructionParser(String instruction) {
 	  
@@ -33,15 +87,18 @@ public class Core {
         return instruction.trim();
     }
     private void IF(String[] program,InstructionState in){
-        if(in.isDummy){
+        if(in.isDummy || in==null){
             return;
+        }
+        if(coreID==0){
+            System.out.println("The value of pc in IF:"+this.pc+" for core:"+this.coreID);
         }
         in.instruction=program[pc++];
         in.isDummy=false;
         return;
     }
-    private void ID_RF(InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
-        if(in.isDummy){
+    private void ID_RF(Queue<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
+        if(in.isDummy || in==null){
             return;
         }
         String instruction=in.instruction;
@@ -51,7 +108,9 @@ public class Core {
         }catch(IllegalArgumentException e) {
             System.err.println("Error occured is:"+e.getMessage());
         }
-        
+        if(coreID==0){
+            System.out.println("The value of pc in ID/RF:"+this.pc+" for core:"+this.coreID);
+        }        
         String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
         in.opcode=decodedInstruction[0].trim();
         switch (in.opcode) {
@@ -190,6 +249,7 @@ public class Core {
 				if(registers[in.rd]!=registers[in.rs1]){
 					pc=labelMapping.get(in.labelName).intValue();
 				}
+                this.stalls++;
 				break;
 			case "blt":
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -198,6 +258,7 @@ public class Core {
 				if(registers[in.rd]<registers[in.rs1]){
 					pc=labelMapping.get(in.labelName).intValue();
 				}
+                this.stalls++;
 				break;
 			case "sw": 
 				// syntax of instruction: sw x10 4(x5)
@@ -216,9 +277,13 @@ public class Core {
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                this.stalls++;
+                this.stalls++;
 				break;
 			case "jr" : 
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+                this.stalls++;
+                this.stalls++;
 				break;
 			case "la" :
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -239,6 +304,7 @@ public class Core {
                 if(registers[in.rd]>=registers[in.rs1]){
                     pc=labelMapping.get(in.labelName).intValue();
                 }
+                this.stalls++;
                 break;
             case "beq":
                 //Ex: beq x1 x2 label
@@ -248,6 +314,7 @@ public class Core {
                 if(registers[in.rd]==registers[in.rs1]){
                     pc=labelMapping.get(in.labelName).intValue();
                 }
+                this.stalls++;
                 break;
             case "lw":
                 //Ex: lw x1 8(x2) where 8 is the offset/immediate value and x2 is the base register
@@ -284,13 +351,20 @@ public class Core {
             case "jal":
                 //Ex: jal x1 label
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
-                in.labelName=decodedInstruction[2];               
+                in.labelName=decodedInstruction[2];
+                // pipeLineQueue.add(new InstructionState());
+                // pipeLineQueue.add(new InstructionState()); 
+                this.stalls++;
+                this.stalls++;              
                 break;
             case "j":
                 //Ex: j label which is equivalent to jal x0 label
                 in.labelName=decodedInstruction[1];
+                this.stalls++;
+                this.stalls++;
                 break;
 			case "ecall":
+            System.out.println("You entered ecall in ID/RF");
 				// nee time inka raledu bro
 				break;
             default:
@@ -304,9 +378,12 @@ public class Core {
         }
     }
     private void EX(InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
-        if(in.isDummy){
+        if(in.isDummy || in==null){
             return;
         }
+        if(coreID==0){
+            System.out.println("The value of pc in EX:"+this.pc+" for core:"+this.coreID);
+        }        
         switch (in.opcode) {
             case "add":
                 in.result = registers[in.rs1] + registers[in.rs2];
@@ -394,14 +471,16 @@ public class Core {
         	  	  switch(a7) {
         	  	  		case 1:
         	  	  			int a0=registers[10];
-        	  	  			System.out.print(a0);
+        	  	  			// System.out.print(a0);
+                            System.out.println("Printing the value that has to be printed using ecall"+a0);
         	  	  			if(this.coreID==0) {
         	  	  				SimulatorGUI.console.append(a0+"");
         	  	  			}
         	  	  			break;
         	  	  		case 4:
                             // System.out.println("Printing as per request of mogambo");
-        	  	  			System.out.print(a_0);
+        	  	  			// System.out.print(a_0);
+                            System.out.println("Printing the value that has to be printed using ecall"+a_0);
         	  	  			if(this.coreID==0) {
         	  	  				SimulatorGUI.console.append(a_0);
         	  	  			}
@@ -415,10 +494,12 @@ public class Core {
         }
     }
     private void MEM(InstructionState in,Memory mem){
-        if(in.isDummy){
+        if(in.isDummy || in==null){
             return;
         }
-		
+        if(coreID==0){
+            System.out.println("The value of pc in MEM:"+this.pc+" for core:"+this.coreID);
+        }		
         switch (in.opcode) {
             case "lw":
                 in.result=mem.memory[in.result];
@@ -430,9 +511,12 @@ public class Core {
         }
     }
     private void WB(InstructionState in){
-        if(in.isDummy){
+        if(in.isDummy || in==null){
             return;
-        }	
+        }
+        if(coreID==0){
+            System.out.println("The value of pc in WB:"+this.pc+" for core:"+this.coreID);
+        }        	
         switch (in.opcode) {
             case "add":
                 registers[in.rd]=in.result;
@@ -505,5 +589,6 @@ public class Core {
     public int coreID;
     private String a_0=""; // variable used for loading the string to be printed using ecall
     public int cc;
+    public int stalls;
 
 }

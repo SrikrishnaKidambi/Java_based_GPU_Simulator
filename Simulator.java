@@ -1,6 +1,8 @@
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 public class Simulator{
@@ -47,14 +49,32 @@ public class Simulator{
         printLabels();
         System.out.println("Program execution started");
         boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
+        InstructionState in1=new InstructionState();
+        InstructionState in2=new InstructionState();
+        InstructionState in3=new InstructionState();
+        InstructionState in4=new InstructionState();
+        InstructionState in5=new InstructionState();
+        in5.isDummy=false;
+        Queue<InstructionState>pipeLineQueue=new LinkedList<>();
+        pipeLineQueue.add(in1);
+        pipeLineQueue.add(in3);
+        pipeLineQueue.add(in2);
+        pipeLineQueue.add(in4);
+        pipeLineQueue.add(in5);
         while(!isDone){
             isInstruction=true;
             for(int i=0;i<4;i++){
                 if(cores[i].pc>=program_Seq.length){
                     break;
                 }
-                this.cores[i].execute(program_Seq, mem,labelMapping,stringVariableMapping,nameVariableMapping);
+                this.cores[i].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
             } 
+            pipeLineQueue.poll();
+            if(cores[0].pc<=program_Seq.length-1){
+                InstructionState new_in=new InstructionState();
+                new_in.isDummy=false;
+                pipeLineQueue.add(new_in);
+            }
             // printResult();
             // Memory.printMemory();
             if(isInstruction)
@@ -65,6 +85,13 @@ public class Simulator{
 //            System.out.println("The value of pc in core 3 is :"+cores[3].pc);
             isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
             
+        }
+        while(!pipeLineQueue.isEmpty()){
+            cores[0].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
+            cores[1].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
+            cores[2].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
+            cores[3].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
+            pipeLineQueue.poll();
         }
     }
     public void printResult(){

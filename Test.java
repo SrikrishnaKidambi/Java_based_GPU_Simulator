@@ -17,12 +17,13 @@ public class Test {
         String[] textSegment=parseAssemblyCode();
         System.out.println("Printing parsed text segment");
         for(int i=0;i<textSegment.length;i++) {
-        	System.out.println(textSegment[i]);
+        	System.out.println(i+" : "+textSegment[i]);
         }
         System.out.println("Memory before executing");
         mem.printMemory();	
         sim.initializeProgram(textSegment);
 		printIntegerMapping();
+		
         sim.runProgram(mem, stringVariableMapping, numberVariableMapping);
         System.out.println("Final result:");
         sim.printResult();      
