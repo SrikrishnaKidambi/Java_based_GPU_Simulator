@@ -675,7 +675,7 @@ public class Core {
         }  
         in.WB_done++; 
     }
-
+    
 	public int[] registers;
     public int pc;
     public int coreID;

@@ -76,11 +76,11 @@ public class Simulator{
             //     break;
             // }
             pipeLineQueue.removeFirst();
-            if(cores[0].pc<=program_Seq.length-1){
+            //if(cores[0].pc<=program_Seq.length-1){
                 InstructionState new_in=new InstructionState();
                 new_in.isDummy=false;
                 pipeLineQueue.addLast(new_in);
-            }
+            //}
             // printResult();
             // Memory.printMemory();
             if(isInstruction)
@@ -130,4 +130,5 @@ public class Simulator{
     public Map<String,Integer> labelMapping;
     public Set<String> opcodes;
     public static boolean isInstruction;
+    public boolean isPipelineForwardingEnabled;
 }
