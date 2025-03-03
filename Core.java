@@ -14,27 +14,7 @@ public class Core {
         this.latencyStalls=0;
         this.totalStalls=0;
     }
-    // public void executeHelper(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
-    //     // InstructionState in1=new InstructionState();
-    //     // InstructionState in2=new InstructionState();
-    //     // InstructionState in3=new InstructionState();
-    //     // InstructionState in4=new InstructionState();
-    //     // InstructionState in5=new InstructionState();
-    //     // in5.isDummy=false;
-    //     // Queue<InstructionState>pipeLineQueue=new LinkedList<>();
-    //     // pipeLineQueue.add(in1);
-    //     // pipeLineQueue.add(in3);
-    //     // pipeLineQueue.add(in2);
-    //     // pipeLineQueue.add(in4);
-    //     // pipeLineQueue.add(in5);
-    //     while(this.pc<program.length){   
-    //         execute(program,pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping);
-    //         // pipeLineQueue.removeFirst();
-    //         // InstructionState new_in=new InstructionState();
-    //         // new_in.isDummy=false;
-    //         // pipeLineQueue.add(new_in);
-    //     }
-    // }
+
     public void execute(String[] program,LinkedList<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         if(pipeLineQueue.size()>=1){
             InstructionState in1=pipeLineQueue.get(0);
@@ -48,10 +28,6 @@ public class Core {
             if(this.coreID==0){
                 System.out.println("Number of stalls:"+this.latencyStalls);
             }
-            // if(this.latencyStalls>0){
-            //     in3.isDummy=true;
-            //     this.latencyStalls--;
-            // }
             for(int i=0;i<latencyStalls;i++){
                 pipeLineQueue.add(2+i, new InstructionState());
             }
@@ -80,11 +56,6 @@ public class Core {
             }
             IF(program, in5);
         }
-        
-        // ID_RF(in,labelMapping,stringVariableMapping,nameVariableMapping);
-        // EX(in,labelMapping,stringVariableMapping,nameVariableMapping);
-        // MEM(in, mem);
-        // WB(in);
         
     }
     private String instructionParser(String instruction) {
@@ -676,6 +647,32 @@ public class Core {
         in.WB_done++; 
     }
     
+    public void hazardDetector(String[] program, int curr_idx){
+        String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
+        String opcode=splitInstruction[0];
+        switch (opcode) {
+            case "add":
+            case "sub":
+            case "mul":
+            case "rem":
+            case "addi":
+            case "and":
+            case "or":
+            case "xor":
+            case "andi":
+            case "ori":
+            case "xori":
+                int rem_instructions=program.length-1-curr_idx;
+                if(rem_instructions>=3){
+                    
+                }
+                break;
+        
+            default:
+                break;
+        }
+    }
+
 	public int[] registers;
     public int pc;
     public int coreID;
