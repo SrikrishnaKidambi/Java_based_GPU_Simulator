@@ -26,4 +26,5 @@ public class InstructionState {
 	public int EX_done;
 	public int MEM_done;
 	public int WB_done;
+	public int pc_val;
 }

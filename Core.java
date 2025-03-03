@@ -15,7 +15,7 @@ public class Core {
         this.totalStalls=0;
     }
 
-    public void execute(String[] program,LinkedList<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
+    public void execute(String[] program,LinkedList<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping){
         if(pipeLineQueue.size()>=1){
             InstructionState in1=pipeLineQueue.get(0);
             WB(in1);
@@ -26,7 +26,7 @@ public class Core {
         }
         if(pipeLineQueue.size()>=3){
             if(this.coreID==0){
-                System.out.println("Number of stalls:"+this.latencyStalls);
+                System.out.println("Number of latency stalls :"+this.latencyStalls);
             }
             for(int i=0;i<latencyStalls;i++){
                 pipeLineQueue.add(2+i, new InstructionState());
@@ -36,23 +36,38 @@ public class Core {
             EX(in3, labelMapping, stringVariableMapping, nameVariableMapping);
         }
         if(pipeLineQueue.size()>=4){
+            for(int i=0;i<dataHazardsMapping.get(pc==0?0:this.pc-1);i++){
+                pipeLineQueue.add(3+i+1, new InstructionState());
+            }
+            totalStalls+=dataHazardsMapping.get(pc==0?0:this.pc-1);
+            // System.out.println("The pc "+(pc-1)+" and data stalls before this are: "+);
+            if(this.coreID==3){
+                dataHazardsMapping.put(pc==0?0:this.pc-1, 0);
+            }
             InstructionState in4=pipeLineQueue.get(3);
             ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
         }
         if(pipeLineQueue.size()>=5){
             InstructionState in5=pipeLineQueue.get(4);
             if(this.coreID==0){
-                System.out.println("Number of stalls:"+this.controlStalls);
+                System.out.println("Number of control stalls:"+this.controlStalls);
             }
+            
             if(this.controlStalls>0){
                 in5.isDummy=true;
                 this.controlStalls--;
             }
-            if(this.pc==program.length){
+            if(this.pc==program.length && in5.IF_done!=4){
+                if(in5.pc_val==8){
+                    System.out.println("You are making last instruction as dummy here");
+                }
                 in5.isDummy=true;
             }
-            if(this.pc==program.length-1){
+            if(this.pc==program.length){
                 lastInstruction=in5;
+            }
+            if(this.pc==program.length-1){
+                System.out.println("The instruction that is going to get executed is dummy or not:"+in5.isDummy);
             }
             IF(program, in5);
         }
@@ -76,13 +91,23 @@ public class Core {
         if(coreID==0){
             System.out.println("The value of pc in IF:"+this.pc+" for opcode:"+in.opcode);
         }
-        in.instruction=program[pc++];
+        in.instruction=program[pc];
+        in.pc_val=pc;
+        pc++;
+        if(this.pc==program.length){
+            lastInstruction=in;
+            System.out.println("Fetched the last instruction successfully with pc value"+in.pc_val);
+        }
+        
         in.isDummy=false;
         in.IF_done++;
         return;
     }
     private void ID_RF(LinkedList<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         if(in.isDummy || in==null || in.IDRF_done==4){
+            if(in.pc_val==8){   // hardcoded currently please check
+                System.out.println("The last instruction is treated as dummy");
+            }
             return;
         }
         String instruction=in.instruction;
@@ -647,31 +672,69 @@ public class Core {
         in.WB_done++; 
     }
     
-    public void hazardDetector(String[] program, int curr_idx){
-        String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
-        String opcode=splitInstruction[0];
-        switch (opcode) {
-            case "add":
-            case "sub":
-            case "mul":
-            case "rem":
-            case "addi":
-            case "and":
-            case "or":
-            case "xor":
-            case "andi":
-            case "ori":
-            case "xori":
-                int rem_instructions=program.length-1-curr_idx;
-                if(rem_instructions>=3){
-                    
-                }
-                break;
-        
-            default:
-                break;
-        }
-    }
+    // public void hazardDetector(String[] program, int curr_idx){
+    //     String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
+    //     String opcode=splitInstruction[0];
+    //     switch (opcode) {
+    //         case "add":
+    //         case "sub":
+    //         case "mul":
+    //         case "rem":
+    //         case "and":
+    //         case "or":
+    //         case "xor":
+    //         case "addi":
+    //         case "andi":
+    //         case "ori":
+    //         case "xori":
+    //         case "mv":
+    //         case "lw":
+    //         case "jal":
+    //         case "jalr":
+    //         case "la":
+    //         case "li":
+    //             int rem_instructions=program.length-1-curr_idx;
+    //             if(rem_instructions>=3){
+    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+    //                 String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
+    //                 String[] insN3=program[curr_idx+3].trim().replace(","," ").split("\\s");
+    //                 String rdCurr=splitInstruction[1];
+    //                 if(insN1[0].equals("j") || insN1[0].equals("jr") || insN2[0].equals("j") || insN2[0].equals("jr") || insN3[0].equals("j") || insN3[0].equals("jr") ){
+
+    //                 }
+    //                 else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+    //                     dataStalls+=3;
+    //                 }
+    //                 else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
+    //                     dataStalls+=2;
+    //                 }
+    //                 else if(rdCurr.equals(insN3[2]) || (insN3.length==4 && rdCurr.equals(insN3[3]))){
+    //                     dataStalls+=1;
+    //                 }
+    //             }
+    //             else if(rem_instructions>=2){
+    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+    //                 String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
+    //                 String rdCurr=splitInstruction[1];
+    //                 if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+    //                     dataStalls+=3;
+    //                 }
+    //                 else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
+    //                     dataStalls+=2;
+    //                 }
+    //             }
+    //             else if(rem_instructions>=1){
+    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+    //                 String rdCurr=splitInstruction[1];
+    //                 if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+    //                     dataStalls+=3;
+    //                 }
+    //             }
+    //             break; 
+    //         default:
+    //             break;
+    //     }
+    // }
 
 	public int[] registers;
     public int pc;
@@ -681,5 +744,6 @@ public class Core {
     public int controlStalls;
     public int totalStalls;
     public int latencyStalls;
+    public int dataStalls;
     public InstructionState lastInstruction;
 }
