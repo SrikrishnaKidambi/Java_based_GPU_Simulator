@@ -307,10 +307,10 @@ public class Core {
 				} 
 				break;
 			case "bne":
-				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
-				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.labelName=decodedInstruction[3];
-				if(registers[in.rd]!=registers[in.rs1]){
+				if(registers[in.rs1]!=registers[in.rs2]){
 					pc=labelMapping.get(in.labelName).intValue();
 				}
                 this.controlStalls++;
@@ -320,10 +320,10 @@ public class Core {
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "blt":
-				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
-				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.labelName=decodedInstruction[3];
-				if(registers[in.rd]<registers[in.rs1]){
+				if(registers[in.rs1]<registers[in.rs2]){
 					pc=labelMapping.get(in.labelName).intValue();
 				}
                 this.controlStalls++;
@@ -378,10 +378,10 @@ public class Core {
 				break;
             case "bge":
                 //Ex: bge x1 x2 label
-                in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
-                in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+                in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
+                in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                 in.labelName=decodedInstruction[3];
-                if(registers[in.rd]>=registers[in.rs1]){
+                if(registers[in.rs1]>=registers[in.rs2]){
                     pc=labelMapping.get(in.labelName).intValue();
                 }
                 this.controlStalls++;
@@ -392,10 +392,10 @@ public class Core {
                 break;
             case "beq":
                 //Ex: beq x1 x2 label
-                in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
-                in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
+                in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
+                in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                 in.labelName=decodedInstruction[3];
-                if(registers[in.rd]==registers[in.rs1]){
+                if(registers[in.rs1]==registers[in.rs2]){
                     pc=labelMapping.get(in.labelName).intValue();
                 }
                 this.controlStalls++;
@@ -749,6 +749,28 @@ public class Core {
     //             break;
     //     }
     // }
+    
+    public void hazardDetectorUtil(LinkedList<InstructionState>pipelineQueue) {
+    	InstructionState curr=pipelineQueue.get(3);  // fetching the instruction that is currently going to ID/RF
+    	// fetching the previous three instructions to compare and check for dependencies
+    	InstructionState prev1=pipelineQueue.get(2);  
+    	InstructionState prev2=pipelineQueue.get(1);
+    	InstructionState prev3=pipelineQueue.get(0);
+    	
+    	
+    }
+    
+    public void hazardDetector(InstructionState curr, InstructionState prev1,InstructionState prev2,InstructionState prev3) {
+    	// Don't do anything if current is dummy
+    	if(curr.isDummy) {
+    		return;
+    	}
+    	
+    	if(!prev1.isDummy) {
+    		
+    	}
+    	
+    }
 
 	public int[] registers;
     public int pc;

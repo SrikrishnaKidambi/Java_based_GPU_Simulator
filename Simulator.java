@@ -47,7 +47,6 @@ public class Simulator{
     public void runProgram(Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         mapAllTheLabels(program_Seq);
         printLabels();
-        hazardDetector(program_Seq);
         for (Map.Entry<Integer,Integer> entry: dataHazardsMapping.entrySet()){
             System.out.println("The number of data stalls for ins with pc "+entry.getKey()+ " are "+entry.getValue());
         }
@@ -107,146 +106,146 @@ public class Simulator{
             }
         }
     }
-    public void hazardDetector(String[] program){
-        for(int i=0;i<program.length;i++){
-            dataHazardsMapping.put(i, 0);
-        }
-        for(int curr_idx=0;curr_idx<program.length;curr_idx++){
-            String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
-            String opcode=splitInstruction[0];
-            switch (opcode) {
-                case "add":
-                case "sub":
-                case "mul":
-                case "rem":
-                case "and":
-                case "or":
-                case "xor":
-                case "addi":
-                case "andi":
-                case "ori":
-                case "xori":
-                case "mv":
-                case "lw":
-                case "jal":
-                case "jalr":
-                case "la":
-                case "li":
-                    int rem_instructions=program.length-1-curr_idx;
-                    if(rem_instructions>=3){
-                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-                        String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
-                        String[] insN3=program[curr_idx+3].trim().replace(","," ").split("\\s");
-                        System.out.println("The next 1 for pc" + curr_idx+"is: "+insN1[0]);
-                        System.out.println("The next 2 for pc" + curr_idx+"is: "+insN2[0]);
-                        System.out.println("The next 3 for pc" + curr_idx+"is: "+insN3[0]);
-                        String rdCurr=splitInstruction[1];
-                        if(insN1[0].equals("j") || insN1[0].equals("jr")|| insN1[0].contains(":") ){
-                            System.out.println("Saiman thopu");
-                        }
-                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
-                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-                            if(curr_idx==0){
-                                System.out.println("if2:Value pushed in map: "+dataHazardsMapping.get(0));
-                            }
-                        }
-                        else if(insN1[0].equals("ecall")){
-                            if(curr_idx==0){
-                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
-                            }
-                        }
-                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-                            if(curr_idx==0){
-                                System.out.println("correct if:Value pushed in map: "+dataHazardsMapping.get(0));
-                            }
-                        }
-                        if(insN2[0].equals("j") || insN2[0].equals("jr")  || insN2[0].contains(":")){
-                            System.out.println("Saiman thopu");
-                        }
-                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN2[0].equals("ecall")){
-                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
-                            if(curr_idx==0){
-                                System.out.println("if3:Value pushed in map: "+dataHazardsMapping.get(0));
-                            }
-                        }
-                        else if(insN2[0].equals("ecall")){
-                            if(curr_idx==0){
-                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
-                            }
-                        }
-                        else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
-                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
-                        }
-                        if(insN3[0].equals("j") || insN3[0].equals("jr") || insN3[0].contains(":")){
-                            System.out.println("Saiman thopu");
-                        }
-                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN3[0].equals("ecall")){
-                            dataHazardsMapping.put(curr_idx+3, 1+dataHazardsMapping.get(curr_idx));
-                            if(curr_idx==0){
-                                System.out.println("if4:Value pushed in map: "+dataHazardsMapping.get(0));
-                            }
-                        }
-                        else if(insN3[0].equals("ecall")){
-                            if(curr_idx==0){
-                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
-                            }
-                        }
-                        else if(rdCurr.equals(insN3[2]) || (insN3.length==4 && rdCurr.equals(insN3[3]))){
-                            dataHazardsMapping.put(curr_idx+3, 1+dataHazardsMapping.get(curr_idx));
-                        }
-                    }
-                    else if(rem_instructions>=2){
-                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-                        String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
-                        String rdCurr=splitInstruction[1];
-                        if(insN1[0].equals("j") || insN1[0].equals("jr")|| insN1[0].contains(":") ){
-                            System.out.println("Saiman thopu");
-                        }
-                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
-                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-                        }
-                        else if(insN1[0].equals("ecall")){
-
-                        }
-                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-                        }
-                        if(insN2[0].equals("j") || insN2[0].equals("jr")  || insN2[0].contains(":")){
-                            System.out.println("Saiman thopu");
-                        }
-                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN2[0].equals("ecall")){
-                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
-                        }
-                        else if(insN2[0].equals("ecall") ){
-
-                        }
-                        else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
-                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
-                        }
-                    }
-                    else if(rem_instructions>=1){
-                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-                        String rdCurr=splitInstruction[1];
-                        if(insN1[0].equals("j") || insN1[0].equals("jr")  ||  insN1[0].contains(":") ){
-
-                        }
-                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
-                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-                        }
-                        else if(insN1[0].equals("ecall")){
-
-                        }
-                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-                        }
-                    }
-                    break; 
-                default:
-                    break;
-            }
-        }
-    }
+//    public void hazardDetector(String[] program){
+//        for(int i=0;i<program.length;i++){
+//            dataHazardsMapping.put(i, 0);
+//        }
+//        for(int curr_idx=0;curr_idx<program.length;curr_idx++){
+//            String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
+//            String opcode=splitInstruction[0];
+//            switch (opcode) {
+//                case "add":
+//                case "sub":
+//                case "mul":
+//                case "rem":
+//                case "and":
+//                case "or":
+//                case "xor":
+//                case "addi":
+//                case "andi":
+//                case "ori":
+//                case "xori":
+//                case "mv":
+//                case "lw":
+//                case "jal":
+//                case "jalr":
+//                case "la":
+//                case "li":
+//                    int rem_instructions=program.length-1-curr_idx;
+//                    if(rem_instructions>=3){
+//                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+//                        String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
+//                        String[] insN3=program[curr_idx+3].trim().replace(","," ").split("\\s");
+//                        System.out.println("The next 1 for pc" + curr_idx+"is: "+insN1[0]);
+//                        System.out.println("The next 2 for pc" + curr_idx+"is: "+insN2[0]);
+//                        System.out.println("The next 3 for pc" + curr_idx+"is: "+insN3[0]);
+//                        String rdCurr=splitInstruction[1];
+//                        if(insN1[0].equals("j") || insN1[0].equals("jr")|| insN1[0].contains(":") ){
+//                            System.out.println("Saiman thopu");
+//                        }
+//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
+//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
+//                            if(curr_idx==0){
+//                                System.out.println("if2:Value pushed in map: "+dataHazardsMapping.get(0));
+//                            }
+//                        }
+//                        else if(insN1[0].equals("ecall")){
+//                            if(curr_idx==0){
+//                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
+//                            }
+//                        }
+//                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
+//                            if(curr_idx==0){
+//                                System.out.println("correct if:Value pushed in map: "+dataHazardsMapping.get(0));
+//                            }
+//                        }
+//                        if(insN2[0].equals("j") || insN2[0].equals("jr")  || insN2[0].contains(":")){
+//                            System.out.println("Saiman thopu");
+//                        }
+//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN2[0].equals("ecall")){
+//                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
+//                            if(curr_idx==0){
+//                                System.out.println("if3:Value pushed in map: "+dataHazardsMapping.get(0));
+//                            }
+//                        }
+//                        else if(insN2[0].equals("ecall")){
+//                            if(curr_idx==0){
+//                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
+//                            }
+//                        }
+//                        else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
+//                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
+//                        }
+//                        if(insN3[0].equals("j") || insN3[0].equals("jr") || insN3[0].contains(":")){
+//                            System.out.println("Saiman thopu");
+//                        }
+//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN3[0].equals("ecall")){
+//                            dataHazardsMapping.put(curr_idx+3, 1+dataHazardsMapping.get(curr_idx));
+//                            if(curr_idx==0){
+//                                System.out.println("if4:Value pushed in map: "+dataHazardsMapping.get(0));
+//                            }
+//                        }
+//                        else if(insN3[0].equals("ecall")){
+//                            if(curr_idx==0){
+//                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
+//                            }
+//                        }
+//                        else if(rdCurr.equals(insN3[2]) || (insN3.length==4 && rdCurr.equals(insN3[3]))){
+//                            dataHazardsMapping.put(curr_idx+3, 1+dataHazardsMapping.get(curr_idx));
+//                        }
+//                    }
+//                    else if(rem_instructions>=2){
+//                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+//                        String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
+//                        String rdCurr=splitInstruction[1];
+//                        if(insN1[0].equals("j") || insN1[0].equals("jr")|| insN1[0].contains(":") ){
+//                            System.out.println("Saiman thopu");
+//                        }
+//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
+//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
+//                        }
+//                        else if(insN1[0].equals("ecall")){
+//
+//                        }
+//                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
+//                        }
+//                        if(insN2[0].equals("j") || insN2[0].equals("jr")  || insN2[0].contains(":")){
+//                            System.out.println("Saiman thopu");
+//                        }
+//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN2[0].equals("ecall")){
+//                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
+//                        }
+//                        else if(insN2[0].equals("ecall") ){
+//
+//                        }
+//                        else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
+//                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
+//                        }
+//                    }
+//                    else if(rem_instructions>=1){
+//                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+//                        String rdCurr=splitInstruction[1];
+//                        if(insN1[0].equals("j") || insN1[0].equals("jr")  ||  insN1[0].contains(":") ){
+//
+//                        }
+//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
+//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
+//                        }
+//                        else if(insN1[0].equals("ecall")){
+//
+//                        }
+//                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
+//                        }
+//                    }
+//                    break; 
+//                default:
+//                    break;
+//            }
+//        }
+//    }
     public void printResult(){
         for(int i=0;i<4;i++){
             System.out.println("Core :"+i);
