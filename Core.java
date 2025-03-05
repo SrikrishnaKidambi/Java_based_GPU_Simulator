@@ -15,7 +15,7 @@ public class Core {
         this.totalStalls=0;
     }
 
-    public void execute(String[] program,LinkedList<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
+    public void execute(String[] program,LinkedList<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping){
         if(pipeLineQueue.size()>=1){
             InstructionState in1=pipeLineQueue.get(0);
             WB(in1);
@@ -26,7 +26,7 @@ public class Core {
         }
         if(pipeLineQueue.size()>=3){
             if(this.coreID==0){
-                System.out.println("Number of stalls:"+this.latencyStalls);
+                // System.out.println("Number of latency stalls :"+this.latencyStalls);
             }
             for(int i=0;i<latencyStalls;i++){
                 pipeLineQueue.add(2+i, new InstructionState());
@@ -36,23 +36,38 @@ public class Core {
             EX(in3, labelMapping, stringVariableMapping, nameVariableMapping);
         }
         if(pipeLineQueue.size()>=4){
+            for(int i=0;i<dataHazardsMapping.get(pc==0?0:this.pc-1);i++){
+                pipeLineQueue.add(3+i, new InstructionState());
+            }
+            totalStalls+=dataHazardsMapping.get(pc==0?0:this.pc-1);
+            // System.out.println("The pc "+(pc-1)+" and data stalls before this are: "+);
+            if(this.coreID==3){
+                dataHazardsMapping.put(pc==0?0:this.pc-1, 0);
+            }
             InstructionState in4=pipeLineQueue.get(3);
             ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
         }
         if(pipeLineQueue.size()>=5){
             InstructionState in5=pipeLineQueue.get(4);
             if(this.coreID==0){
-                System.out.println("Number of stalls:"+this.controlStalls);
+                // System.out.println("Number of control stalls:"+this.controlStalls);
             }
+            
             if(this.controlStalls>0){
                 in5.isDummy=true;
                 this.controlStalls--;
             }
-            if(this.pc==program.length){
+            if(this.pc==program.length && in5.IF_done!=4){
+                if(in5.pc_val==8){
+                    // System.out.println("You are making last instruction as dummy here");
+                }
                 in5.isDummy=true;
             }
-            if(this.pc==program.length-1){
+            if(this.pc==program.length){
                 lastInstruction=in5;
+            }
+            if(this.pc==program.length-1){
+                // System.out.println("The instruction that is going to get executed is dummy or not:"+in5.isDummy);
             }
             IF(program, in5);
         }
@@ -76,13 +91,23 @@ public class Core {
         if(coreID==0){
             System.out.println("The value of pc in IF:"+this.pc+" for opcode:"+in.opcode);
         }
-        in.instruction=program[pc++];
+        in.instruction=program[pc];
+        in.pc_val=pc;
+        pc++;
+        if(this.pc==program.length){
+            lastInstruction=in;
+            System.out.println("Fetched the last instruction successfully with pc value"+in.pc_val);
+        }
+        
         in.isDummy=false;
         in.IF_done++;
         return;
     }
     private void ID_RF(LinkedList<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         if(in.isDummy || in==null || in.IDRF_done==4){
+            if(in.pc_val==8){   // hardcoded currently please check
+                System.out.println("The last instruction is treated as dummy");
+            }
             return;
         }
         String instruction=in.instruction;
@@ -107,14 +132,15 @@ public class Core {
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction add");
+                    System.exit(0);
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "sub":
                 //Ex: sub x1 x2 x3
@@ -124,14 +150,15 @@ public class Core {
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction sub");
+                    System.exit(0);
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "mul":
                 //Ex: mul x1 x2 x3
@@ -141,14 +168,15 @@ public class Core {
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction mul");
+                    System.exit(0);
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "mv":
                 //Ex: mv x1 x2
@@ -157,16 +185,17 @@ public class Core {
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "addi":
                 //Ex: addi x1 x2 8
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
                 if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction addi");
+                    System.exit(0);
                 }
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -174,16 +203,17 @@ public class Core {
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "muli":
                 //Ex: muli x1 x2 3
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
                 if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction muli");
+                    System.exit(0);
                 }
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -191,9 +221,9 @@ public class Core {
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "rem":
                 //Ex: rem x1 x2 x3
@@ -203,14 +233,15 @@ public class Core {
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction rem");
+                    System.exit(0);
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
 			case "and": 
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -218,7 +249,8 @@ public class Core {
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
 				}else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction and");
+                    System.exit(0);
 				}
 				break;
 			case "or": 
@@ -227,7 +259,8 @@ public class Core {
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
 				}else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction or");
+                    System.exit(0);
 				}
 				break;
 			case "xor": 
@@ -236,14 +269,16 @@ public class Core {
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
 				}else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction xor");
+                    System.exit(0);
 				}
 				break;
 			case "andi": 
 				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction andi");
+                    System.exit(0);
 				}
 				else{
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -253,7 +288,8 @@ public class Core {
 				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction ori");
+                    System.exit(0);
 				}
 				else{
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -263,7 +299,8 @@ public class Core {
 				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction xori");
+                    System.exit(0);
 				}
 				else{
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -278,9 +315,9 @@ public class Core {
 				}
                 this.controlStalls++;
                 totalStalls++;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "blt":
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -291,9 +328,9 @@ public class Core {
 				}
                 this.controlStalls++;
                 totalStalls++;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "sw": 
 				// syntax of instruction: sw x10 4(x5)
@@ -315,18 +352,18 @@ public class Core {
                 this.controlStalls++;
                 this.controlStalls++;
                 totalStalls+=2;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "jr" : 
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
                 this.controlStalls++;
                 this.controlStalls++;
                 totalStalls+=2;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "la" :
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -349,9 +386,9 @@ public class Core {
                 }
                 this.controlStalls++;
                 totalStalls++;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "beq":
                 //Ex: beq x1 x2 label
@@ -363,9 +400,9 @@ public class Core {
                 }
                 this.controlStalls++;
                 totalStalls++;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "lw":
                 //Ex: lw x1 8(x2) where 8 is the offset/immediate value and x2 is the base register
@@ -403,14 +440,15 @@ public class Core {
                 //Ex: jal x1 label
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.labelName=decodedInstruction[2];
+                System.out.println("The label name in ID for : "+in.opcode+" is "+in.labelName);
                 // pipeLineQueue.add(new InstructionState());
                 // pipeLineQueue.add(new InstructionState()); 
                 this.controlStalls++;
                 this.controlStalls++;
                 totalStalls+=2;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);  
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);            
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);  
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);            
                 break;
             case "j":
                 //Ex: j label which is equivalent to jal x0 label
@@ -418,9 +456,9 @@ public class Core {
                 this.controlStalls++;
                 this.controlStalls++;
                 totalStalls+=2;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
 			case "ecall":
             System.out.println("You entered ecall in ID/RF");
@@ -479,6 +517,7 @@ public class Core {
                 break;
             case "jal":
                 in.result=pc;
+                System.out.println("The label name is "+in.labelName);
                 pc=labelMapping.get(in.labelName).intValue();
                 pc++;
                 break;
@@ -647,31 +686,69 @@ public class Core {
         in.WB_done++; 
     }
     
-    public void hazardDetector(String[] program, int curr_idx){
-        String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
-        String opcode=splitInstruction[0];
-        switch (opcode) {
-            case "add":
-            case "sub":
-            case "mul":
-            case "rem":
-            case "addi":
-            case "and":
-            case "or":
-            case "xor":
-            case "andi":
-            case "ori":
-            case "xori":
-                int rem_instructions=program.length-1-curr_idx;
-                if(rem_instructions>=3){
+    // public void hazardDetector(String[] program, int curr_idx){
+    //     String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
+    //     String opcode=splitInstruction[0];
+    //     switch (opcode) {
+    //         case "add":
+    //         case "sub":
+    //         case "mul":
+    //         case "rem":
+    //         case "and":
+    //         case "or":
+    //         case "xor":
+    //         case "addi":
+    //         case "andi":
+    //         case "ori":
+    //         case "xori":
+    //         case "mv":
+    //         case "lw":
+    //         case "jal":
+    //         case "jalr":
+    //         case "la":
+    //         case "li":
+    //             int rem_instructions=program.length-1-curr_idx;
+    //             if(rem_instructions>=3){
+    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+    //                 String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
+    //                 String[] insN3=program[curr_idx+3].trim().replace(","," ").split("\\s");
+    //                 String rdCurr=splitInstruction[1];
+    //                 if(insN1[0].equals("j") || insN1[0].equals("jr") || insN2[0].equals("j") || insN2[0].equals("jr") || insN3[0].equals("j") || insN3[0].equals("jr") ){
 
-                }
-                break;
-        
-            default:
-                break;
-        }
-    }
+    //                 }
+    //                 else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+    //                     dataStalls+=3;
+    //                 }
+    //                 else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
+    //                     dataStalls+=2;
+    //                 }
+    //                 else if(rdCurr.equals(insN3[2]) || (insN3.length==4 && rdCurr.equals(insN3[3]))){
+    //                     dataStalls+=1;
+    //                 }
+    //             }
+    //             else if(rem_instructions>=2){
+    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+    //                 String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
+    //                 String rdCurr=splitInstruction[1];
+    //                 if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+    //                     dataStalls+=3;
+    //                 }
+    //                 else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
+    //                     dataStalls+=2;
+    //                 }
+    //             }
+    //             else if(rem_instructions>=1){
+    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
+    //                 String rdCurr=splitInstruction[1];
+    //                 if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
+    //                     dataStalls+=3;
+    //                 }
+    //             }
+    //             break; 
+    //         default:
+    //             break;
+    //     }
+    // }
 
 	public int[] registers;
     public int pc;
@@ -681,5 +758,6 @@ public class Core {
     public int controlStalls;
     public int totalStalls;
     public int latencyStalls;
+    public int dataStalls;
     public InstructionState lastInstruction;
 }
