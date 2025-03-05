@@ -1,0 +1,53 @@
+ 0   la x16 base       # stores the base address of the array
+ 1   li x31 4         # x31 has the value 4
+ 2   jal x1 bubbleSort
+ 3   j printArray
+
+ 4   bubbleSort:
+ 5       addi x10 x0 0     # i = 0
+ 6       addi x12 x0 4     # n = 20
+ 7   LoopOuter:
+ 8       addi x11 x0 0     # j = 0
+ 9       addi x14 x12 -1
+10       bge x10 x14 Exit  # Exit the outer loop if i >= n - 1
+11   LoopInner:
+12       sub x13 x12 x10   # n - i
+13       addi x13 x13 -1   # n - i - 1
+14       bge x11 x13 Incrementer  # Exit inner loop if j >= n - i - 1
+15       mul x19 x11 x31   # x19 = j * 4
+16       add x20 x16 x19   # x20 = x16 + j
+17       lw x25 0(x20)     # x25 = value at x16 + j
+18       addi x21 x20 4    # x21 = x16 + j + 1
+19       lw x26 0(x21)     # x26 = value at x16 + j + 1
+20       blt x26 x25 Swap
+21       addi x11 x11 1
+22       j LoopInner
+23   Swap:
+24       sw x25 0(x21)     # swap contents in memory
+25       sw x26 0(x20)
+26       addi x11 x11 1
+27       j LoopInner
+28   Incrementer:
+29       addi x10 x10 1
+30       j LoopOuter
+31   Exit:
+32       jr x1
+
+33   printArray:
+34       la x10 str1
+35       li x17 4
+36       ecall
+37       addi x29 x0 0     # counter of the array
+38   Loop:
+39       beq x29 x12 Done
+40       li x17 1
+41       lw x30 0(x16)
+42       mv x10 x30
+43       ecall   
+44       la x10 str
+45       li x17 4
+46       ecall  
+47       addi x16 x16 4
+48       addi x29 x29 1
+49       j Loop
+50   Done:
