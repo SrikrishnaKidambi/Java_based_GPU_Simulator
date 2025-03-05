@@ -26,7 +26,7 @@ public class Core {
         }
         if(pipeLineQueue.size()>=3){
             if(this.coreID==0){
-                System.out.println("Number of latency stalls :"+this.latencyStalls);
+                // System.out.println("Number of latency stalls :"+this.latencyStalls);
             }
             for(int i=0;i<latencyStalls;i++){
                 pipeLineQueue.add(2+i, new InstructionState());
@@ -37,7 +37,7 @@ public class Core {
         }
         if(pipeLineQueue.size()>=4){
             for(int i=0;i<dataHazardsMapping.get(pc==0?0:this.pc-1);i++){
-                pipeLineQueue.add(3+i+1, new InstructionState());
+                pipeLineQueue.add(3+i, new InstructionState());
             }
             totalStalls+=dataHazardsMapping.get(pc==0?0:this.pc-1);
             // System.out.println("The pc "+(pc-1)+" and data stalls before this are: "+);
@@ -50,7 +50,7 @@ public class Core {
         if(pipeLineQueue.size()>=5){
             InstructionState in5=pipeLineQueue.get(4);
             if(this.coreID==0){
-                System.out.println("Number of control stalls:"+this.controlStalls);
+                // System.out.println("Number of control stalls:"+this.controlStalls);
             }
             
             if(this.controlStalls>0){
@@ -59,7 +59,7 @@ public class Core {
             }
             if(this.pc==program.length && in5.IF_done!=4){
                 if(in5.pc_val==8){
-                    System.out.println("You are making last instruction as dummy here");
+                    // System.out.println("You are making last instruction as dummy here");
                 }
                 in5.isDummy=true;
             }
@@ -67,7 +67,7 @@ public class Core {
                 lastInstruction=in5;
             }
             if(this.pc==program.length-1){
-                System.out.println("The instruction that is going to get executed is dummy or not:"+in5.isDummy);
+                // System.out.println("The instruction that is going to get executed is dummy or not:"+in5.isDummy);
             }
             IF(program, in5);
         }
@@ -132,14 +132,15 @@ public class Core {
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction add");
+                    System.exit(0);
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "sub":
                 //Ex: sub x1 x2 x3
@@ -149,14 +150,15 @@ public class Core {
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction sub");
+                    System.exit(0);
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "mul":
                 //Ex: mul x1 x2 x3
@@ -166,14 +168,15 @@ public class Core {
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction mul");
+                    System.exit(0);
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "mv":
                 //Ex: mv x1 x2
@@ -182,16 +185,17 @@ public class Core {
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "addi":
                 //Ex: addi x1 x2 8
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
                 if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction addi");
+                    System.exit(0);
                 }
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -199,16 +203,17 @@ public class Core {
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "muli":
                 //Ex: muli x1 x2 3
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
                 if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction muli");
+                    System.exit(0);
                 }
                 else{
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -216,9 +221,9 @@ public class Core {
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "rem":
                 //Ex: rem x1 x2 x3
@@ -228,14 +233,15 @@ public class Core {
                     in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction rem");
+                    System.exit(0);
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
                 totalStalls+=latency-1;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
 			case "and": 
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -243,7 +249,8 @@ public class Core {
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
 				}else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction and");
+                    System.exit(0);
 				}
 				break;
 			case "or": 
@@ -252,7 +259,8 @@ public class Core {
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
 				}else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction or");
+                    System.exit(0);
 				}
 				break;
 			case "xor": 
@@ -261,14 +269,16 @@ public class Core {
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
 				}else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    System.out.println("Incorrent instruction xor");
+                    System.exit(0);
 				}
 				break;
 			case "andi": 
 				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction andi");
+                    System.exit(0);
 				}
 				else{
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -278,7 +288,8 @@ public class Core {
 				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction ori");
+                    System.exit(0);
 				}
 				else{
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -288,7 +299,8 @@ public class Core {
 				in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				if(decodedInstruction[3].charAt(0)=='X' || decodedInstruction[3].charAt(0)=='x'){
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
+                    System.out.println("Incorrent instruction xori");
+                    System.exit(0);
 				}
 				else{
 					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
@@ -303,9 +315,9 @@ public class Core {
 				}
                 this.controlStalls++;
                 totalStalls++;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "blt":
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -316,9 +328,9 @@ public class Core {
 				}
                 this.controlStalls++;
                 totalStalls++;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "sw": 
 				// syntax of instruction: sw x10 4(x5)
@@ -340,18 +352,18 @@ public class Core {
                 this.controlStalls++;
                 this.controlStalls++;
                 totalStalls+=2;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "jr" : 
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
                 this.controlStalls++;
                 this.controlStalls++;
                 totalStalls+=2;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "la" :
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -374,9 +386,9 @@ public class Core {
                 }
                 this.controlStalls++;
                 totalStalls++;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "beq":
                 //Ex: beq x1 x2 label
@@ -388,9 +400,9 @@ public class Core {
                 }
                 this.controlStalls++;
                 totalStalls++;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
             case "lw":
                 //Ex: lw x1 8(x2) where 8 is the offset/immediate value and x2 is the base register
@@ -428,14 +440,15 @@ public class Core {
                 //Ex: jal x1 label
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.labelName=decodedInstruction[2];
+                System.out.println("The label name in ID for : "+in.opcode+" is "+in.labelName);
                 // pipeLineQueue.add(new InstructionState());
                 // pipeLineQueue.add(new InstructionState()); 
                 this.controlStalls++;
                 this.controlStalls++;
                 totalStalls+=2;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);  
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);            
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);  
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);            
                 break;
             case "j":
                 //Ex: j label which is equivalent to jal x0 label
@@ -443,9 +456,9 @@ public class Core {
                 this.controlStalls++;
                 this.controlStalls++;
                 totalStalls+=2;
-                if(coreID==0)
-                System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
-                System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
+                // if(coreID==0)
+                // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
+                // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
 			case "ecall":
             System.out.println("You entered ecall in ID/RF");
@@ -504,6 +517,7 @@ public class Core {
                 break;
             case "jal":
                 in.result=pc;
+                System.out.println("The label name is "+in.labelName);
                 pc=labelMapping.get(in.labelName).intValue();
                 pc++;
                 break;
