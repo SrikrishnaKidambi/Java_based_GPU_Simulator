@@ -30,7 +30,6 @@ public class Test {
 			int latency=scanner.nextInt();
 			latencies.put(entry.getKey(), latency); 
 		}
-		scanner.close();
         sim=new Simulator();
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();

@@ -13,9 +13,30 @@ public class Core {
         this.controlStalls=0;
         this.latencyStalls=0;
         this.totalStalls=0;
+        pipeLineQueue=new LinkedList<>();
+        InstructionState in1=new InstructionState();
+        InstructionState in2=new InstructionState();
+        InstructionState in3=new InstructionState();
+        InstructionState in4=new InstructionState();
+        InstructionState in5=new InstructionState();
+        in5.isDummy=false;
+        pipeLineQueue.addLast(in1);
+        pipeLineQueue.addLast(in3);
+        pipeLineQueue.addLast(in2);
+        pipeLineQueue.addLast(in4);
+        pipeLineQueue.addLast(in5);
     }
-
-    public void execute(String[] program,LinkedList<InstructionState>pipeLineQueue,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping){
+    
+    public void executeUtil(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping) {
+    	execute(program, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+    	System.out.println("Size of the pipeline queue:"+pipeLineQueue.size());
+    	pipeLineQueue.removeFirst();
+        InstructionState new_in=new InstructionState();
+        new_in.isDummy=false;
+        pipeLineQueue.addLast(new_in);
+        
+    }
+    public void execute(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping){
         if(pipeLineQueue.size()>=1){
             InstructionState in1=pipeLineQueue.get(0);
             WB(in1);
@@ -36,23 +57,23 @@ public class Core {
             EX(in3, labelMapping, stringVariableMapping, nameVariableMapping);
         }
         if(pipeLineQueue.size()>=4){
-            for(int i=0;i<dataHazardsMapping.get(pc==0?0:this.pc-1);i++){
-                pipeLineQueue.add(3+i, new InstructionState());
-            }
-            totalStalls+=dataHazardsMapping.get(pc==0?0:this.pc-1);
-            // System.out.println("The pc "+(pc-1)+" and data stalls before this are: "+);
-            if(this.coreID==3){
-                dataHazardsMapping.put(pc==0?0:this.pc-1, 0);
-            }
             InstructionState in4=pipeLineQueue.get(3);
+            System.out.println("PC of the instruction that is getting executed:"+in4.pc_val);
+            System.out.println("The fetched instruction is dummy:"+in4.isDummy);
             ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
+            int dataStalls=hazardDetectorUtil(pipeLineQueue);
+            for(int i=0;i<dataStalls;i++) {
+            	pipeLineQueue.add(3+i, new InstructionState());
+            }
         }
         if(pipeLineQueue.size()>=5){
             InstructionState in5=pipeLineQueue.get(4);
             if(this.coreID==0){
                 // System.out.println("Number of control stalls:"+this.controlStalls);
             }
-            
+            if(this.coreID==0) {
+            	System.out.println("Number of control stalls:"+this.controlStalls);
+            }
             if(this.controlStalls>0){
                 in5.isDummy=true;
                 this.controlStalls--;
@@ -63,11 +84,15 @@ public class Core {
                 }
                 in5.isDummy=true;
             }
-            if(this.pc==program.length){
-                lastInstruction=in5;
-            }
+//            if(this.pc==program.length){
+//                lastInstruction=in5;
+//            }
             if(this.pc==program.length-1){
                 // System.out.println("The instruction that is going to get executed is dummy or not:"+in5.isDummy);
+            }
+            if(this.coreID==0) {
+            	System.out.println("The instruction is dummy:"+in5.pc_val);
+            	System.out.println("The instruction is dummy:"+in5.isDummy);
             }
             IF(program, in5);
         }
@@ -88,11 +113,11 @@ public class Core {
         if(in.isDummy || in==null || in.IF_done==4){
             return;
         }
+        in.instruction=program[pc];
+        in.pc_val=pc;
         if(coreID==0){
             System.out.println("The value of pc in IF:"+this.pc+" for opcode:"+in.opcode);
         }
-        in.instruction=program[pc];
-        in.pc_val=pc;
         pc++;
         if(this.pc==program.length){
             lastInstruction=in;
@@ -117,11 +142,12 @@ public class Core {
         }catch(IllegalArgumentException e) {
             System.err.println("Error occured is:"+e.getMessage());
         }
-        if(coreID==0){
-            System.out.println("The value of pc in ID/RF:"+this.pc+" for opcode:"+in.opcode);
-        }        
+               
         String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
         in.opcode=decodedInstruction[0].trim();
+        if(coreID==0){
+            System.out.println("The value of pc in ID/RF:"+this.pc+" for opcode:"+in.opcode);
+        } 
         int latency=0;
         switch (in.opcode) {
             case "add":
@@ -400,6 +426,7 @@ public class Core {
                 }
                 this.controlStalls++;
                 totalStalls++;
+                System.out.println("The value of IDRF_done:"+in.IDRF_done+" for the core:"+this.coreID);
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -679,108 +706,72 @@ public class Core {
             default:
                 break;
         }
-        //hardwiring x0 to 0.
+        // hardwiring x0 to 0.
         if(registers[0]!=0){
             registers[0]=0;
         }  
         in.WB_done++; 
     }
     
-    // public void hazardDetector(String[] program, int curr_idx){
-    //     String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
-    //     String opcode=splitInstruction[0];
-    //     switch (opcode) {
-    //         case "add":
-    //         case "sub":
-    //         case "mul":
-    //         case "rem":
-    //         case "and":
-    //         case "or":
-    //         case "xor":
-    //         case "addi":
-    //         case "andi":
-    //         case "ori":
-    //         case "xori":
-    //         case "mv":
-    //         case "lw":
-    //         case "jal":
-    //         case "jalr":
-    //         case "la":
-    //         case "li":
-    //             int rem_instructions=program.length-1-curr_idx;
-    //             if(rem_instructions>=3){
-    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-    //                 String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
-    //                 String[] insN3=program[curr_idx+3].trim().replace(","," ").split("\\s");
-    //                 String rdCurr=splitInstruction[1];
-    //                 if(insN1[0].equals("j") || insN1[0].equals("jr") || insN2[0].equals("j") || insN2[0].equals("jr") || insN3[0].equals("j") || insN3[0].equals("jr") ){
-
-    //                 }
-    //                 else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-    //                     dataStalls+=3;
-    //                 }
-    //                 else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
-    //                     dataStalls+=2;
-    //                 }
-    //                 else if(rdCurr.equals(insN3[2]) || (insN3.length==4 && rdCurr.equals(insN3[3]))){
-    //                     dataStalls+=1;
-    //                 }
-    //             }
-    //             else if(rem_instructions>=2){
-    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-    //                 String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
-    //                 String rdCurr=splitInstruction[1];
-    //                 if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-    //                     dataStalls+=3;
-    //                 }
-    //                 else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
-    //                     dataStalls+=2;
-    //                 }
-    //             }
-    //             else if(rem_instructions>=1){
-    //                 String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-    //                 String rdCurr=splitInstruction[1];
-    //                 if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-    //                     dataStalls+=3;
-    //                 }
-    //             }
-    //             break; 
-    //         default:
-    //             break;
-    //     }
-    // }
-    
-    public void hazardDetectorUtil(LinkedList<InstructionState>pipelineQueue) {
+    public int hazardDetectorUtil(LinkedList<InstructionState>pipelineQueue) {
     	InstructionState curr=pipelineQueue.get(3);  // fetching the instruction that is currently going to ID/RF
     	// fetching the previous three instructions to compare and check for dependencies
     	InstructionState prev1=pipelineQueue.get(2);  
     	InstructionState prev2=pipelineQueue.get(1);
     	InstructionState prev3=pipelineQueue.get(0);
-    	hazardDetector(curr,prev1,prev2,prev3);
+    	return hazardDetector(curr,prev1,prev2,prev3);  // returning the computed data stalls
     }
     
-    public void hazardDetector(InstructionState curr, InstructionState prev1,InstructionState prev2,InstructionState prev3) {
+    public int hazardDetector(InstructionState curr, InstructionState prev1,InstructionState prev2,InstructionState prev3) {
     	// Don't do anything if current is dummy
     	if(curr.isDummy) {
-    		return;
+    		return 0;
+    	}
+    	
+    	// checking for ecall seperately as it has no rd, rs1 or rs2 but exhibits RAW dependency
+    	if(curr.opcode.equals("ecall")) {
+    		if(!prev1.isDummy && prev1.rd!=-1) {
+    			if(prev1.rd==10 || prev1.rd==17) {
+    				curr.IDRF_done=0;  // perform the ID/RF again when stalls are found
+        			return 3;
+        		}
+    		}
+    		
+    		if(!prev2.isDummy && prev2.rd!=-1) {
+    			if(prev2.rd==10 || prev2.rd==17) {
+    				curr.IDRF_done=0; 
+        			return 2;
+        		}
+    		}
+    		
+    		if(!prev3.isDummy && prev3.rd!=-1) {
+    			if(prev3.rd==10 || prev3.rd==17) {
+    				curr.IDRF_done=0;
+        			return 1;
+        		}
+    		}
+    		
     	}
     	
     	if(!prev1.isDummy && prev1.rd!=-1) {
     		if(curr.rs1==prev1.rd || curr.rs2==prev1.rd) {
-    			dataStalls+=3;  // this indicates that there is a dependency with immediate previous instruction that lead to three stalls.  
+    			curr.IDRF_done=0;
+    			return 3;  // this indicates that there is a dependency with immediate previous instruction that lead to three stalls.  
     		}
     	}
     	if(!prev2.isDummy && prev2.rd!=-1) {
     		if(curr.rs1==prev2.rd || curr.rs2==prev2.rd) {
-    			dataStalls+=2; // dependency with second previous instruction
-    		}
+    			curr.IDRF_done=0;
+    			return 2; // dependency with second previous instruction resulting in only two stalls
+    		} 
     	}
     	if(!prev3.isDummy && prev3.rd!=-1) {
     		if(curr.rs1==prev3.rd || curr.rs2==prev3.rd) {
-    			dataStalls+=1; // dependency with third prev instruction
+    			curr.IDRF_done=0;
+    			return 1; // dependency with third prev instruction resulting in only one stall
     		}
     	}
-    	
+    	return 0;
     }
 
 	public int[] registers;
@@ -791,6 +782,6 @@ public class Core {
     public int controlStalls;
     public int totalStalls;
     public int latencyStalls;
-    public int dataStalls;
     public InstructionState lastInstruction;
+    public LinkedList<InstructionState> pipeLineQueue;
 }

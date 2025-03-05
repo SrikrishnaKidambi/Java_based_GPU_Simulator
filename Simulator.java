@@ -47,40 +47,21 @@ public class Simulator{
     public void runProgram(Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         mapAllTheLabels(program_Seq);
         printLabels();
-        for (Map.Entry<Integer,Integer> entry: dataHazardsMapping.entrySet()){
-            System.out.println("The number of data stalls for ins with pc "+entry.getKey()+ " are "+entry.getValue());
-        }
         System.out.println(program_Seq.length);
         System.out.println("Program execution started");
         boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
-        InstructionState in1=new InstructionState();
-        InstructionState in2=new InstructionState();
-        InstructionState in3=new InstructionState();
-        InstructionState in4=new InstructionState();
-        InstructionState in5=new InstructionState();
-        in5.isDummy=false;
-        LinkedList<InstructionState>pipeLineQueue=new LinkedList<>();
-        pipeLineQueue.addLast(in1);
-        pipeLineQueue.addLast(in3);
-        pipeLineQueue.addLast(in2);
-        pipeLineQueue.addLast(in4);
-        pipeLineQueue.addLast(in5);
         while(!isDone){
             isInstruction=true;
             for(int i=0;i<4;i++){
                 if(cores[i].pc>=program_Seq.length){
                     break;
                 }
-                this.cores[i].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+                this.cores[i].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
             } 
             // if(pipeLineQueue.isEmpty()){
             //     break;
             // }
-            pipeLineQueue.removeFirst();
-            //if(cores[0].pc<=program_Seq.length-1){
-                InstructionState new_in=new InstructionState();
-                new_in.isDummy=false;
-                pipeLineQueue.addLast(new_in);
+            
             //}
             // printResult();
             // Memory.printMemory();
@@ -91,19 +72,71 @@ public class Simulator{
 //            System.out.println("The value of pc in core 2 is :"+cores[2].pc);
 //            System.out.println("The value of pc in core 3 is :"+cores[3].pc);
             isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
+            System.out.println();
             
         }
-        while(!pipeLineQueue.isEmpty()){
-
-            cores[0].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
-            cores[1].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
-            cores[2].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
-            cores[3].execute(program_Seq, pipeLineQueue, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
-            if(pipeLineQueue.removeFirst()==cores[0].lastInstruction){
-                System.out.println("The last instruction is:"+cores[0].lastInstruction.opcode);
-                System.out.println("Sriman thopu dammunte aapu");
-                break;
+        boolean firstPipelineDone=false;
+        boolean secondPipelineDone=false;
+        boolean thirdPipelineDone=false;
+        boolean fourthPipelineDone=false;
+        
+        while(!cores[0].pipeLineQueue.isEmpty() && !cores[1].pipeLineQueue.isEmpty() && !cores[2].pipeLineQueue.isEmpty() && !cores[3].pipeLineQueue.isEmpty()){
+        	if(!firstPipelineDone) {
+        		cores[0].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        	}
+        	if(!secondPipelineDone) {
+        		cores[1].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        	}
+        	if(!thirdPipelineDone) {
+        		cores[2].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        	}
+        	if(!fourthPipelineDone) {
+        		cores[3].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        	}
+            if(!firstPipelineDone) {
+            	InstructionState first_top=cores[0].pipeLineQueue.get(0);
+            	System.out.println("the last instruction in core 0 is:"+cores[0].lastInstruction.pc_val);
+            	System.out.println("the last instruction in core 0 is:"+first_top.pc_val);
+            	
+                if(first_top==cores[0].lastInstruction) {
+                	System.out.println("the last instruction in core 0 is:"+cores[0].lastInstruction.pc_val);
+                	firstPipelineDone=true;
+                	cores[0].pipeLineQueue.removeFirst();
+                }else {
+                	cores[0].pipeLineQueue.removeFirst();
+                }
             }
+            if(!secondPipelineDone) {
+            	InstructionState second_top=cores[1].pipeLineQueue.getFirst();
+                if(second_top==cores[1].lastInstruction) {
+                	System.out.println("the last instruction in core 1 is:"+cores[1].lastInstruction);
+                	secondPipelineDone=true;
+                	cores[1].pipeLineQueue.removeFirst();
+                }else {
+                	cores[1].pipeLineQueue.removeFirst();
+                }
+            }
+            if(!thirdPipelineDone) {
+            	InstructionState third_top=cores[2].pipeLineQueue.getFirst();
+                if(third_top==cores[2].lastInstruction) {
+                	System.out.println("the last instruction in core 2 is:"+cores[2].lastInstruction);
+                	thirdPipelineDone=true;
+                	cores[2].pipeLineQueue.removeFirst();
+                }else {
+                	cores[2].pipeLineQueue.removeFirst();
+                }
+            }
+            if(!fourthPipelineDone) {
+            	InstructionState fourth_top=cores[3].pipeLineQueue.getFirst();
+                if(fourth_top==cores[3].lastInstruction) {
+                	System.out.println("the last instruction in core 3 is:"+cores[3].lastInstruction);
+                	fourthPipelineDone=true;
+                	cores[3].pipeLineQueue.removeFirst();
+                }else {
+                	cores[3].pipeLineQueue.removeFirst();
+                }
+            }
+            
         }
     }
 //    public void hazardDetector(String[] program){
@@ -263,6 +296,7 @@ public class Simulator{
         SimulatorGUI.console.append("\nThe number of stalls of core 1 are: "+cores[1].totalStalls);
         SimulatorGUI.console.append("\nThe number of stalls of core 2 are: "+cores[2].totalStalls);
         SimulatorGUI.console.append("\nThe number of stalls of core 3 are: "+cores[3].totalStalls);
+        SimulatorGUI.console.append("\n");
     }
 
 
