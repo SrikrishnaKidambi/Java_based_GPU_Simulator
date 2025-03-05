@@ -756,8 +756,7 @@ public class Core {
     	InstructionState prev1=pipelineQueue.get(2);  
     	InstructionState prev2=pipelineQueue.get(1);
     	InstructionState prev3=pipelineQueue.get(0);
-    	
-    	
+    	hazardDetector(curr,prev1,prev2,prev3);
     }
     
     public void hazardDetector(InstructionState curr, InstructionState prev1,InstructionState prev2,InstructionState prev3) {
@@ -766,8 +765,20 @@ public class Core {
     		return;
     	}
     	
-    	if(!prev1.isDummy) {
-    		
+    	if(!prev1.isDummy && prev1.rd!=-1) {
+    		if(curr.rs1==prev1.rd || curr.rs2==prev1.rd) {
+    			dataStalls+=3;  // this indicates that there is a dependency with immediate previous instruction that lead to three stalls.  
+    		}
+    	}
+    	if(!prev2.isDummy && prev2.rd!=-1) {
+    		if(curr.rs1==prev2.rd || curr.rs2==prev2.rd) {
+    			dataStalls+=2; // dependency with second previous instruction
+    		}
+    	}
+    	if(!prev3.isDummy && prev3.rd!=-1) {
+    		if(curr.rs1==prev3.rd || curr.rs2==prev3.rd) {
+    			dataStalls+=1; // dependency with third prev instruction
+    		}
     	}
     	
     }
