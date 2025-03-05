@@ -338,7 +338,7 @@ public class Core {
 				in.rs2=Integer.parseInt(decodedInstruction[1].substring(1));
 				String[] offsetAndRegBase=decodedInstruction[2].split("[()]");
 				in.immediateVal=Integer.parseInt(offsetAndRegBase[0]);
-				in.rd=Integer.parseInt(offsetAndRegBase[1].substring(1));  //here the address of the register that has the base address of the memory location is being stored.
+				in.rs1=Integer.parseInt(offsetAndRegBase[1].substring(1));  //here the address of the register that has the base address of the memory location is being stored.
 				if(in.immediateVal<-512 || in.immediateVal>512){
 					System.out.println("Immediate value cannot be less than -512 or greater than 512");
 					System.exit(0);
@@ -554,7 +554,7 @@ public class Core {
 					System.out.println("Memory out of bounds");
 					System.exit(0);
 				}
-				in.result=registers[in.rd]+in.immediateVal+this.coreID;
+				in.result=registers[in.rs1]+in.immediateVal+this.coreID;
 				break;
 			case "jalr": 
 				in.result=pc;
