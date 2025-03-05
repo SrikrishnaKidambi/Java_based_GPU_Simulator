@@ -664,7 +664,7 @@ public class Core {
             case "xori":
                 int rem_instructions=program.length-1-curr_idx;
                 if(rem_instructions>=3){
-                    
+
                 }
                 break;
         
