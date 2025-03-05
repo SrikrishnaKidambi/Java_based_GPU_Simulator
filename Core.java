@@ -198,7 +198,7 @@ public class Core {
                     System.exit(0);
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    in.immediateVal=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
@@ -216,7 +216,7 @@ public class Core {
                     System.exit(0);
                 }
                 else{
-                    in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+                    in.immediateVal=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
                 latency=latencies.get(in.opcode);
                 latencyStalls+=latency-1;
@@ -281,7 +281,7 @@ public class Core {
                     System.exit(0);
 				}
 				else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+					in.immediateVal=Integer.parseInt(decodedInstruction[3].substring(0));
 				} 
 				break;
 			case "ori": 
@@ -292,7 +292,7 @@ public class Core {
                     System.exit(0);
 				}
 				else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+					in.immediateVal=Integer.parseInt(decodedInstruction[3].substring(0));
 				} 
 				break;
 			case "xori": 
@@ -303,7 +303,7 @@ public class Core {
                     System.exit(0);
 				}
 				else{
-					in.rs2=Integer.parseInt(decodedInstruction[3].substring(0));
+					in.immediateVal=Integer.parseInt(decodedInstruction[3].substring(0));
 				} 
 				break;
 			case "bne":
@@ -496,10 +496,10 @@ public class Core {
                 in.result = registers[in.rs1];
                 break;
             case "addi":
-                in.result = registers[in.rs1] + in.rs2;
+                in.result = registers[in.rs1] + in.immediateVal;
                 break;
             case "muli":
-                in.result = registers[in.rs1] * in.rs2;
+                in.result = registers[in.rs1] * in.immediateVal;
                 break;
             case "rem":
                 in.result = registers[in.rs1] % registers[in.rs2];
@@ -538,13 +538,13 @@ public class Core {
                 in.result=registers[in.rs1] ^ registers[in.rs2];
 				break;
 			case "andi":
-                in.result=registers[in.rs1] & in.rs2;
+                in.result=registers[in.rs1] & in.immediateVal;
 				break;
 			case "ori":
-                in.result=registers[in.rs1] | in.rs2;
+                in.result=registers[in.rs1] | in.immediateVal;
 				break;
 			case "xori":
-                in.result=registers[in.rs1] ^ in.rs2;
+                in.result=registers[in.rs1] ^ in.immediateVal;
 				break;
 			case "bne":
 				// pass the other conditional branch instructions in the same way for execution phase
