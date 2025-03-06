@@ -80,18 +80,18 @@ public class Simulator{
         boolean thirdPipelineDone=false;
         boolean fourthPipelineDone=false;
         
-        while(!cores[0].pipeLineQueue.isEmpty() && !cores[1].pipeLineQueue.isEmpty() && !cores[2].pipeLineQueue.isEmpty() && !cores[3].pipeLineQueue.isEmpty()){
+        while(!firstPipelineDone || !secondPipelineDone || !thirdPipelineDone || !fourthPipelineDone){
         	if(!firstPipelineDone) {
-        		cores[0].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        		cores[0].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
         	}
         	if(!secondPipelineDone) {
-        		cores[1].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        		cores[1].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
         	}
         	if(!thirdPipelineDone) {
-        		cores[2].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        		cores[2].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
         	}
         	if(!fourthPipelineDone) {
-        		cores[3].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        		cores[3].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
         	}
             if(!firstPipelineDone) {
             	InstructionState first_top=cores[0].pipeLineQueue.get(0);
@@ -119,7 +119,7 @@ public class Simulator{
             if(!thirdPipelineDone) {
             	InstructionState third_top=cores[2].pipeLineQueue.getFirst();
                 if(third_top==cores[2].lastInstruction) {
-                	System.out.println("the last instruction in core 2 is:"+cores[2].lastInstruction);
+//                	System.out.println("the last instruction in core 2 is:"+cores[2].lastInstruction);
                 	thirdPipelineDone=true;
                 	cores[2].pipeLineQueue.removeFirst();
                 }else {
@@ -129,7 +129,7 @@ public class Simulator{
             if(!fourthPipelineDone) {
             	InstructionState fourth_top=cores[3].pipeLineQueue.getFirst();
                 if(fourth_top==cores[3].lastInstruction) {
-                	System.out.println("the last instruction in core 3 is:"+cores[3].lastInstruction);
+//                	System.out.println("the last instruction in core 3 is:"+cores[3].lastInstruction);
                 	fourthPipelineDone=true;
                 	cores[3].pipeLineQueue.removeFirst();
                 }else {

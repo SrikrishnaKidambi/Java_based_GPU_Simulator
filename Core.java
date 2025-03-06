@@ -719,6 +719,12 @@ public class Core {
     	InstructionState prev1=pipelineQueue.get(2);  
     	InstructionState prev2=pipelineQueue.get(1);
     	InstructionState prev3=pipelineQueue.get(0);
+    	if(this.coreID==0) {
+    		System.out.println("Op code for curr:"+curr.opcode);
+        	System.out.println("Op code for curr:"+prev1.opcode);
+        	System.out.println("Op code for curr:"+prev2.opcode);
+        	System.out.println("Op code for curr:"+prev3.opcode);
+    	}
     	return hazardDetector(curr,prev1,prev2,prev3);  // returning the computed data stalls
     }
     
@@ -755,19 +761,19 @@ public class Core {
     	
     	if(!prev1.isDummy && prev1.rd!=-1) {
     		if(curr.rs1==prev1.rd || curr.rs2==prev1.rd) {
-    			curr.IDRF_done=0;
+    			curr.IDRF_done--;
     			return 3;  // this indicates that there is a dependency with immediate previous instruction that lead to three stalls.  
     		}
     	}
     	if(!prev2.isDummy && prev2.rd!=-1) {
     		if(curr.rs1==prev2.rd || curr.rs2==prev2.rd) {
-    			curr.IDRF_done=0;
+    			curr.IDRF_done--;
     			return 2; // dependency with second previous instruction resulting in only two stalls
     		} 
     	}
     	if(!prev3.isDummy && prev3.rd!=-1) {
     		if(curr.rs1==prev3.rd || curr.rs2==prev3.rd) {
-    			curr.IDRF_done=0;
+    			curr.IDRF_done--;
     			return 1; // dependency with third prev instruction resulting in only one stall
     		}
     	}
