@@ -27,7 +27,7 @@ public class Simulator{
                 	SimulatorGUI.console.append(label+"has already been used. Hence stopping the execution of program");
                 	throw new IllegalArgumentException("Duplicate label found");
                 }
-                labelMapping.put(label,i);
+                labelMapping.put(label,i+1);
                 // System.out.println("label: "+label+ " and pc: "+i);
             }
         }
@@ -65,8 +65,9 @@ public class Simulator{
             //}
             // printResult();
             // Memory.printMemory();
-            if(isInstruction)
-                this.clock++; 
+            if(isInstruction) {
+            	this.clock++;
+            }    
 //            System.out.println("The value of pc in core 0 is :"+cores[0].pc);
 //            System.out.println("The value of pc in core 1 is :"+cores[1].pc);
 //            System.out.println("The value of pc in core 2 is :"+cores[2].pc);
@@ -95,8 +96,8 @@ public class Simulator{
         	}
             if(!firstPipelineDone) {
             	InstructionState first_top=cores[0].pipeLineQueue.get(0);
-            	System.out.println("the last instruction in core 0 is:"+cores[0].lastInstruction.pc_val);
-            	System.out.println("the last instruction in core 0 is:"+first_top.pc_val);
+//            	System.out.println("the last instruction in core 0 is:"+cores[0].lastInstruction.pc_val);
+//            	System.out.println("the last instruction in core 0 is:"+first_top.pc_val);
             	
                 if(first_top==cores[0].lastInstruction) {
                 	System.out.println("the last instruction in core 0 is:"+cores[0].lastInstruction.pc_val);
@@ -109,7 +110,7 @@ public class Simulator{
             if(!secondPipelineDone) {
             	InstructionState second_top=cores[1].pipeLineQueue.getFirst();
                 if(second_top==cores[1].lastInstruction) {
-                	System.out.println("the last instruction in core 1 is:"+cores[1].lastInstruction);
+                	System.out.println("the last instruction in core 1 is:"+cores[1].lastInstruction.pc_val);
                 	secondPipelineDone=true;
                 	cores[1].pipeLineQueue.removeFirst();
                 }else {
@@ -119,7 +120,7 @@ public class Simulator{
             if(!thirdPipelineDone) {
             	InstructionState third_top=cores[2].pipeLineQueue.getFirst();
                 if(third_top==cores[2].lastInstruction) {
-//                	System.out.println("the last instruction in core 2 is:"+cores[2].lastInstruction);
+                	System.out.println("the last instruction in core 2 is:"+cores[2].lastInstruction.pc_val);
                 	thirdPipelineDone=true;
                 	cores[2].pipeLineQueue.removeFirst();
                 }else {
@@ -129,7 +130,7 @@ public class Simulator{
             if(!fourthPipelineDone) {
             	InstructionState fourth_top=cores[3].pipeLineQueue.getFirst();
                 if(fourth_top==cores[3].lastInstruction) {
-//                	System.out.println("the last instruction in core 3 is:"+cores[3].lastInstruction);
+                	System.out.println("the last instruction in core 3 is:"+cores[3].lastInstruction.pc_val);
                 	fourthPipelineDone=true;
                 	cores[3].pipeLineQueue.removeFirst();
                 }else {
@@ -298,7 +299,6 @@ public class Simulator{
         SimulatorGUI.console.append("\nThe number of stalls of core 3 are: "+cores[3].totalStalls);
         SimulatorGUI.console.append("\n");
     }
-
 
     public int clock;
     public Core[] cores;

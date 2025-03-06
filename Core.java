@@ -62,6 +62,7 @@ public class Core {
             System.out.println("The fetched instruction is dummy:"+in4.isDummy);
             ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
             int dataStalls=hazardDetectorUtil(pipeLineQueue);
+            totalStalls+=dataStalls;
             for(int i=0;i<dataStalls;i++) {
             	pipeLineQueue.add(3+i, new InstructionState());
             }
@@ -78,11 +79,37 @@ public class Core {
                 in5.isDummy=true;
                 this.controlStalls--;
             }
-            if(this.pc==program.length && in5.IF_done!=4){
-                if(in5.pc_val==8){
-                    // System.out.println("You are making last instruction as dummy here");
+            if(this.coreID==0) {
+            	if(this.pc==program.length && in5.IF_done_core0==false){
+                    if(in5.pc_val==8){
+                        // System.out.println("You are making last instruction as dummy here");
+                    }
+                    in5.isDummy=true;
                 }
-                in5.isDummy=true;
+            }
+            if(this.coreID==1) {
+            	if(this.pc==program.length && in5.IF_done_core1==false){
+                    if(in5.pc_val==8){
+                        // System.out.println("You are making last instruction as dummy here");
+                    }
+                    in5.isDummy=true;
+                }
+            }
+            if(this.coreID==2) {
+            	if(this.pc==program.length && in5.IF_done_core2==false){
+                    if(in5.pc_val==8){
+                        // System.out.println("You are making last instruction as dummy here");
+                    }
+                    in5.isDummy=true;
+                }
+            }
+            if(this.coreID==3) {
+            	if(this.pc==program.length && in5.IF_done_core3==false){
+                    if(in5.pc_val==8){
+                        // System.out.println("You are making last instruction as dummy here");
+                    }
+                    in5.isDummy=true;
+                }
             }
 //            if(this.pc==program.length){
 //                lastInstruction=in5;
@@ -110,8 +137,50 @@ public class Core {
         return instruction.trim();
     }
     private void IF(String[] program,InstructionState in){
-        if(in.isDummy || in==null || in.IF_done==4){
-            return;
+        if(this.coreID==0) {
+        	if(in.isDummy || in==null || in.IF_done_core0==true){
+        		if(this.coreID==0) {
+            		System.out.println("----------------------The pipeline currently :");
+            		for(int i=0;i<=4;i++) {
+                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+                	}
+                	System.out.println();
+            	}
+                return;
+            }
+        }else if(this.coreID==1) {
+        	if(in.isDummy || in==null || in.IF_done_core1==true){
+        		if(this.coreID==0) {
+            		System.out.println("----------------------The pipeline currently :");
+            		for(int i=0;i<=4;i++) {
+                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+                	}
+                	System.out.println();
+            	}
+                return;
+            }
+        }else if(this.coreID==2) {
+        	if(in.isDummy || in==null || in.IF_done_core2==true){
+        		if(this.coreID==0) {
+            		System.out.println("----------------------The pipeline currently :");
+            		for(int i=0;i<=4;i++) {
+                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+                	}
+                	System.out.println();
+            	}
+                return;
+            }
+        }if(this.coreID==3) {
+        	if(in.isDummy || in==null || in.IF_done_core3==true){
+        		if(this.coreID==0) {
+            		System.out.println("----------------------The pipeline currently :");
+            		for(int i=0;i<=4;i++) {
+                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+                	}
+                	System.out.println();
+            	}
+                return;
+            }
         }
         in.instruction=program[pc];
         in.pc_val=pc;
@@ -119,21 +188,63 @@ public class Core {
             System.out.println("The value of pc in IF:"+this.pc+" for opcode:"+in.opcode);
         }
         pc++;
+        if(this.coreID==0) {
+    		System.out.println("----------------------The pipeline currently :");
+    		for(int i=0;i<=4;i++) {
+        		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+        	}
+        	System.out.println();
+        	System.out.println("The total number of stalls so far are: "+this.totalStalls);
+    	}
         if(this.pc==program.length){
             lastInstruction=in;
             System.out.println("Fetched the last instruction successfully with pc value"+in.pc_val);
         }
         
         in.isDummy=false;
-        in.IF_done++;
+        if(this.coreID==0) {
+        	in.IF_done_core0=true;
+        }
+        if(this.coreID==1) {
+        	in.IF_done_core1=true;
+        }
+        if(this.coreID==2) {
+        	in.IF_done_core2=true;
+        }
+        if(this.coreID==3) {
+        	in.IF_done_core3=true;
+        }	
         return;
     }
     private void ID_RF(LinkedList<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
-        if(in.isDummy || in==null || in.IDRF_done==4){
-            if(in.pc_val==8){   // hardcoded currently please check
-                System.out.println("The last instruction is treated as dummy");
+        if(this.coreID==0) {
+        	if(in.isDummy || in==null || in.IDRF_done_core0==true){
+                if(in.pc_val==8){   // hardcoded currently please check
+                    System.out.println("The last instruction is treated as dummy");
+                }
+                return;
             }
-            return;
+        }else if(this.coreID==1) {
+        	if(in.isDummy || in==null || in.IDRF_done_core1==true){
+                if(in.pc_val==8){   // hardcoded currently please check
+                    System.out.println("The last instruction is treated as dummy");
+                }
+                return;
+            }
+        }else if(this.coreID==2) {
+        	if(in.isDummy || in==null || in.IDRF_done_core2==true){
+                if(in.pc_val==8){   // hardcoded currently please check
+                    System.out.println("The last instruction is treated as dummy");
+                }
+                return;
+            }
+        }else if(this.coreID==3) {
+        	if(in.isDummy || in==null || in.IDRF_done_core3==true){
+                if(in.pc_val==8){   // hardcoded currently please check
+                    System.out.println("The last instruction is treated as dummy");
+                }
+                return;
+            }
         }
         String instruction=in.instruction;
         String parsedInstruction = null;
@@ -161,9 +272,34 @@ public class Core {
                     System.out.println("Incorrent instruction add");
                     System.exit(0);
                 }
-                latency=latencies.get(in.opcode);
-                latencyStalls+=latency-1;
-                totalStalls+=latency-1;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_once0) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_once1) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_once2) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_once3) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -179,9 +315,34 @@ public class Core {
                     System.out.println("Incorrent instruction sub");
                     System.exit(0);
                 }
-                latency=latencies.get(in.opcode);
-                latencyStalls+=latency-1;
-                totalStalls+=latency-1;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_once0) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_once1) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_once2) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_once3) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -197,9 +358,34 @@ public class Core {
                     System.out.println("Incorrent instruction mul");
                     System.exit(0);
                 }
-                latency=latencies.get(in.opcode);
-                latencyStalls+=latency-1;
-                totalStalls+=latency-1;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_once0) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_once1) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_once2) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_once3) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -208,9 +394,34 @@ public class Core {
                 //Ex: mv x1 x2
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
-                latency=latencies.get(in.opcode);
-                latencyStalls+=latency-1;
-                totalStalls+=latency-1;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_once0) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_once1) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_once2) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_once3) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -226,9 +437,34 @@ public class Core {
                 else{
                     in.immediateVal=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
-                latency=latencies.get(in.opcode);
-                latencyStalls+=latency-1;
-                totalStalls+=latency-1;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_once0) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_once1) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_once2) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_once3) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -244,9 +480,34 @@ public class Core {
                 else{
                     in.immediateVal=Integer.parseInt(decodedInstruction[3].substring(0));
                 }
-                latency=latencies.get(in.opcode);
-                latencyStalls+=latency-1;
-                totalStalls+=latency-1;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_once0) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_once1) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_once2) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_once3) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -262,9 +523,34 @@ public class Core {
                     System.out.println("Incorrent instruction rem");
                     System.exit(0);
                 }
-                latency=latencies.get(in.opcode);
-                latencyStalls+=latency-1;
-                totalStalls+=latency-1;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_once0) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_once1) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_once2) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_once3) {
+                		latency=latencies.get(in.opcode);
+                        latencyStalls+=latency-1;
+                        totalStalls+=latency-1;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+latencyStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -338,9 +624,33 @@ public class Core {
 				in.labelName=decodedInstruction[3];
 				if(registers[in.rs1]!=registers[in.rs2]){
 					pc=labelMapping.get(in.labelName).intValue();
-				}
-                this.controlStalls++;
-                totalStalls++;
+				}else {
+                	pc=in.pc_val+1;
+                }
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_core0) {
+                		this.controlStalls++;
+                        totalStalls++;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_core1) {
+                		this.controlStalls++;
+                        totalStalls++;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_core2) {
+                		this.controlStalls++;
+                        totalStalls++;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_core3) {
+                		this.controlStalls++;
+                        totalStalls++;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -351,9 +661,34 @@ public class Core {
 				in.labelName=decodedInstruction[3];
 				if(registers[in.rs1]<registers[in.rs2]){
 					pc=labelMapping.get(in.labelName).intValue();
-				}
-                this.controlStalls++;
-                totalStalls++;
+				}else {
+                	pc=in.pc_val+1;
+                }
+				if(this.coreID==0) {
+                	if(!in.IDRF_done_core0) {
+                		this.controlStalls++;
+                        totalStalls++;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_core1) {
+                		this.controlStalls++;
+                        totalStalls++;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_core2) {
+                		this.controlStalls++;
+                        totalStalls++;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_core3) {
+                		this.controlStalls++;
+                        totalStalls++;
+                	}
+                }
+                
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -375,18 +710,60 @@ public class Core {
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs1=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.rs2=Integer.parseInt(decodedInstruction[3].substring(1));
-                this.controlStalls++;
-                this.controlStalls++;
-                totalStalls+=2;
+				if(this.coreID==0) {
+                	if(!in.IDRF_done_core0) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_core1) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_core2) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_core3) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "jr" : 
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
-                this.controlStalls++;
-                this.controlStalls++;
-                totalStalls+=2;
+				if(this.coreID==0) {
+                	if(!in.IDRF_done_core0) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_core1) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_core2) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_core3) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -409,9 +786,33 @@ public class Core {
                 in.labelName=decodedInstruction[3];
                 if(registers[in.rs1]>=registers[in.rs2]){
                     pc=labelMapping.get(in.labelName).intValue();
+                }else {
+                	pc=in.pc_val+1;
                 }
-                this.controlStalls++;
-                totalStalls++;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_core0) {
+                		this.controlStalls+=1;
+                        totalStalls+=1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_core1) {
+                		this.controlStalls+=1;
+                        totalStalls+=1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_core2) {
+                		this.controlStalls+=1;
+                        totalStalls+=1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_core3) {
+                		this.controlStalls+=1;
+                        totalStalls+=1;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -421,12 +822,38 @@ public class Core {
                 in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                 in.labelName=decodedInstruction[3];
+                System.out.println("The values of rs1 and rs2 are:"+registers[in.rs1]+" and "+registers[in.rs2]);
+                System.out.println("The values in x12 and x0 are "+registers[12]+" and "+registers[0]);
                 if(registers[in.rs1]==registers[in.rs2]){
                     pc=labelMapping.get(in.labelName).intValue();
+                }else {
+                	pc=in.pc_val+1;
                 }
-                this.controlStalls++;
-                totalStalls++;
-                System.out.println("The value of IDRF_done:"+in.IDRF_done+" for the core:"+this.coreID);
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_core0) {
+                		this.controlStalls+=1;
+                        totalStalls+=1;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_core1) {
+                		this.controlStalls+=1;
+                        totalStalls+=1;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_core2) {
+                		this.controlStalls+=1;
+                        totalStalls+=1;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_core3) {
+                		this.controlStalls+=1;
+                        totalStalls+=1;
+                	}
+                }
+//                System.out.println("The value of IDRF_done:"+in.IDRF_done+" for the core:"+this.coreID);
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -470,9 +897,30 @@ public class Core {
                 System.out.println("The label name in ID for : "+in.opcode+" is "+in.labelName);
                 // pipeLineQueue.add(new InstructionState());
                 // pipeLineQueue.add(new InstructionState()); 
-                this.controlStalls++;
-                this.controlStalls++;
-                totalStalls+=2;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_core0) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_core1) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_core2) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_core3) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);  
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);            
@@ -480,9 +928,30 @@ public class Core {
             case "j":
                 //Ex: j label which is equivalent to jal x0 label
                 in.labelName=decodedInstruction[1];
-                this.controlStalls++;
-                this.controlStalls++;
-                totalStalls+=2;
+                if(this.coreID==0) {
+                	if(!in.IDRF_done_core0) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==1) {
+                	if(!in.IDRF_done_core1) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==2) {
+                	if(!in.IDRF_done_core2) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
+                if(this.coreID==3) {
+                	if(!in.IDRF_done_core3) {
+                		this.controlStalls+=2;
+                        totalStalls+=2;
+                	}
+                }
                 // if(coreID==0)
                 // System.out.println("Number of stalls in "+in.opcode+" are "+controlStalls);
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
@@ -500,11 +969,37 @@ public class Core {
 			}
                 break;
         }
-        in.IDRF_done++;
+        if(this.coreID==0) {
+        	in.IDRF_done_core0=true;
+        }
+        if(this.coreID==1) {
+        	in.IDRF_done_core1=true;
+        }
+        if(this.coreID==2) {
+        	in.IDRF_done_core2=true;
+        }
+        if(this.coreID==3) {
+        	in.IDRF_done_core3=true;
+        }
     }
     private void EX(InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
-        if(in.isDummy || in==null || in.EX_done==4){
-            return;
+        if(this.coreID==0) {
+        	if(in.isDummy || in==null || in.EX_done_core0==true){
+        		System.out.println("*********Returning for core0 because the instruction is dummy:"+in.isDummy);
+                return;
+            }
+        }else if(this.coreID==1) {
+        	if(in.isDummy || in==null || in.EX_done_core1==true){
+                return;
+            }
+        }else if(this.coreID==2) {
+        	if(in.isDummy || in==null || in.EX_done_core2==true){
+                return;
+            }
+        }else if(this.coreID==3) {
+        	if(in.isDummy || in==null || in.EX_done_core3==true){
+                return;
+            }
         }
         if(coreID==0){
             System.out.println("The value of pc in EX:"+this.pc+" for opcode:"+in.opcode);
@@ -520,7 +1015,12 @@ public class Core {
                 in.result = registers[in.rs1] * registers[in.rs2];
                 break;
             case "mv":
-                in.result = registers[in.rs1];
+            	in.result = registers[in.rs1];
+            	System.out.println("Printing the core values till 15 for checking in core:"+this.coreID);
+            	for(int i=0;i<11;i++) {
+            		System.out.print(registers[i]+" ");
+            	}
+            	System.out.println("Done printing the core values(debugging)");
                 break;
             case "addi":
                 in.result = registers[in.rs1] + in.immediateVal;
@@ -533,7 +1033,7 @@ public class Core {
                 break;
             case "lw":
                 if(registers[in.rs1]+in.immediateVal+this.coreID>=1024 || registers[in.rs1]+in.immediateVal+this.coreID<0){
-                    System.out.println("The memory address requested is not accessible by the core");
+                    System.out.println("The memory address requested is not accessible by the core "+registers[in.rs1]+in.immediateVal+this.coreID);
                     System.exit(0);
                     break;
                 }
@@ -546,11 +1046,9 @@ public class Core {
                 in.result=pc;
                 System.out.println("The label name is "+in.labelName);
                 pc=labelMapping.get(in.labelName).intValue();
-                pc++;
                 break;
             case "j":
                 pc=labelMapping.get(in.labelName).intValue();
-                pc++;
                 break;
 			case "jr":
 				pc=registers[in.rd];
@@ -577,7 +1075,7 @@ public class Core {
 				// pass the other conditional branch instructions in the same way for execution phase
 				break;
 			case "sw":
-				if((registers[in.rd]+in.immediateVal+this.coreID)>=1024 || (registers[in.rd]+in.immediateVal+this.coreID)<0){
+				if((registers[in.rs1]+in.immediateVal+this.coreID)>=1024 || (registers[in.rs1]+in.immediateVal+this.coreID)<0){
 					System.out.println("Memory out of bounds");
 					System.exit(0);
 				}
@@ -618,11 +1116,36 @@ public class Core {
             default:
                 break;
         }
-        in.EX_done++;
+        if(this.coreID==0) {
+        	in.EX_done_core0=true;
+        }
+        if(this.coreID==1) {
+        	in.EX_done_core1=true;
+        }
+        if(this.coreID==2) {
+        	in.EX_done_core2=true;
+        }
+        if(this.coreID==3) {
+        	in.EX_done_core3=true;
+        }
     }
     private void MEM(InstructionState in,Memory mem){
-        if(in.isDummy || in==null || in.MEM_done==4){
-            return;
+        if(this.coreID==0) {
+        	if(in.isDummy || in==null || in.MEM_done_core0==true){
+                return;
+            }
+        }else if(this.coreID==1) {
+        	if(in.isDummy || in==null || in.MEM_done_core1==true){
+                return;
+            }
+        }if(this.coreID==2) {
+        	if(in.isDummy || in==null || in.MEM_done_core2==true){
+                return;
+            }
+        }if(this.coreID==3) {
+        	if(in.isDummy || in==null || in.MEM_done_core3==true){
+                return;
+            }
         }
         if(coreID==0){
             System.out.println("The value of pc in MEM:"+this.pc+" for opcode:"+in.opcode);
@@ -636,12 +1159,40 @@ public class Core {
             default:
                 break;
         }
-        in.MEM_done++;
+        if(this.coreID==0) {
+        	in.MEM_done_core0=true;
+        }
+        if(this.coreID==1) {
+        	in.MEM_done_core1=true;
+        }
+        if(this.coreID==2) {
+        	in.MEM_done_core2=true;
+        }
+        if(this.coreID==3) {
+        	in.MEM_done_core3=true;
+        }
     }
     private void WB(InstructionState in){
-        if(in.isDummy || in==null || in.WB_done==4){
-            return;
-        }
+        	if(this.coreID==0) {
+            	if(in.isDummy || in==null || in.WB_done_core0==true){
+                    return;
+                }
+            }
+        	if(this.coreID==1) {
+            	if(in.isDummy || in==null || in.WB_done_core1==true){
+                    return;
+                }
+            }
+        	if(this.coreID==2) {
+            	if(in.isDummy || in==null || in.WB_done_core2==true){
+                    return;
+                }
+            }
+        	if(this.coreID==3) {
+            	if(in.isDummy || in==null || in.WB_done_core3==true){
+                    return;
+                }
+            }
         if(coreID==0){
             System.out.println("The value of pc in WB:"+this.pc+" for opcode:"+in.opcode);
         }        	
@@ -710,7 +1261,18 @@ public class Core {
         if(registers[0]!=0){
             registers[0]=0;
         }  
-        in.WB_done++; 
+        if(this.coreID==0) {
+        	in.WB_done_core0=true;
+        }
+        if(this.coreID==1) {
+        	in.WB_done_core1=true;
+        }
+        if(this.coreID==2) {
+        	in.WB_done_core2=true;
+        }
+        if(this.coreID==3) {
+        	in.WB_done_core3=true;
+        } 
     }
     
     public int hazardDetectorUtil(LinkedList<InstructionState>pipelineQueue) {
@@ -719,12 +1281,12 @@ public class Core {
     	InstructionState prev1=pipelineQueue.get(2);  
     	InstructionState prev2=pipelineQueue.get(1);
     	InstructionState prev3=pipelineQueue.get(0);
-    	if(this.coreID==0) {
-    		System.out.println("Op code for curr:"+curr.opcode);
-        	System.out.println("Op code for curr:"+prev1.opcode);
-        	System.out.println("Op code for curr:"+prev2.opcode);
-        	System.out.println("Op code for curr:"+prev3.opcode);
-    	}
+//    	if(this.coreID==0) {
+//    		System.out.println("Op code for curr:"+curr.opcode);
+//        	System.out.println("Op code for prev1:"+prev1.opcode);
+//        	System.out.println("Op code for prev2:"+prev2.opcode);
+//        	System.out.println("Op code for prev3:"+prev3.opcode);
+//    	}
     	return hazardDetector(curr,prev1,prev2,prev3);  // returning the computed data stalls
     }
     
@@ -738,21 +1300,66 @@ public class Core {
     	if(curr.opcode.equals("ecall")) {
     		if(!prev1.isDummy && prev1.rd!=-1) {
     			if(prev1.rd==10 || prev1.rd==17) {
-    				curr.IDRF_done=0;  // perform the ID/RF again when stalls are found
+    				if(this.coreID==0) {
+    					curr.IDRF_done_core0=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once0=true;
+    				}
+    				if(this.coreID==1) {
+    					curr.IDRF_done_core1=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once1=true;
+    				}
+    				if(this.coreID==2) {
+    					curr.IDRF_done_core2=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once2=true;
+    				}
+    				if(this.coreID==3) {
+    					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once3=true;
+    				}
         			return 3;
         		}
     		}
     		
     		if(!prev2.isDummy && prev2.rd!=-1) {
     			if(prev2.rd==10 || prev2.rd==17) {
-    				curr.IDRF_done=0; 
+    				if(this.coreID==0) {
+    					curr.IDRF_done_core0=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once0=true;
+    				}
+    				if(this.coreID==1) {
+    					curr.IDRF_done_core1=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once1=true;
+    				}
+    				if(this.coreID==2) {
+    					curr.IDRF_done_core2=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once2=true;
+    				}
+    				if(this.coreID==3) {
+    					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once3=true;
+    				} 
         			return 2;
         		}
     		}
     		
     		if(!prev3.isDummy && prev3.rd!=-1) {
     			if(prev3.rd==10 || prev3.rd==17) {
-    				curr.IDRF_done=0;
+    				if(this.coreID==0) {
+    					curr.IDRF_done_core0=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once0=true;
+    				}
+    				if(this.coreID==1) {
+    					curr.IDRF_done_core1=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once1=true;
+    				}
+    				if(this.coreID==2) {
+    					curr.IDRF_done_core2=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once2=true;
+    				}
+    				if(this.coreID==3) {
+    					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
+    					curr.IDRF_done_once3=true;
+    				}
         			return 1;
         		}
     		}
@@ -761,19 +1368,64 @@ public class Core {
     	
     	if(!prev1.isDummy && prev1.rd!=-1) {
     		if(curr.rs1==prev1.rd || curr.rs2==prev1.rd) {
-    			curr.IDRF_done--;
+    			if(this.coreID==0) {
+					curr.IDRF_done_core0=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once0=true;
+				}
+				if(this.coreID==1) {
+					curr.IDRF_done_core1=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once1=true;
+				}
+				if(this.coreID==2) {
+					curr.IDRF_done_core2=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once2=true;
+				}
+				if(this.coreID==3) {
+					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once3=true;
+				}
     			return 3;  // this indicates that there is a dependency with immediate previous instruction that lead to three stalls.  
     		}
     	}
     	if(!prev2.isDummy && prev2.rd!=-1) {
     		if(curr.rs1==prev2.rd || curr.rs2==prev2.rd) {
-    			curr.IDRF_done--;
+    			if(this.coreID==0) {
+					curr.IDRF_done_core0=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once0=true;
+				}
+				if(this.coreID==1) {
+					curr.IDRF_done_core1=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once1=true;
+				}
+				if(this.coreID==2) {
+					curr.IDRF_done_core2=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once2=true;
+				}
+				if(this.coreID==3) {
+					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once3=true;
+				}
     			return 2; // dependency with second previous instruction resulting in only two stalls
     		} 
     	}
     	if(!prev3.isDummy && prev3.rd!=-1) {
     		if(curr.rs1==prev3.rd || curr.rs2==prev3.rd) {
-    			curr.IDRF_done--;
+    			if(this.coreID==0) {
+					curr.IDRF_done_core0=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once0=true;
+				}
+				if(this.coreID==1) {
+					curr.IDRF_done_core1=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once1=true;
+				}
+				if(this.coreID==2) {
+					curr.IDRF_done_core2=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once2=true;
+				}
+				if(this.coreID==3) {
+					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
+					curr.IDRF_done_once3=true;
+				}
     			return 1; // dependency with third prev instruction resulting in only one stall
     		}
     	}
