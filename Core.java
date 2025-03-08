@@ -27,8 +27,8 @@ public class Core {
         pipeLineQueue.addLast(in5);
     }
     
-    public void executeUtil(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping) {
-    	execute(program, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+    public void executeUtil(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping,boolean isPipelineForwardingEnabled) {
+    	execute(program, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
     	System.out.println("Size of the pipeline queue:"+pipeLineQueue.size());
     	pipeLineQueue.removeFirst();
         InstructionState new_in=new InstructionState();
@@ -36,13 +36,20 @@ public class Core {
         pipeLineQueue.addLast(new_in);
         
     }
-    public void execute(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping){
+    public void execute(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping,boolean isPipelineForwardingEnabled){
         if(pipeLineQueue.size()>=1){
             InstructionState in1=pipeLineQueue.get(0);
             WB(in1);
         }
         if(pipeLineQueue.size()>=2){
             InstructionState in2=pipeLineQueue.get(1);
+            if(isPipelineForwardingEnabled){
+                int dataStalls=hazardDetectorUtil(pipeLineQueue,isPipelineForwardingEnabled,1);
+                totalStalls+=dataStalls;
+                for(int i=0;i<dataStalls;i++) {
+                    pipeLineQueue.add(1+i, new InstructionState());
+                }
+            }
             MEM(in2, mem);
         }
         if(pipeLineQueue.size()>=3){
@@ -54,17 +61,39 @@ public class Core {
             }
             latencyStalls=0;  //making the number of stalls due to latency to zero
             InstructionState in3=pipeLineQueue.get(2);
+            if(isPipelineForwardingEnabled){
+                int dataStalls=hazardDetectorUtil(pipeLineQueue,isPipelineForwardingEnabled,2);
+                System.out.println("Total number of datastalls req by branch at pc: "+ in3.pc_val+ " are "+dataStalls);
+                totalStalls+=dataStalls;
+                for(int i=0;i<dataStalls;i++) {
+                    pipeLineQueue.add(2+i, new InstructionState());
+                }
+            }
             EX(in3, labelMapping, stringVariableMapping, nameVariableMapping);
         }
         if(pipeLineQueue.size()>=4){
             InstructionState in4=pipeLineQueue.get(3);
             System.out.println("PC of the instruction that is getting executed:"+in4.pc_val);
             System.out.println("The fetched instruction is dummy:"+in4.isDummy);
+            if(isPipelineForwardingEnabled){
+                decode(in4);
+                if(!in4.isDummy && (in4.opcode.equals("bne") || in4.opcode.equals("beq") || in4.opcode.equals("blt") || in4.opcode.equals("bge"))){
+                    int dataStalls=hazardDetectorUtil(pipeLineQueue,isPipelineForwardingEnabled,3);
+                    System.out.println("Total number of datastalls req by branch at pc: "+ in4.pc_val+ " are "+dataStalls);
+                    totalStalls+=dataStalls;
+                    for(int i=0;i<dataStalls;i++) {
+                        pipeLineQueue.add(3+i, new InstructionState());
+                    }
+                }
+            }
+            in4 = pipeLineQueue.get(3);
             ID_RF(pipeLineQueue,in4, labelMapping, stringVariableMapping, nameVariableMapping,latencies);
-            int dataStalls=hazardDetectorUtil(pipeLineQueue);
-            totalStalls+=dataStalls;
-            for(int i=0;i<dataStalls;i++) {
-            	pipeLineQueue.add(3+i, new InstructionState());
+            if(!isPipelineForwardingEnabled){
+                int dataStalls=hazardDetectorUtil(pipeLineQueue,isPipelineForwardingEnabled,4);
+                totalStalls+=dataStalls;
+                for(int i=0;i<dataStalls;i++) {
+                    pipeLineQueue.add(3+i, new InstructionState());
+                }
             }
         }
         if(pipeLineQueue.size()>=5){
@@ -81,33 +110,33 @@ public class Core {
             }
             if(this.coreID==0) {
             	if(this.pc==program.length && in5.IF_done_core0==false){
-                    if(in5.pc_val==8){
-                        // System.out.println("You are making last instruction as dummy here");
-                    }
+                    // if(in5.pc_val==8){
+                    //     // System.out.println("You are making last instruction as dummy here");
+                    // }
                     in5.isDummy=true;
                 }
             }
             if(this.coreID==1) {
             	if(this.pc==program.length && in5.IF_done_core1==false){
-                    if(in5.pc_val==8){
-                        // System.out.println("You are making last instruction as dummy here");
-                    }
+                    // if(in5.pc_val==8){
+                    //     // System.out.println("You are making last instruction as dummy here");
+                    // }
                     in5.isDummy=true;
                 }
             }
             if(this.coreID==2) {
             	if(this.pc==program.length && in5.IF_done_core2==false){
-                    if(in5.pc_val==8){
-                        // System.out.println("You are making last instruction as dummy here");
-                    }
+                    // if(in5.pc_val==8){
+                    //     // System.out.println("You are making last instruction as dummy here");
+                    // }
                     in5.isDummy=true;
                 }
             }
             if(this.coreID==3) {
             	if(this.pc==program.length && in5.IF_done_core3==false){
-                    if(in5.pc_val==8){
-                        // System.out.println("You are making last instruction as dummy here");
-                    }
+                    // if(in5.pc_val==8){
+                    //     // System.out.println("You are making last instruction as dummy here");
+                    // }
                     in5.isDummy=true;
                 }
             }
@@ -182,6 +211,9 @@ public class Core {
                 return;
             }
         }
+        if(program[pc].contains(":")){
+            pc++;
+        }
         in.instruction=program[pc];
         in.pc_val=pc;
         if(coreID==0){
@@ -216,33 +248,52 @@ public class Core {
         }	
         return;
     }
+    private void decode(InstructionState in){
+        if(in.isDummy){
+            return;
+        }
+        String instruction=in.instruction;
+        String parsedInstruction = null;
+        try {
+            parsedInstruction=instructionParser(instruction);
+        }catch(IllegalArgumentException e) {
+            System.err.println("Error occured is:"+e.getMessage());
+        }
+        String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
+        in.opcode=decodedInstruction[0].trim();
+        if(in.opcode.equals("bne") || in.opcode.equals("beq") || in.opcode.equals("blt") || in.opcode.equals("bge")){
+            in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
+            in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
+        }
+        return;
+    }
     private void ID_RF(LinkedList<InstructionState>pipeLineQueue,InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
         if(this.coreID==0) {
         	if(in.isDummy || in==null || in.IDRF_done_core0==true){
-                if(in.pc_val==8){   // hardcoded currently please check
-                    System.out.println("The last instruction is treated as dummy");
-                }
+                // if(in.pc_val==8){   // hardcoded currently please check
+                //     System.out.println("The last instruction is treated as dummy");
+                // }
                 return;
             }
         }else if(this.coreID==1) {
         	if(in.isDummy || in==null || in.IDRF_done_core1==true){
-                if(in.pc_val==8){   // hardcoded currently please check
-                    System.out.println("The last instruction is treated as dummy");
-                }
+                // if(in.pc_val==8){   // hardcoded currently please check
+                //     System.out.println("The last instruction is treated as dummy");
+                // }
                 return;
             }
         }else if(this.coreID==2) {
         	if(in.isDummy || in==null || in.IDRF_done_core2==true){
-                if(in.pc_val==8){   // hardcoded currently please check
-                    System.out.println("The last instruction is treated as dummy");
-                }
+                // if(in.pc_val==8){   // hardcoded currently please check
+                //     System.out.println("The last instruction is treated as dummy");
+                // }
                 return;
             }
         }else if(this.coreID==3) {
         	if(in.isDummy || in==null || in.IDRF_done_core3==true){
-                if(in.pc_val==8){   // hardcoded currently please check
-                    System.out.println("The last instruction is treated as dummy");
-                }
+                // if(in.pc_val==8){   // hardcoded currently please check
+                //     System.out.println("The last instruction is treated as dummy");
+                // }
                 return;
             }
         }
@@ -622,7 +673,20 @@ public class Core {
 				in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.labelName=decodedInstruction[3];
-				if(registers[in.rs1]!=registers[in.rs2]){
+                int temp4_rs1=registers[in.rs1],temp4_rs2=registers[in.rs2];
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        temp4_rs1=in.pipeline_reg[0];
+                        temp4_rs2=in.pipeline_reg[1];
+                    }else if(in.pipeline_reg[0]!=null){
+                        temp4_rs1=in.pipeline_reg[0];
+                        temp4_rs2=registers[in.rs2];
+                    }else if(in.pipeline_reg[1]!=null){
+                        temp4_rs1=registers[in.rs1];
+                        temp4_rs2=in.pipeline_reg[1];
+                    }
+                }
+				if(temp4_rs1!=temp4_rs2){
 					pc=labelMapping.get(in.labelName).intValue();
 				}else {
                 	pc=in.pc_val+1;
@@ -659,7 +723,20 @@ public class Core {
 				in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.labelName=decodedInstruction[3];
-				if(registers[in.rs1]<registers[in.rs2]){
+                int temp1_rs1=registers[in.rs1],temp1_rs2=registers[in.rs2];
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        temp1_rs1=in.pipeline_reg[0];
+                        temp1_rs2=in.pipeline_reg[1];
+                    }else if(in.pipeline_reg[0]!=null){
+                        temp1_rs1=in.pipeline_reg[0];
+                        temp1_rs2=registers[in.rs2];
+                    }else if(in.pipeline_reg[1]!=null){
+                        temp1_rs1=registers[in.rs1];
+                        temp1_rs2=in.pipeline_reg[1];
+                    }
+                }
+				if(temp1_rs1<temp1_rs2){
 					pc=labelMapping.get(in.labelName).intValue();
 				}else {
                 	pc=in.pc_val+1;
@@ -739,7 +816,7 @@ public class Core {
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "jr" : 
-				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
+				in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
 				if(this.coreID==0) {
                 	if(!in.IDRF_done_core0) {
                 		this.controlStalls+=2;
@@ -784,7 +861,20 @@ public class Core {
                 in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                 in.labelName=decodedInstruction[3];
-                if(registers[in.rs1]>=registers[in.rs2]){
+                int temp2_rs1=registers[in.rs1],temp2_rs2=registers[in.rs2];
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        temp2_rs1=in.pipeline_reg[0];
+                        temp2_rs2=in.pipeline_reg[1];
+                    }else if(in.pipeline_reg[0]!=null){
+                        temp2_rs1=in.pipeline_reg[0];
+                        temp2_rs2=registers[in.rs2];
+                    }else if(in.pipeline_reg[1]!=null){
+                        temp2_rs1=registers[in.rs1];
+                        temp2_rs2=in.pipeline_reg[1];
+                    }
+                }
+                if(temp2_rs1>=temp2_rs2){
                     pc=labelMapping.get(in.labelName).intValue();
                 }else {
                 	pc=in.pc_val+1;
@@ -824,7 +914,20 @@ public class Core {
                 in.labelName=decodedInstruction[3];
                 System.out.println("The values of rs1 and rs2 are:"+registers[in.rs1]+" and "+registers[in.rs2]);
                 System.out.println("The values in x12 and x0 are "+registers[12]+" and "+registers[0]);
-                if(registers[in.rs1]==registers[in.rs2]){
+                int temp3_rs1=registers[in.rs1],temp3_rs2=registers[in.rs2];
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        temp3_rs1=in.pipeline_reg[0];
+                        temp3_rs2=in.pipeline_reg[1];
+                    }else if(in.pipeline_reg[0]!=null){
+                        temp3_rs1=in.pipeline_reg[0];
+                        temp3_rs2=registers[in.rs2];
+                    }else if(in.pipeline_reg[1]!=null){
+                        temp3_rs1=registers[in.rs1];
+                        temp3_rs2=in.pipeline_reg[1];
+                    }
+                }
+                if(temp3_rs1==temp3_rs2){
                     pc=labelMapping.get(in.labelName).intValue();
                 }else {
                 	pc=in.pc_val+1;
@@ -1006,15 +1109,60 @@ public class Core {
         }        
         switch (in.opcode) {
             case "add":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0]+in.pipeline_reg[1];
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0]+registers[in.rs2];
+                    }
+                    else if(in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[1]+registers[in.rs1];
+                    }
+                    break;
+                }
                 in.result = registers[in.rs1] + registers[in.rs2];
                 break;
             case "sub":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0]-in.pipeline_reg[1];
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0]-registers[in.rs2];
+                    }
+                    else if(in.pipeline_reg[1]!=null){
+                        in.result=registers[in.rs1]+in.pipeline_reg[1];
+                    }
+                    break;
+                }
                 in.result = registers[in.rs1] - registers[in.rs2];
                 break;
             case "mul":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0]*in.pipeline_reg[1];
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0]*registers[in.rs2];
+                    }
+                    else if(in.pipeline_reg[1]!=null){
+                        in.result=registers[in.rs1]*in.pipeline_reg[1];
+                    }
+                    break;
+                }
                 in.result = registers[in.rs1] * registers[in.rs2];
                 break;
             case "mv":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0];
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0];
+                    }
+                    break;
+                }
             	in.result = registers[in.rs1];
             	System.out.println("Printing the core values till 15 for checking in core:"+this.coreID);
             	for(int i=0;i<11;i++) {
@@ -1023,12 +1171,42 @@ public class Core {
             	System.out.println("Done printing the core values(debugging)");
                 break;
             case "addi":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0]+in.immediateVal;
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0]+in.immediateVal;
+                    }
+                    break;
+                }
                 in.result = registers[in.rs1] + in.immediateVal;
                 break;
             case "muli":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0]*in.immediateVal;
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0]*in.immediateVal;
+                    }
+                    break;
+                }
                 in.result = registers[in.rs1] * in.immediateVal;
                 break;
             case "rem":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0]%in.pipeline_reg[1];
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0]%registers[in.rs2];
+                    }
+                    else if(in.pipeline_reg[1]!=null){
+                        in.result=registers[in.rs1]%in.pipeline_reg[1];
+                    }
+                    break;
+                }
                 in.result = registers[in.rs1] % registers[in.rs2];
                 break;
             case "lw":
@@ -1037,7 +1215,16 @@ public class Core {
                     System.exit(0);
                     break;
                 }
-                in.result=registers[in.rs1]+in.immediateVal+this.coreID;
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                    }
+                    break;
+                }
+                in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
                 break;
             case "li":
                 in.result=in.immediateVal;
@@ -1051,24 +1238,92 @@ public class Core {
                 pc=labelMapping.get(in.labelName).intValue();
                 break;
 			case "jr":
-				pc=registers[in.rd];
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null){
+                        pc=in.pipeline_reg[0];
+                    }
+                }
+				pc=registers[in.rs1];
 				break;
 			case "and":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0]&in.pipeline_reg[1];
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0]&registers[in.rs2];
+                    }
+                    else if(in.pipeline_reg[1]!=null){
+                        in.result=registers[in.rs1]&in.pipeline_reg[1];
+                    }
+                    break;
+                }
                 in.result=registers[in.rs1] & registers[in.rs2];
 				break;
 			case "or":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0] | in.pipeline_reg[1];
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0] | registers[in.rs2];
+                    }
+                    else if(in.pipeline_reg[1]!=null){
+                        in.result=registers[in.rs1] | in.pipeline_reg[1];
+                    }
+                    break;
+                }
                 in.result=registers[in.rs1] | registers[in.rs2];
 				break;
 			case "xor":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0] ^ in.pipeline_reg[1];
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0] ^ registers[in.rs2];
+                    }
+                    else if(in.pipeline_reg[1]!=null){
+                        in.result=registers[in.rs1] ^ in.pipeline_reg[1];
+                    }
+                    break;
+                }
                 in.result=registers[in.rs1] ^ registers[in.rs2];
 				break;
 			case "andi":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0] & in.immediateVal;
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0]  & in.immediateVal;
+                    }
+                    break;
+                }
                 in.result=registers[in.rs1] & in.immediateVal;
 				break;
 			case "ori":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0] | in.immediateVal;
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0] | in.immediateVal;
+                    }
+                    break;
+                }
                 in.result=registers[in.rs1] | in.immediateVal;
 				break;
 			case "xori":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.result=in.pipeline_reg[0] ^ in.immediateVal;
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.result=in.pipeline_reg[0] ^ in.immediateVal;
+                    }
+                    break;
+                }
                 in.result=registers[in.rs1] ^ in.immediateVal;
 				break;
 			case "bne":
@@ -1079,10 +1334,28 @@ public class Core {
 					System.out.println("Memory out of bounds");
 					System.exit(0);
 				}
-				in.result=registers[in.rs1]+in.immediateVal+this.coreID;
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                    }
+                    break;
+                }
+				in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
 				break;
 			case "jalr": 
 				in.result=pc;
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        pc=in.pipeline_reg[0]+in.pipeline_reg[1];
+                    }else if(in.pipeline_reg[0]!=null){
+                        pc=in.pipeline_reg[0]+registers[in.rs2];
+                    }else if(in.pipeline_reg[1]!=null){
+                        pc=registers[in.rs1]+in.pipeline_reg[1];
+                    }
+                }
 				pc=registers[in.rs1]+registers[in.rs2];
 				break;
 			case "la":
@@ -1090,11 +1363,22 @@ public class Core {
 				break;
 			case "ecall":
                   // a0 -x10 and a7 - x17 please maintain these in the code
+                    
         	  	  int a7=registers[17];  // register x17 is used for identification of the data type of the value to be printed.
+                    if(in.isfowarded){
+                        if(in.pipeline_reg[1]!=null){
+                            a7=in.pipeline_reg[1];
+                        }
+                    }
                 //   System.out.println("The value of a7 is "+a7);
         	  	  switch(a7) {
         	  	  		case 1:
         	  	  			int a0=registers[10];
+                            if(in.isfowarded){
+                                if(in.pipeline_reg[0]!=null){
+                                    a0=in.pipeline_reg[0];
+                                }
+                            }
         	  	  			// System.out.print(a0);
                             System.out.println("Printing the value that has to be printed using ecall"+a0);
         	  	  			if(this.coreID==0) {
@@ -1152,10 +1436,19 @@ public class Core {
         }		
         switch (in.opcode) {
             case "lw":
-                in.result=mem.memory[in.result];
+                in.result=mem.memory[in.addressIdx];
                 break;
             case "sw":
-                mem.memory[in.result]=registers[in.rs2];
+                if(in.isfowarded){
+                    if(in.pipeline_reg[1]!=null){
+                        mem.memory[in.addressIdx]=in.pipeline_reg[1];
+                        break;
+                    }
+                }
+                mem.memory[in.addressIdx]=registers[in.rs2];
+                if(coreID==0)
+                    mem.printMemory();
+                break;
             default:
                 break;
         }
@@ -1275,19 +1568,30 @@ public class Core {
         } 
     }
     
-    public int hazardDetectorUtil(LinkedList<InstructionState>pipelineQueue) {
-    	InstructionState curr=pipelineQueue.get(3);  // fetching the instruction that is currently going to ID/RF
+    public int hazardDetectorUtil(LinkedList<InstructionState>pipelineQueue,boolean isPipelineForwardingEnabled,int i) {
+    	InstructionState curr=new InstructionState();  // fetching the instruction that is currently going to ID/RF
     	// fetching the previous three instructions to compare and check for dependencies
-    	InstructionState prev1=pipelineQueue.get(2);  
-    	InstructionState prev2=pipelineQueue.get(1);
-    	InstructionState prev3=pipelineQueue.get(0);
+    	InstructionState prev1=new InstructionState();  
+    	InstructionState prev2=new InstructionState();
+    	InstructionState prev3=new InstructionState();
 //    	if(this.coreID==0) {
 //    		System.out.println("Op code for curr:"+curr.opcode);
 //        	System.out.println("Op code for prev1:"+prev1.opcode);
 //        	System.out.println("Op code for prev2:"+prev2.opcode);
 //        	System.out.println("Op code for prev3:"+prev3.opcode);
 //    	}
-    	return hazardDetector(curr,prev1,prev2,prev3);  // returning the computed data stalls
+        if(!isPipelineForwardingEnabled){
+            curr=pipelineQueue.get(3);
+            prev1=pipelineQueue.get(2);
+            prev2=pipelineQueue.get(1);
+            prev3=pipelineQueue.get(0);
+        }
+        if(isPipelineForwardingEnabled){
+            return hazardDetectorWithPipelineForwadingUtil(pipelineQueue,i);
+        }
+        else{
+            return hazardDetector(curr,prev1,prev2,prev3);  // returning the computed data stalls
+        }
     }
     
     public int hazardDetector(InstructionState curr, InstructionState prev1,InstructionState prev2,InstructionState prev3) {
@@ -1295,7 +1599,7 @@ public class Core {
     	if(curr.isDummy) {
     		return 0;
     	}
-    	
+
     	// checking for ecall seperately as it has no rd, rs1 or rs2 but exhibits RAW dependency
     	if(curr.opcode.equals("ecall")) {
     		if(!prev1.isDummy && prev1.rd!=-1) {
@@ -1431,12 +1735,183 @@ public class Core {
     	}
     	return 0;
     }
+    public int hazardDetectorWithPipelineForwadingUtil(LinkedList<InstructionState>pipelineQueue,int i){
+        InstructionState curr=new InstructionState();
+        InstructionState prev1=new InstructionState();
+        InstructionState prev2=new InstructionState();
+        InstructionState prev3=new InstructionState();
+        if(i==1){
+            curr=pipelineQueue.get(i);
+            prev1=pipelineQueue.get(i-1);
+        }
+        else if(i==2){
+            curr=pipelineQueue.get(i);
+            prev1=pipelineQueue.get(i-1);
+            prev2=pipelineQueue.get(i-2);
+        }
+        else if(i==3){
+            curr=pipelineQueue.get(i);
+            prev1=pipelineQueue.get(i-1);
+            prev2=pipelineQueue.get(i-2);
+            prev3=pipelineQueue.get(i-3);
+        }
+        return hazardDetectorWithPipelineForwading(curr, prev1, prev2, prev3);
+    }
+    public int hazardDetectorWithPipelineForwading(InstructionState curr, InstructionState prev1,InstructionState prev2,InstructionState prev3){
+    	// Don't do anything if current is dummy
+    	if(curr.isDummy) {
+    		return 0;
+    	}
+    	System.out.println("**** IS dummy: "+curr.isDummy + " and pc val "+curr.pc_val+ " is ID done "+ curr.IDRF_done_core0+ " and IF done "+curr.IF_done_core0+" and EX done "+curr.EX_done_core0+ " and MEM done "+curr.MEM_done_core0);// for debugging
+        
+        // System.out.println("Printing the pipeline ");
+        // for(int i=0;i<pipeLineQueue.size();i++){
+        //     System.out.print(pipeLineQueue.get(i).pc_val+" ");
+        // }
+        // System.out.println();
+
+        // checking for ecall seperately as it has no rd, rs1 or rs2 but exhibits RAW dependency
+
+    	if(curr.opcode.equals("ecall")) {
+    		if(!prev1.isDummy && prev1.rd!=-1) {
+    			if(prev1.rd==10 || prev1.rd==17) {
+                    if(prev1.rd==10 && curr.pipeline_reg[0]==null){
+                        curr.pipeline_reg[0]=prev1.result;
+                        curr.isfowarded=true;
+                        return 0;
+                    }
+                    else if(prev1.rd==17 && curr.pipeline_reg[1]==null){
+                        curr.pipeline_reg[1]=prev1.result;
+                        curr.isfowarded=true;
+                        return 0;
+                    }
+                    else if(curr.isfowarded){
+                        return 0;
+                    }
+        			return 1;
+        		}
+    		}
+    		
+    		if(!prev2.isDummy && prev2.rd!=-1) {
+    			if(prev2.rd==10 || prev2.rd==17) {
+                    if(prev2.rd==10 && curr.pipeline_reg[0]==null){
+                        curr.pipeline_reg[0]=prev2.result;
+                        curr.isfowarded=true;
+                        return 0;
+                    }
+                    else if(prev2.rd==17 && curr.pipeline_reg[1]==null){
+                        curr.pipeline_reg[1]=prev2.result;
+                        curr.isfowarded=true;
+                        return 0;
+                    }
+                    else if(curr.isfowarded){
+                        return 0;
+                    }
+        			return 1;
+        		}
+    		}
+    		
+    		if(!prev3.isDummy && prev3.rd!=-1) {
+    			if(prev3.rd==10 || prev3.rd==17) {
+                    if(prev3.rd==10 && curr.pipeline_reg[0]==null){
+                        curr.pipeline_reg[0]=prev3.result;
+                        curr.isfowarded=true;
+                        return 0;
+                    }
+                    else if(prev3.rd==17 && curr.pipeline_reg[1]==null){
+                        curr.pipeline_reg[1]=prev3.result;
+                        curr.isfowarded=true;
+                        return 0;
+                    }
+                    else if(curr.isfowarded){
+                        return 0;
+                    }
+        			return 1;
+        		}
+    		}
+    		
+    	}
+    	
+    	if(!prev1.isDummy && prev1.rd!=-1) {
+    		if(curr.rs1==prev1.rd || curr.rs2==prev1.rd) {
+    			if(prev1.result!=null && curr.rs1==prev1.rd && curr.rs2==prev1.rd && curr.pipeline_reg[0]==null && curr.pipeline_reg[1]==null){
+                    curr.pipeline_reg[0]=prev1.result;
+                    curr.pipeline_reg[1]=prev1.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(prev1.result!=null && curr.rs1==prev1.rd && curr.pipeline_reg[0]==null){
+                    curr.pipeline_reg[0]=prev1.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(prev1.result!=null && curr.rs2==prev1.rd && curr.pipeline_reg[1]==null){
+                    curr.pipeline_reg[1]=prev1.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(curr.isfowarded){
+                    return 0;
+                }
+    			return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
+    		}
+    	}
+    	if(!prev2.isDummy && prev2.rd!=-1) {
+    		if(curr.rs1==prev2.rd || curr.rs2==prev2.rd) {
+    			if(prev2.result!=null && curr.rs1==prev2.rd && curr.rs2==prev2.rd && curr.pipeline_reg[0]==null && curr.pipeline_reg[1]==null){
+                    curr.pipeline_reg[0]=prev2.result;
+                    curr.pipeline_reg[1]=prev2.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(prev2.result!=null && curr.rs1==prev2.rd && curr.pipeline_reg[0]==null){
+                    curr.pipeline_reg[0]=prev2.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(prev2.result!=null && curr.rs2==prev2.rd && curr.pipeline_reg[1]==null){
+                    curr.pipeline_reg[1]=prev2.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(curr.isfowarded){
+                    return 0;
+                }
+    			return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
+    		}
+    	}
+    	if(!prev3.isDummy && prev3.rd!=-1) {
+    		if(curr.rs1==prev3.rd || curr.rs2==prev3.rd) {
+    			if(prev3.result!=null && curr.rs1==prev3.rd && curr.rs2==prev3.rd && curr.pipeline_reg[0]==null && curr.pipeline_reg[1]==null){
+                    curr.pipeline_reg[0]=prev3.result;
+                    curr.pipeline_reg[1]=prev3.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(prev3.result!=null && curr.rs1==prev3.rd && curr.pipeline_reg[0]==null){
+                    curr.pipeline_reg[0]=prev3.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(prev3.result!=null && curr.rs2==prev3.rd && curr.pipeline_reg[1]==null){
+                    curr.pipeline_reg[1]=prev3.result;
+                    curr.isfowarded=true;
+                    return 0;
+                }
+                else if(curr.isfowarded){
+                    return 0;
+                }
+    			return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
+    		}
+    	}
+    	return 0;
+    }
 
 	public int[] registers;
     public int pc;
     public int coreID;
     private String a_0=""; // variable used for loading the string to be printed using ecall
-    public int cc;
+    public int cc; 
     public int controlStalls;
     public int totalStalls;
     public int latencyStalls;

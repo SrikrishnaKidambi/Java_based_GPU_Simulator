@@ -44,7 +44,7 @@ public class Simulator{
     public void initializeProgram(String[] program){
         this.program_Seq=program;
     }
-    public void runProgram(Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies){
+    public void runProgram(Memory mem,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,boolean isPipelineForwardingEnabled){
         mapAllTheLabels(program_Seq);
         printLabels();
         System.out.println(program_Seq.length);
@@ -56,7 +56,7 @@ public class Simulator{
                 if(cores[i].pc>=program_Seq.length){
                     break;
                 }
-                this.cores[i].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+                this.cores[i].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
             } 
             // if(pipeLineQueue.isEmpty()){
             //     break;
@@ -67,7 +67,12 @@ public class Simulator{
             // Memory.printMemory();
             if(isInstruction) {
             	this.clock++;
-            }    
+            }   
+            System.out.println("The values in core 0");
+            for(int i=0;i<32;i++){
+                System.out.print(cores[0].registers[i]+" ");
+            } 
+            System.out.println();
 //            System.out.println("The value of pc in core 0 is :"+cores[0].pc);
 //            System.out.println("The value of pc in core 1 is :"+cores[1].pc);
 //            System.out.println("The value of pc in core 2 is :"+cores[2].pc);
@@ -82,17 +87,22 @@ public class Simulator{
         boolean fourthPipelineDone=false;
         
         while(!firstPipelineDone || !secondPipelineDone || !thirdPipelineDone || !fourthPipelineDone){
+            System.out.println("The values in core 0");
+            for(int i=0;i<32;i++){
+                System.out.print(cores[0].registers[i]+" ");
+            } 
+            System.out.println();
         	if(!firstPipelineDone) {
-        		cores[0].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        		cores[0].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
         	}
         	if(!secondPipelineDone) {
-        		cores[1].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        		cores[1].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
         	}
         	if(!thirdPipelineDone) {
-        		cores[2].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        		cores[2].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
         	}
         	if(!fourthPipelineDone) {
-        		cores[3].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping);
+        		cores[3].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
         	}
             if(!firstPipelineDone) {
             	InstructionState first_top=cores[0].pipeLineQueue.get(0);
@@ -140,147 +150,7 @@ public class Simulator{
             
         }
     }
-//    public void hazardDetector(String[] program){
-//        for(int i=0;i<program.length;i++){
-//            dataHazardsMapping.put(i, 0);
-//        }
-//        for(int curr_idx=0;curr_idx<program.length;curr_idx++){
-//            String[] splitInstruction=program[curr_idx].trim().replace(","," ").split("\\s");
-//            String opcode=splitInstruction[0];
-//            switch (opcode) {
-//                case "add":
-//                case "sub":
-//                case "mul":
-//                case "rem":
-//                case "and":
-//                case "or":
-//                case "xor":
-//                case "addi":
-//                case "andi":
-//                case "ori":
-//                case "xori":
-//                case "mv":
-//                case "lw":
-//                case "jal":
-//                case "jalr":
-//                case "la":
-//                case "li":
-//                    int rem_instructions=program.length-1-curr_idx;
-//                    if(rem_instructions>=3){
-//                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-//                        String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
-//                        String[] insN3=program[curr_idx+3].trim().replace(","," ").split("\\s");
-//                        System.out.println("The next 1 for pc" + curr_idx+"is: "+insN1[0]);
-//                        System.out.println("The next 2 for pc" + curr_idx+"is: "+insN2[0]);
-//                        System.out.println("The next 3 for pc" + curr_idx+"is: "+insN3[0]);
-//                        String rdCurr=splitInstruction[1];
-//                        if(insN1[0].equals("j") || insN1[0].equals("jr")|| insN1[0].contains(":") ){
-//                            System.out.println("Saiman thopu");
-//                        }
-//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
-//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-//                            if(curr_idx==0){
-//                                System.out.println("if2:Value pushed in map: "+dataHazardsMapping.get(0));
-//                            }
-//                        }
-//                        else if(insN1[0].equals("ecall")){
-//                            if(curr_idx==0){
-//                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
-//                            }
-//                        }
-//                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-//                            if(curr_idx==0){
-//                                System.out.println("correct if:Value pushed in map: "+dataHazardsMapping.get(0));
-//                            }
-//                        }
-//                        if(insN2[0].equals("j") || insN2[0].equals("jr")  || insN2[0].contains(":")){
-//                            System.out.println("Saiman thopu");
-//                        }
-//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN2[0].equals("ecall")){
-//                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
-//                            if(curr_idx==0){
-//                                System.out.println("if3:Value pushed in map: "+dataHazardsMapping.get(0));
-//                            }
-//                        }
-//                        else if(insN2[0].equals("ecall")){
-//                            if(curr_idx==0){
-//                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
-//                            }
-//                        }
-//                        else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
-//                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
-//                        }
-//                        if(insN3[0].equals("j") || insN3[0].equals("jr") || insN3[0].contains(":")){
-//                            System.out.println("Saiman thopu");
-//                        }
-//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN3[0].equals("ecall")){
-//                            dataHazardsMapping.put(curr_idx+3, 1+dataHazardsMapping.get(curr_idx));
-//                            if(curr_idx==0){
-//                                System.out.println("if4:Value pushed in map: "+dataHazardsMapping.get(0));
-//                            }
-//                        }
-//                        else if(insN3[0].equals("ecall")){
-//                            if(curr_idx==0){
-//                                System.out.println("if:Value pushed in map: "+dataHazardsMapping.get(0));
-//                            }
-//                        }
-//                        else if(rdCurr.equals(insN3[2]) || (insN3.length==4 && rdCurr.equals(insN3[3]))){
-//                            dataHazardsMapping.put(curr_idx+3, 1+dataHazardsMapping.get(curr_idx));
-//                        }
-//                    }
-//                    else if(rem_instructions>=2){
-//                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-//                        String[] insN2=program[curr_idx+2].trim().replace(","," ").split("\\s");
-//                        String rdCurr=splitInstruction[1];
-//                        if(insN1[0].equals("j") || insN1[0].equals("jr")|| insN1[0].contains(":") ){
-//                            System.out.println("Saiman thopu");
-//                        }
-//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
-//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-//                        }
-//                        else if(insN1[0].equals("ecall")){
-//
-//                        }
-//                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-//                        }
-//                        if(insN2[0].equals("j") || insN2[0].equals("jr")  || insN2[0].contains(":")){
-//                            System.out.println("Saiman thopu");
-//                        }
-//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN2[0].equals("ecall")){
-//                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
-//                        }
-//                        else if(insN2[0].equals("ecall") ){
-//
-//                        }
-//                        else if(rdCurr.equals(insN2[2]) || (insN2.length==4 && rdCurr.equals(insN2[3]))){
-//                            dataHazardsMapping.put(curr_idx+2, 2+dataHazardsMapping.get(curr_idx));
-//                        }
-//                    }
-//                    else if(rem_instructions>=1){
-//                        String[] insN1=program[curr_idx+1].trim().replace(","," ").split("\\s");
-//                        String rdCurr=splitInstruction[1];
-//                        if(insN1[0].equals("j") || insN1[0].equals("jr")  ||  insN1[0].contains(":") ){
-//
-//                        }
-//                        else if((rdCurr.equals("x17") || rdCurr.equals("X17") || rdCurr.equals("X10") || rdCurr.equals("x10")) && insN1[0].equals("ecall")){
-//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-//                        }
-//                        else if(insN1[0].equals("ecall")){
-//
-//                        }
-//                        else if(rdCurr.equals(insN1[2]) || (insN1.length==4 && rdCurr.equals(insN1[3]))){
-//                            dataHazardsMapping.put(curr_idx+1, 3+dataHazardsMapping.get(curr_idx));
-//                        }
-//                    }
-//                    break; 
-//                default:
-//                    break;
-//            }
-//        }
-//    }
-    public void printResult(){
+    public void printResult(Map<String,Integer>latencies){
         for(int i=0;i<4;i++){
             System.out.println("Core :"+i);
             for(int j=0;j<32;j++){
@@ -293,10 +163,11 @@ public class Simulator{
         labelMapping.clear();
         System.out.println("Printing the labels map after clearing:");
         this.clock=0;
-        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+cores[0].totalStalls);
-        SimulatorGUI.console.append("\nThe number of stalls of core 1 are: "+cores[1].totalStalls);
-        SimulatorGUI.console.append("\nThe number of stalls of core 2 are: "+cores[2].totalStalls);
-        SimulatorGUI.console.append("\nThe number of stalls of core 3 are: "+cores[3].totalStalls);
+        int latency_offset=latencies.getOrDefault("addi",0)-1;
+        SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+(cores[0].totalStalls-latency_offset));
+        SimulatorGUI.console.append("\nThe number of stalls of core 1 are: "+(cores[1].totalStalls-latency_offset));
+        SimulatorGUI.console.append("\nThe number of stalls of core 2 are: "+(cores[2].totalStalls-latency_offset));
+        SimulatorGUI.console.append("\nThe number of stalls of core 3 are: "+(cores[3].totalStalls-latency_offset));
         SimulatorGUI.console.append("\n");
     }
 
@@ -307,5 +178,4 @@ public class Simulator{
     public Set<String> opcodes;
     public static boolean isInstruction;
     public Map<Integer,Integer> dataHazardsMapping;
-    public boolean isPipelineForwardingEnabled;
 }

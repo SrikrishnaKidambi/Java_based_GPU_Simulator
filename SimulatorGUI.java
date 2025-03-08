@@ -9,8 +9,39 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+class TeeOutputStream extends OutputStream {
+    private final OutputStream first;
+    private final OutputStream second;
+
+    public TeeOutputStream(OutputStream first, OutputStream second) {
+        this.first = first;
+        this.second = second;
+    }
+
+    @Override
+    public void write(int b) throws IOException {
+        first.write(b);  // Write to console
+        second.write(b); // Write to file
+    }
+
+    @Override
+    public void flush() throws IOException {
+        first.flush();
+        second.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        first.close();
+        second.close();
+    }
+}
 
 public class SimulatorGUI {
 	private static JFrame frame=null;

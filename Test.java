@@ -30,6 +30,14 @@ public class Test {
 			int latency=scanner.nextInt();
 			latencies.put(entry.getKey(), latency); 
 		}
+		System.out.println("Enter 1 to enable pipeline forwarding else enter 0: ");
+		int input=scanner.nextInt();
+		if(input==1){
+			isPipelineForwardingEnabled=true;
+		}
+		else{
+			isPipelineForwardingEnabled=false;
+		}
         sim=new Simulator();
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();
@@ -42,9 +50,9 @@ public class Test {
         sim.initializeProgram(textSegment);
 		printIntegerMapping();
 		
-        sim.runProgram(mem, stringVariableMapping, numberVariableMapping,latencies);
+        sim.runProgram(mem, stringVariableMapping, numberVariableMapping,latencies,isPipelineForwardingEnabled);
         System.out.println("Final result:");
-        sim.printResult();      
+        sim.printResult(latencies);      
         mem.printMemory();
     }
     
@@ -156,9 +164,13 @@ public class Test {
 				isParsingTextSegment=true;
 			}
 			if(isParsingTextSegment && !isDataSegmentParsing && !line.equals(".text")) {
-				programCode.add(line);
+				if(!line.trim().isEmpty()){
+					programCode.add(line);
+				}
 			}
+			 
 		}
+		programCode.add("addi x0 x0 0");   // adding this extra line to address the issue of having a label at the end of the program code given as input
 		String[] program=new String[programCode.size()];
 		int i=0;
 		for(String line:programCode) {
@@ -189,4 +201,5 @@ public class Test {
 	public Map<String,Integer> numberVariableMapping=new HashMap<>();
 	public Memory mem=new Memory();
 	public Simulator sim;
+	public boolean isPipelineForwardingEnabled;
 }

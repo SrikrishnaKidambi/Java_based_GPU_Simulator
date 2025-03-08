@@ -6,6 +6,7 @@ public class InstructionState {
 		rs1=-1;
 		rs2=-1;
 		isDummy=true;
+		pc_val=null;
 		
 		IF_done_core0=false;
 		IDRF_done_core0=false;
@@ -35,8 +36,14 @@ public class InstructionState {
 		IDRF_done_once1=false;
 		IDRF_done_once2=false;
 		IDRF_done_once3=false;
-		
+		result=null;
+		pipeline_reg=new Integer[8];
+		pipeline_reg[0]=null; // this refer for rs1 content in general due to forwarding
+		pipeline_reg[1]=null; // this refer for rs2 content in general due to forwarding
+
+		isfowarded=false;
 	}
+	public Integer[] pipeline_reg;
 	public String instruction;
 	public String opcode;
 	public int rd;
@@ -45,7 +52,9 @@ public class InstructionState {
 	public String labelName;
 	public int immediateVal;
 	public boolean isDummy;
-	public int result;
+	public Integer result;
+	public int addressIdx;
+	public boolean isfowarded;
 	
 	public boolean IF_done_core0;
 	public boolean IDRF_done_core0;
@@ -76,5 +85,5 @@ public class InstructionState {
 	public boolean IDRF_done_once2;
 	public boolean IDRF_done_once3;   // these variables hold the information that control stalls already got incremented so do not do again if the instruction is undergoing ID/RF
 
-	public int pc_val;
+	public Integer pc_val;
 }
