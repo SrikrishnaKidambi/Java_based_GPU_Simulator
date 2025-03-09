@@ -1,0 +1,11 @@
+0 : addi x11 x0 3
+1 : addi x12 x0 4
+2 : j addFun
+3 : addi x14 x11 x11
+4 : addFun:
+5 : add x13 x11 x12
+6 : mv x10 x11
+7 : li x17 1
+8 : addi x0 x0 0
+9 :
+10 : ecall
