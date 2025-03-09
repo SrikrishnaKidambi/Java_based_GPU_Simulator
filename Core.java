@@ -165,11 +165,11 @@ public class Core {
 //            }
 //            System.out.println();
         }
-        System.out.println("--------------------------------Printing the Pipeline after execution for core :"+this.coreID);
-        for(int i=0;i<Math.min(pipeLineQueue.size(), 5);i++) {
-        	System.out.print(pipeLineQueue.get(i).pc_val+" ");
-        }
-        System.out.println();
+    //     System.out.println("--------------------------------Printing the Pipeline after execution for core :"+this.coreID);
+    //     for(int i=0;i<Math.min(pipeLineQueue.size(), 5);i++) {
+    //     	System.out.print(pipeLineQueue.get(i).pc_val+" ");
+    //     }
+    //     System.out.println();
     }
     private String instructionParser(String instruction) {
 	  
