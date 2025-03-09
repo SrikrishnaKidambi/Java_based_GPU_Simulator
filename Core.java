@@ -13,6 +13,8 @@ public class Core {
         this.controlStalls=0;
         this.latencyStalls=0;
         this.totalStalls=0;
+        instructionsExecuted=new int[1];
+        this.instructionsExecuted[0]=0;
         pipeLineQueue=new LinkedList<>();
         InstructionState in1=new InstructionState();
         InstructionState in2=new InstructionState();
@@ -50,6 +52,8 @@ public class Core {
                     pipeLineQueue.add(1+i, new InstructionState());
                 }
             }
+            in2=pipeLineQueue.get(1);
+            System.out.println("@@@@Calling mem for the opcode "+in2.opcode);
             MEM(in2, mem);
         }
         if(pipeLineQueue.size()>=3){
@@ -69,6 +73,7 @@ public class Core {
                     pipeLineQueue.add(2+i, new InstructionState());
                 }
             }
+            in3=pipeLineQueue.get(2);
             EX(in3, labelMapping, stringVariableMapping, nameVariableMapping);
         }
         if(pipeLineQueue.size()>=4){
@@ -151,7 +156,7 @@ public class Core {
             	System.out.println("The instruction is dummy:"+in5.isDummy);
             }
 //            IF(program, in5);
-            FetcherResult temp=Simulator.IF(pc, in5, coreID, program, lastInstruction);
+            FetcherResult temp=Simulator.IF(pc, in5, coreID, program, lastInstruction,instructionsExecuted);
             this.pc=temp.pc_val;
             lastInstruction=temp.lastInstruction;
             System.out.println("Printing the pipeline:");
@@ -161,7 +166,7 @@ public class Core {
 //            System.out.println();
         }
         System.out.println("--------------------------------Printing the Pipeline after execution for core :"+this.coreID);
-        for(int i=0;i<5;i++) {
+        for(int i=0;i<Math.min(pipeLineQueue.size(), 5);i++) {
         	System.out.print(pipeLineQueue.get(i).pc_val+" ");
         }
         System.out.println();
@@ -810,10 +815,10 @@ public class Core {
 				String[] offsetAndRegBase=decodedInstruction[2].split("[()]");
 				in.immediateVal=Integer.parseInt(offsetAndRegBase[0]);
 				in.rs1=Integer.parseInt(offsetAndRegBase[1].substring(1));  //here the address of the register that has the base address of the memory location is being stored.
-				if(in.immediateVal<-512 || in.immediateVal>512){
-					System.out.println("Immediate value cannot be less than -512 or greater than 512");
-					System.exit(0);
-				}
+				// if(in.immediateVal<-512 || in.immediateVal>512){
+				// 	System.out.println("Immediate value cannot be less than -512 or greater than 512");
+				// 	System.exit(0);
+				// }
 				break;
 			case "jalr":
 				// syntax : jalr x1 x2 x0 -> store the value of pc+4 in x1 and jump to x2+x0
@@ -1027,22 +1032,22 @@ public class Core {
                     }
                 }
                 in.immediateVal=Integer.parseInt(decodedInstruction[2].substring(0,paramStart));
-                if(in.immediateVal<-512 || in.immediateVal>512){
-                    System.out.println("The immediate value can only be between -512 and 512"); // as the total memory the core can access is 1024 bytes so using immediate I can go 512bytes up and 512 bytes down
-                    System.exit(0);
-                    break;
-                }
+                // if(in.immediateVal<-512 || in.immediateVal>512){
+                //     System.out.println("The immediate value can only be between -512 and 512"); // as the total memory the core can access is 1024 bytes so using immediate I can go 512bytes up and 512 bytes down
+                //     System.exit(0);
+                //     break;
+                // }
                 in.rs1=Integer.parseInt(decodedInstruction[2].substring(paramStart+2,paramEnd));
                 break;
             case "li":
                 //Ex: li x1 8
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.immediateVal=Integer.parseInt(decodedInstruction[2]);
-                if(in.immediateVal>=256 || in.immediateVal<0){
-                  System.out.println("Cannot access the requested memory location");
-                  System.exit(0);
-                  break;
-                }
+                // if(in.immediateVal>=256 || in.immediateVal<0){
+                //   System.out.println("Cannot access the requested memory location");
+                //   System.exit(0);
+                //   break;
+                // }
                 break;
             case "jal":
                 //Ex: jal x1 label
@@ -1261,11 +1266,11 @@ public class Core {
                 in.result = registers[in.rs1] % registers[in.rs2];
                 break;
             case "lw":
-                if(registers[in.rs1]+in.immediateVal+this.coreID>=1024 || registers[in.rs1]+in.immediateVal+this.coreID<0){
-                    System.out.println("The memory address requested is not accessible by the core "+registers[in.rs1]+in.immediateVal+this.coreID);
-                    System.exit(0);
-                    break;
-                }
+                // if(registers[in.rs1]+in.immediateVal+this.coreID>=1024 || registers[in.rs1]+in.immediateVal+this.coreID<0){
+                //     System.out.println("The memory address requested is not accessible by the core "+registers[in.rs1]+in.immediateVal+this.coreID);
+                //     System.exit(0);
+                //     break;
+                // }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
@@ -1275,6 +1280,7 @@ public class Core {
                     }
                     break;
                 }
+                
                 in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
                 break;
             case "li":
@@ -1381,10 +1387,10 @@ public class Core {
 				// pass the other conditional branch instructions in the same way for execution phase
 				break;
 			case "sw":
-				if((registers[in.rs1]+in.immediateVal+this.coreID)>=1024 || (registers[in.rs1]+in.immediateVal+this.coreID)<0){
-					System.out.println("Memory out of bounds");
-					System.exit(0);
-				}
+				// if((registers[in.rs1]+in.immediateVal+this.coreID)>=1024 || (registers[in.rs1]+in.immediateVal+this.coreID)<0){
+				// 	System.out.println("Memory out of bounds");
+				// 	System.exit(0);
+				// }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
@@ -1392,8 +1398,9 @@ public class Core {
                     else if(in.pipeline_reg[0]!=null){
                         in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
                     }
-                    break;
+                    System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
                 }
+                System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
 				in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
 				break;
 			case "jalr": 
@@ -1493,9 +1500,13 @@ public class Core {
                 if(in.isfowarded){
                     if(in.pipeline_reg[1]!=null){
                         mem.memory[in.addressIdx]=in.pipeline_reg[1];
+                        System.out.println("The value that is stored in registers[16]:"+registers[16]);
+                        System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
                         break;
                     }
                 }
+                System.out.println("The value that is stored in registers[16]:"+registers[16]);
+                System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
                 mem.memory[in.addressIdx]=registers[in.rs2];
                 if(coreID==0)
                     mem.printMemory();
@@ -1671,7 +1682,7 @@ public class Core {
     					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
     					curr.IDRF_done_once3=true;
     				}
-        			return 3;
+        			return 3-1;
         		}
     		}
     		
@@ -1693,7 +1704,7 @@ public class Core {
     					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
     					curr.IDRF_done_once3=true;
     				} 
-        			return 2;
+        			return 2-1;
         		}
     		}
     		
@@ -1715,7 +1726,7 @@ public class Core {
     					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
     					curr.IDRF_done_once3=true;
     				}
-        			return 1;
+        			return 1-1;
         		}
     		}
     		
@@ -1739,7 +1750,7 @@ public class Core {
 					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
 					curr.IDRF_done_once3=true;
 				}
-    			return 3;  // this indicates that there is a dependency with immediate previous instruction that lead to three stalls.  
+    			return 3-1;  // this indicates that there is a dependency with immediate previous instruction that lead to three stalls.  
     		}
     	}
     	if(!prev2.isDummy && prev2.rd!=-1) {
@@ -1760,7 +1771,7 @@ public class Core {
 					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
 					curr.IDRF_done_once3=true;
 				}
-    			return 2; // dependency with second previous instruction resulting in only two stalls
+    			return 2-1; // dependency with second previous instruction resulting in only two stalls
     		} 
     	}
     	if(!prev3.isDummy && prev3.rd!=-1) {
@@ -1781,7 +1792,7 @@ public class Core {
 					curr.IDRF_done_core3=false;  // perform the ID/RF again when stalls are found
 					curr.IDRF_done_once3=true;
 				}
-    			return 1; // dependency with third prev instruction resulting in only one stall
+    			return 1-1; // dependency with third prev instruction resulting in only one stall
     		}
     	}
     	return 0;
@@ -1968,4 +1979,5 @@ public class Core {
     public int latencyStalls;
     public InstructionState lastInstruction;
     public LinkedList<InstructionState> pipeLineQueue;
+    public int[] instructionsExecuted;
 }

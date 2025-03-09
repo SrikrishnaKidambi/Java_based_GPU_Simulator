@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -13,11 +14,15 @@ public class Simulator{
         }
         labelMapping=new HashMap<>();
         dataHazardsMapping=new HashMap<>();
+        // instructionsExecuted=new int[4];
+        // for(int i=0;i<4;i++){
+        //     instructionsExecuted[i]=0;
+        // }
         opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","rem","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall"));
     }
 
     
-    public static FetcherResult IF(int pc,InstructionState in,int coreID,String[] program,InstructionState last) {
+    public static FetcherResult IF(int pc,InstructionState in,int coreID,String[] program,InstructionState last,int[] instructionsExecuted) {
     	if(coreID==0) {
         	if(in.isDummy || in==null || in.IF_done_core0==true){
                 return new FetcherResult(last,pc);
@@ -41,6 +46,8 @@ public class Simulator{
     	in.instruction=program[pc];
     	in.pc_val=pc;
     	pc++;
+        instructionsExecuted[0]++;
+        // instructionsExecuted[coreID]++;
 //    	in.isDummy=false;
     	if(pc==program.length) {
     		last=in;
@@ -93,9 +100,10 @@ public class Simulator{
         printLabels();
         System.out.println(program_Seq.length);
         System.out.println("Program execution started");
-        boolean isDone=(cores[0].pc>=program_Seq.length && cores[1].pc>=program_Seq.length && cores[2].pc>=program_Seq.length && cores[3].pc>=program_Seq.length);
+        this.clock+=4;
+        boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
         while(!isDone){
-            isInstruction=true;
+            // isInstruction=true;
             for(int i=0;i<4;i++){
                 if(cores[i].pc>=program_Seq.length){
                     continue;
@@ -109,9 +117,9 @@ public class Simulator{
             //}
             // printResult();
             // Memory.printMemory();
-            if(isInstruction) {
+            //if(isInstruction) {
             	this.clock++;
-            }   
+            //}   
 //            System.out.println("The values in core 0");
 //            for(int i=0;i<32;i++){
 //                System.out.print(cores[0].registers[i]+" ");
@@ -121,7 +129,7 @@ public class Simulator{
             System.out.println("The value of pc in core 1 is :"+cores[1].pc);
             System.out.println("The value of pc in core 2 is :"+cores[2].pc);
             System.out.println("The value of pc in core 3 is :"+cores[3].pc);
-            isDone=(cores[0].pc>=program_Seq.length && cores[1].pc>=program_Seq.length && cores[2].pc>=program_Seq.length && cores[3].pc>=program_Seq.length);
+            isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
             System.out.println();
         }
         boolean firstPipelineDone=false;
@@ -201,17 +209,31 @@ public class Simulator{
             }
             System.out.println();
         }
-        System.out.println("The number of clock cycles taken are:"+this.clock);
-        SimulatorGUI.console.append("\nThe number of clock cycles taken for execution are "+this.clock);
-        labelMapping.clear();
-        System.out.println("Printing the labels map after clearing:");
-        this.clock=0;
+        System.out.println("The number of clock cycles taken are:"+(this.clock-this.labelMapping.size()));
+        SimulatorGUI.console.append("\nThe number of clock cycles taken for execution are "+(this.clock-1));
+        // labelMapping.clear();
+        // System.out.println("Printing the labels map after clearing:");
+        // this.clock=0;
         int latency_offset=latencies.getOrDefault("addi",0)-1;
         SimulatorGUI.console.append("\nThe number of stalls of core 0 are: "+(cores[0].totalStalls-latency_offset));
         SimulatorGUI.console.append("\nThe number of stalls of core 1 are: "+(cores[1].totalStalls-latency_offset));
         SimulatorGUI.console.append("\nThe number of stalls of core 2 are: "+(cores[2].totalStalls-latency_offset));
         SimulatorGUI.console.append("\nThe number of stalls of core 3 are: "+(cores[3].totalStalls-latency_offset));
         SimulatorGUI.console.append("\n");
+
+        // calculation of total number of instructions executed and IPC
+        int maxNumberofInstructions=Math.max(Math.max(cores[0].instructionsExecuted[0], cores[1].instructionsExecuted[0]),Math.max(cores[2].instructionsExecuted[0], cores[3].instructionsExecuted[0]));
+        double IPC=(double)maxNumberofInstructions/this.clock;
+        double IPC0=(double)cores[0].instructionsExecuted[0]/this.clock;
+        double IPC1=(double)cores[1].instructionsExecuted[0]/this.clock;
+        double IPC2=(double)cores[2].instructionsExecuted[0]/this.clock;
+        double IPC3=(double)cores[3].instructionsExecuted[0]/this.clock;
+        SimulatorGUI.console.append("\nIPC : "+IPC+"\n");
+        SimulatorGUI.console.append("IPC for all the cores: \n");
+        SimulatorGUI.console.append("IPC of core 0: "+IPC0+"\n");
+        SimulatorGUI.console.append("IPC of core 1: "+IPC1+"\n");
+        SimulatorGUI.console.append("IPC of core 2: "+IPC2+"\n");
+        SimulatorGUI.console.append("IPC of core 3: "+IPC3+"\n");
     }
 
     public int clock;
@@ -221,4 +243,5 @@ public class Simulator{
     public Set<String> opcodes;
     public static boolean isInstruction;
     public Map<Integer,Integer> dataHazardsMapping;
+    // public int[] instructionsExecuted;
 }
