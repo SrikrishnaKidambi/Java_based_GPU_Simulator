@@ -44,7 +44,6 @@ public class Simulator{
 //    	in.isDummy=false;
     	if(pc==program.length) {
     		last=in;
-    		
     	}
     	if(coreID==0) {
         	in.IF_done_core0=true;
@@ -94,12 +93,12 @@ public class Simulator{
         printLabels();
         System.out.println(program_Seq.length);
         System.out.println("Program execution started");
-        boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
+        boolean isDone=(cores[0].pc>=program_Seq.length && cores[1].pc>=program_Seq.length && cores[2].pc>=program_Seq.length && cores[3].pc>=program_Seq.length);
         while(!isDone){
             isInstruction=true;
             for(int i=0;i<4;i++){
                 if(cores[i].pc>=program_Seq.length){
-                    break;
+                    continue;
                 }
                 this.cores[i].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
             } 
@@ -113,18 +112,17 @@ public class Simulator{
             if(isInstruction) {
             	this.clock++;
             }   
-            System.out.println("The values in core 0");
-            for(int i=0;i<32;i++){
-                System.out.print(cores[0].registers[i]+" ");
-            } 
+//            System.out.println("The values in core 0");
+//            for(int i=0;i<32;i++){
+//                System.out.print(cores[0].registers[i]+" ");
+//            } 
             System.out.println();
-//            System.out.println("The value of pc in core 0 is :"+cores[0].pc);
-//            System.out.println("The value of pc in core 1 is :"+cores[1].pc);
-//            System.out.println("The value of pc in core 2 is :"+cores[2].pc);
-//            System.out.println("The value of pc in core 3 is :"+cores[3].pc);
-            isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
+            System.out.println("The value of pc in core 0 is :"+cores[0].pc);
+            System.out.println("The value of pc in core 1 is :"+cores[1].pc);
+            System.out.println("The value of pc in core 2 is :"+cores[2].pc);
+            System.out.println("The value of pc in core 3 is :"+cores[3].pc);
+            isDone=(cores[0].pc>=program_Seq.length && cores[1].pc>=program_Seq.length && cores[2].pc>=program_Seq.length && cores[3].pc>=program_Seq.length);
             System.out.println();
-            
         }
         boolean firstPipelineDone=false;
         boolean secondPipelineDone=false;

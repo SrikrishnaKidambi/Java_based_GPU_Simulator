@@ -154,8 +154,13 @@ public class Core {
             FetcherResult temp=Simulator.IF(pc, in5, coreID, program, lastInstruction);
             this.pc=temp.pc_val;
             lastInstruction=temp.lastInstruction;
+            System.out.println("Printing the pipeline:");
+//            for(int i=0;i<5;i++) {
+//            	System.out.print(pipeLineQueue.get(i).pc_val+" ");
+//            }
+//            System.out.println();
         }
-        System.out.println("Printing the Pipeline after execution:");
+        System.out.println("--------------------------------Printing the Pipeline after execution for core :"+this.coreID);
         for(int i=0;i<5;i++) {
         	System.out.print(pipeLineQueue.get(i).pc_val+" ");
         }
@@ -270,7 +275,6 @@ public class Core {
         in.opcode=decodedInstruction[0].trim();
         if(in.opcode.equals("bne") || in.opcode.equals("beq") || in.opcode.equals("blt") || in.opcode.equals("bge")){
         	if(parsedInstruction.contains("CID")){
-        		
         		return;
         	}
             in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -681,14 +685,19 @@ public class Core {
 				} 
 				break;
 			case "bne":
-				in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
-				in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
-				in.labelName=decodedInstruction[3];
-                int temp4_rs1=registers[in.rs1],temp4_rs2=registers[in.rs2];
-                if(decodedInstruction[1].equals("CID")) {
-					temp4_rs1=this.coreID;
-					temp4_rs2=Integer.parseInt(decodedInstruction[2]);
-				}
+				int temp4_rs1=0,temp4_rs2=0;
+                if(!decodedInstruction[1].equals("CID")) {
+                	in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
+                    in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
+                    in.labelName=decodedInstruction[3];
+                    temp4_rs1=registers[in.rs1];
+                    temp4_rs2=registers[in.rs2];
+                }
+                if(decodedInstruction[1].equals("CID")){
+                    temp4_rs1=this.coreID;
+                    temp4_rs2=Integer.parseInt(decodedInstruction[2]);
+                    in.labelName=decodedInstruction[3];
+                }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         temp4_rs1=in.pipeline_reg[0];
@@ -735,21 +744,19 @@ public class Core {
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "blt":
-				if(decodedInstruction[1].equals("CID")) {
-					in.rs1=this.coreID;
-					in.rs2=Integer.parseInt(decodedInstruction[2]);
-					in.labelName=decodedInstruction[3];
-					break;
-				}
-				in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
-				in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
-				in.labelName=decodedInstruction[3];
-				
-                int temp1_rs1=registers[in.rs1],temp1_rs2=registers[in.rs2];
-                if(decodedInstruction[1].equals("CID")) {
-					temp1_rs1=this.coreID;
-					temp1_rs2=Integer.parseInt(decodedInstruction[2]);
-				}
+				int temp1_rs1=0,temp1_rs2=0;
+                if(!decodedInstruction[1].equals("CID")) {
+                	in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
+                    in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
+                    in.labelName=decodedInstruction[3];
+                    temp1_rs1=registers[in.rs1];
+                    temp1_rs2=registers[in.rs2];
+                }
+                if(decodedInstruction[1].equals("CID")){
+                    temp1_rs1=this.coreID;
+                    temp1_rs2=Integer.parseInt(decodedInstruction[2]);
+                    in.labelName=decodedInstruction[3];
+                }
                 if(in.isfowarded ){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         temp1_rs1=in.pipeline_reg[0];
@@ -884,13 +891,19 @@ public class Core {
 				break;
             case "bge":
                 //Ex: bge x1 x2 label
-                in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
-                in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
-                in.labelName=decodedInstruction[3];
-                int temp2_rs1=registers[in.rs1],temp2_rs2=registers[in.rs2];
+                
+                int temp2_rs1=0,temp2_rs2=0;
+                if(!decodedInstruction[1].equals("CID")) {
+                	in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
+                    in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
+                    in.labelName=decodedInstruction[3];
+                    temp2_rs1=registers[in.rs1];
+                    temp2_rs2=registers[in.rs2];
+                }
                 if(decodedInstruction[1].equals("CID")){
                     temp2_rs1=this.coreID;
                     temp2_rs2=Integer.parseInt(decodedInstruction[2]);
+                    in.labelName=decodedInstruction[3];
                 }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
@@ -940,15 +953,18 @@ public class Core {
             case "beq":
                 //Ex: beq x1 x2 label
 
-                in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
-                in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
-                in.labelName=decodedInstruction[3];
-                System.out.println("The values of rs1 and rs2 are:"+registers[in.rs1]+" and "+registers[in.rs2]);
-                System.out.println("The values in x12 and x0 are "+registers[12]+" and "+registers[0]);
-                int temp3_rs1=registers[in.rs1],temp3_rs2=registers[in.rs2];
+            	int temp3_rs1=0,temp3_rs2=0;
+                if(!decodedInstruction[1].equals("CID")) {
+                	in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
+                    in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
+                    in.labelName=decodedInstruction[3];
+                    temp3_rs1=registers[in.rs1];
+                    temp3_rs2=registers[in.rs2];
+                }
                 if(decodedInstruction[1].equals("CID")){
                     temp3_rs1=this.coreID;
                     temp3_rs2=Integer.parseInt(decodedInstruction[2]);
+                    in.labelName=decodedInstruction[3];
                 }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
