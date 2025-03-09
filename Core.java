@@ -150,9 +150,16 @@ public class Core {
             	System.out.println("The instruction is dummy:"+in5.pc_val);
             	System.out.println("The instruction is dummy:"+in5.isDummy);
             }
-            IF(program, in5);
+//            IF(program, in5);
+            FetcherResult temp=Simulator.IF(pc, in5, coreID, program, lastInstruction);
+            this.pc=temp.pc_val;
+            lastInstruction=temp.lastInstruction;
         }
-        
+        System.out.println("Printing the Pipeline after execution:");
+        for(int i=0;i<5;i++) {
+        	System.out.print(pipeLineQueue.get(i).pc_val+" ");
+        }
+        System.out.println();
     }
     private String instructionParser(String instruction) {
 	  
@@ -165,89 +172,89 @@ public class Core {
         }
         return instruction.trim();
     }
-    private void IF(String[] program,InstructionState in){
-        if(this.coreID==0) {
-        	if(in.isDummy || in==null || in.IF_done_core0==true){
-        		if(this.coreID==0) {
-            		System.out.println("----------------------The pipeline currently :");
-            		for(int i=0;i<=4;i++) {
-                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
-                	}
-                	System.out.println();
-            	}
-                return;
-            }
-        }else if(this.coreID==1) {
-        	if(in.isDummy || in==null || in.IF_done_core1==true){
-        		if(this.coreID==0) {
-            		System.out.println("----------------------The pipeline currently :");
-            		for(int i=0;i<=4;i++) {
-                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
-                	}
-                	System.out.println();
-            	}
-                return;
-            }
-        }else if(this.coreID==2) {
-        	if(in.isDummy || in==null || in.IF_done_core2==true){
-        		if(this.coreID==0) {
-            		System.out.println("----------------------The pipeline currently :");
-            		for(int i=0;i<=4;i++) {
-                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
-                	}
-                	System.out.println();
-            	}
-                return;
-            }
-        }if(this.coreID==3) {
-        	if(in.isDummy || in==null || in.IF_done_core3==true){
-        		if(this.coreID==0) {
-            		System.out.println("----------------------The pipeline currently :");
-            		for(int i=0;i<=4;i++) {
-                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
-                	}
-                	System.out.println();
-            	}
-                return;
-            }
-        }
-        if(program[pc].contains(":")){
-            pc++;
-        }
-        in.instruction=program[pc];
-        in.pc_val=pc;
-        if(coreID==0){
-            System.out.println("The value of pc in IF:"+this.pc+" for opcode:"+in.opcode);
-        }
-        pc++;
-        if(this.coreID==0) {
-    		System.out.println("----------------------The pipeline currently :");
-    		for(int i=0;i<=4;i++) {
-        		System.out.print(pipeLineQueue.get(i).pc_val+" ");
-        	}
-        	System.out.println();
-        	System.out.println("The total number of stalls so far are: "+this.totalStalls);
-    	}
-        if(this.pc==program.length){
-            lastInstruction=in;
-            System.out.println("Fetched the last instruction successfully with pc value"+in.pc_val);
-        }
-        
-        in.isDummy=false;
-        if(this.coreID==0) {
-        	in.IF_done_core0=true;
-        }
-        if(this.coreID==1) {
-        	in.IF_done_core1=true;
-        }
-        if(this.coreID==2) {
-        	in.IF_done_core2=true;
-        }
-        if(this.coreID==3) {
-        	in.IF_done_core3=true;
-        }	
-        return;
-    }
+//    private void IF(String[] program,InstructionState in){
+//        if(this.coreID==0) {
+//        	if(in.isDummy || in==null || in.IF_done_core0==true){
+//        		if(this.coreID==0) {
+//            		System.out.println("----------------------The pipeline currently :");
+//            		for(int i=0;i<=4;i++) {
+//                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+//                	}
+//                	System.out.println();
+//            	}
+//                return;
+//            }
+//        }else if(this.coreID==1) {
+//        	if(in.isDummy || in==null || in.IF_done_core1==true){
+//        		if(this.coreID==0) {
+//            		System.out.println("----------------------The pipeline currently :");
+//            		for(int i=0;i<=4;i++) {
+//                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+//                	}
+//                	System.out.println();
+//            	}
+//                return;
+//            }
+//        }else if(this.coreID==2) {
+//        	if(in.isDummy || in==null || in.IF_done_core2==true){
+//        		if(this.coreID==0) {
+//            		System.out.println("----------------------The pipeline currently :");
+//            		for(int i=0;i<=4;i++) {
+//                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+//                	}
+//                	System.out.println();
+//            	}
+//                return;
+//            }
+//        }if(this.coreID==3) {
+//        	if(in.isDummy || in==null || in.IF_done_core3==true){
+//        		if(this.coreID==0) {
+//            		System.out.println("----------------------The pipeline currently :");
+//            		for(int i=0;i<=4;i++) {
+//                		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+//                	}
+//                	System.out.println();
+//            	}
+//                return;
+//            }
+//        }
+//        if(program[pc].contains(":")){
+//            pc++;
+//        }
+//        in.instruction=program[pc];
+//        in.pc_val=pc;
+//        if(coreID==0){
+//            System.out.println("The value of pc in IF:"+this.pc+" for opcode:"+in.opcode);
+//        }
+//        pc++;
+//        if(this.coreID==0) {
+//    		System.out.println("----------------------The pipeline currently :");
+//    		for(int i=0;i<=4;i++) {
+//        		System.out.print(pipeLineQueue.get(i).pc_val+" ");
+//        	}
+//        	System.out.println();
+//        	System.out.println("The total number of stalls so far are: "+this.totalStalls);
+//    	}
+//        if(this.pc==program.length){
+//            lastInstruction=in;
+//            System.out.println("Fetched the last instruction successfully with pc value"+in.pc_val);
+//        }
+//        
+////        in.isDummy=false;
+//        if(this.coreID==0) {
+//        	in.IF_done_core0=true;
+//        }
+//        if(this.coreID==1) {
+//        	in.IF_done_core1=true;
+//        }
+//        if(this.coreID==2) {
+//        	in.IF_done_core2=true;
+//        }
+//        if(this.coreID==3) {
+//        	in.IF_done_core3=true;
+//        }	
+//        return;
+//    }
     private void decode(InstructionState in){
         if(in.isDummy){
             return;
@@ -262,6 +269,10 @@ public class Core {
         String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
         in.opcode=decodedInstruction[0].trim();
         if(in.opcode.equals("bne") || in.opcode.equals("beq") || in.opcode.equals("blt") || in.opcode.equals("bge")){
+        	if(parsedInstruction.contains("CID")){
+        		
+        		return;
+        	}
             in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
             in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
         }
@@ -674,6 +685,10 @@ public class Core {
 				in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.labelName=decodedInstruction[3];
                 int temp4_rs1=registers[in.rs1],temp4_rs2=registers[in.rs2];
+                if(decodedInstruction[1].equals("CID")) {
+					temp4_rs1=this.coreID;
+					temp4_rs2=Integer.parseInt(decodedInstruction[2]);
+				}
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         temp4_rs1=in.pipeline_reg[0];
@@ -720,11 +735,22 @@ public class Core {
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
 				break;
 			case "blt":
+				if(decodedInstruction[1].equals("CID")) {
+					in.rs1=this.coreID;
+					in.rs2=Integer.parseInt(decodedInstruction[2]);
+					in.labelName=decodedInstruction[3];
+					break;
+				}
 				in.rs1=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
 				in.labelName=decodedInstruction[3];
+				
                 int temp1_rs1=registers[in.rs1],temp1_rs2=registers[in.rs2];
-                if(in.isfowarded){
+                if(decodedInstruction[1].equals("CID")) {
+					temp1_rs1=this.coreID;
+					temp1_rs2=Integer.parseInt(decodedInstruction[2]);
+				}
+                if(in.isfowarded ){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         temp1_rs1=in.pipeline_reg[0];
                         temp1_rs2=in.pipeline_reg[1];
@@ -861,6 +887,10 @@ public class Core {
                 in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                 in.labelName=decodedInstruction[3];
+                if(decodedInstruction[1].equals("CID")) {
+					in.rs1=this.coreID;
+					in.rs2=Integer.parseInt(decodedInstruction[2]);
+				}
                 int temp2_rs1=registers[in.rs1],temp2_rs2=registers[in.rs2];
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){

@@ -16,6 +16,51 @@ public class Simulator{
         opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","rem","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall"));
     }
 
+    
+    public static FetcherResult IF(int pc,InstructionState in,int coreID,String[] program,InstructionState last) {
+    	if(coreID==0) {
+        	if(in.isDummy || in==null || in.IF_done_core0==true){
+                return new FetcherResult(last,pc);
+            }
+        }else if(coreID==1) {
+        	if(in.isDummy || in==null || in.IF_done_core1==true){
+        		return new FetcherResult(last,pc);
+            }
+        }else if(coreID==2) {
+        	if(in.isDummy || in==null || in.IF_done_core2==true){
+        		return new FetcherResult(last,pc);
+            }
+        }else if(coreID==3) {
+        	if(in.isDummy || in==null || in.IF_done_core3==true){
+        		return new FetcherResult(last,pc);
+            }
+        }
+    	if(program[pc].contains(":")) {
+    		pc++;
+    	}
+    	in.instruction=program[pc];
+    	in.pc_val=pc;
+    	pc++;
+//    	in.isDummy=false;
+    	if(pc==program.length) {
+    		last=in;
+    		
+    	}
+    	if(coreID==0) {
+        	in.IF_done_core0=true;
+        }
+        if(coreID==1) {
+        	in.IF_done_core1=true;
+        }
+        if(coreID==2) {
+        	in.IF_done_core2=true;
+        }
+        if(coreID==3) {
+        	in.IF_done_core3=true;
+        }	
+        return new FetcherResult(last,pc);
+    }
+    
     //function for mapping all the labels with proper instruction number. 
     private void mapAllTheLabels(String[] program){
         for(int i=0;i<program.length;i++){
