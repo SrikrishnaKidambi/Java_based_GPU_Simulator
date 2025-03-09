@@ -862,6 +862,10 @@ public class Core {
                 in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                 in.labelName=decodedInstruction[3];
                 int temp2_rs1=registers[in.rs1],temp2_rs2=registers[in.rs2];
+                if(decodedInstruction[1].equals("CID")){
+                    temp2_rs1=this.coreID;
+                    temp2_rs2=Integer.parseInt(decodedInstruction[2]);
+                }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         temp2_rs1=in.pipeline_reg[0];
@@ -909,12 +913,17 @@ public class Core {
                 break;
             case "beq":
                 //Ex: beq x1 x2 label
+
                 in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                 in.labelName=decodedInstruction[3];
                 System.out.println("The values of rs1 and rs2 are:"+registers[in.rs1]+" and "+registers[in.rs2]);
                 System.out.println("The values in x12 and x0 are "+registers[12]+" and "+registers[0]);
                 int temp3_rs1=registers[in.rs1],temp3_rs2=registers[in.rs2];
+                if(decodedInstruction[1].equals("CID")){
+                    temp3_rs1=this.coreID;
+                    temp3_rs2=Integer.parseInt(decodedInstruction[2]);
+                }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         temp3_rs1=in.pipeline_reg[0];
