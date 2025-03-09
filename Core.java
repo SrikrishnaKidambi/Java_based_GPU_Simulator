@@ -887,10 +887,6 @@ public class Core {
                 in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                 in.labelName=decodedInstruction[3];
-                if(decodedInstruction[1].equals("CID")) {
-					in.rs1=this.coreID;
-					in.rs2=Integer.parseInt(decodedInstruction[2]);
-				}
                 int temp2_rs1=registers[in.rs1],temp2_rs2=registers[in.rs2];
                 if(decodedInstruction[1].equals("CID")){
                     temp2_rs1=this.coreID;
