@@ -8,15 +8,21 @@ This is a project to simulate the GPU architecture .
 javac SimulatorGUI.java
 java SimulatorGUI
 ```
+### Phase - 1
 - Check the java output in teminal and GUI is also implemented for displaying the registers of cores and memory of the simulator.
 - Use the drop down to see the registers of each cores and the memory accessed by each core . You can also use the drop down to switch between the display type among hex, binary and signed.
 - We implemented the instructions "add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall".
 - The instructions which we implemented of our choice is "rem" which calculates the modulo.
 - We implemented the text and data segment .
 
+### Phase - 2
+
+- In this phase, all the instruction execution takes place in a pipelined fashion. 
 
 ---
 ### Minutes of Meeting:
+
+#### Date : 2
 
 #### Date : 24-02-2025
 

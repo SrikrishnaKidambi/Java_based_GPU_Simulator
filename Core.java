@@ -160,10 +160,10 @@ public class Core {
             this.pc=temp.pc_val;
             lastInstruction=temp.lastInstruction;
             System.out.println("Printing the pipeline:");
-//            for(int i=0;i<5;i++) {
-//            	System.out.print(pipeLineQueue.get(i).pc_val+" ");
-//            }
-//            System.out.println();
+           for(int i=0;i<5;i++) {
+            System.out.print(pipeLineQueue.get(i).pc_val+" ");
+           }
+           System.out.println();
         }
     //     System.out.println("--------------------------------Printing the Pipeline after execution for core :"+this.coreID);
     //     for(int i=0;i<Math.min(pipeLineQueue.size(), 5);i++) {
@@ -972,6 +972,7 @@ public class Core {
                     in.labelName=decodedInstruction[3];
                 }
                 if(in.isfowarded){
+                    System.out.println("Forwarding is happening");
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         temp3_rs1=in.pipeline_reg[0];
                         temp3_rs2=in.pipeline_reg[1];
@@ -983,6 +984,7 @@ public class Core {
                         temp3_rs2=in.pipeline_reg[1];
                     }
                 }
+                System.out.println("The forwarded values in beq are:"+temp3_rs1+" and "+temp3_rs2);
                 if(temp3_rs1==temp3_rs2){
                     pc=labelMapping.get(in.labelName).intValue();
                 }else {
@@ -1830,6 +1832,8 @@ public class Core {
     	if(curr.isDummy) {
     		return 0;
     	}
+        int stall=0;
+        boolean isStall;
     	System.out.println("**** IS dummy: "+curr.isDummy + " and pc val "+curr.pc_val+ " is ID done "+ curr.IDRF_done_core0+ " and IF done "+curr.IF_done_core0+" and EX done "+curr.EX_done_core0+ " and MEM done "+curr.MEM_done_core0);// for debugging
         
         // System.out.println("Printing the pipeline ");
@@ -1839,140 +1843,189 @@ public class Core {
         // System.out.println();
 
         // checking for ecall seperately as it has no rd, rs1 or rs2 but exhibits RAW dependency
-
+        
     	if(curr.opcode.equals("ecall")) {
+            isStall=true;
     		if(!prev1.isDummy && prev1.rd!=-1) {
     			if(prev1.rd==10 || prev1.rd==17) {
                     if(prev1.rd==10 && curr.pipeline_reg[0]==null){
                         curr.pipeline_reg[0]=prev1.result;
                         curr.isfowarded=true;
-                        return 0;
+                        isStall=false;
+                        // return 0;
                     }
                     else if(prev1.rd==17 && curr.pipeline_reg[1]==null){
                         curr.pipeline_reg[1]=prev1.result;
                         curr.isfowarded=true;
-                        return 0;
+                        isStall=false;
+                        // return 0;
                     }
                     else if(curr.isfowarded){
-                        return 0;
+                        isStall=false;
+                        // return 0;
                     }
-        			return 1;
+        			// return 1;
+                    if(isStall){
+                        stall++;
+                    }
         		}
     		}
     		
     		if(!prev2.isDummy && prev2.rd!=-1) {
+                isStall=true;
     			if(prev2.rd==10 || prev2.rd==17) {
                     if(prev2.rd==10 && curr.pipeline_reg[0]==null){
                         curr.pipeline_reg[0]=prev2.result;
                         curr.isfowarded=true;
-                        return 0;
+                        // return 0;
+                        isStall=false;
                     }
                     else if(prev2.rd==17 && curr.pipeline_reg[1]==null){
                         curr.pipeline_reg[1]=prev2.result;
                         curr.isfowarded=true;
-                        return 0;
+                        // return 0;
+                        isStall=false;
                     }
                     else if(curr.isfowarded){
-                        return 0;
+                        // return 0;
+                        isStall=false;
                     }
-        			return 1;
+        			// return 1;
+                    if(isStall){
+                        stall++;
+                    }
         		}
     		}
     		
     		if(!prev3.isDummy && prev3.rd!=-1) {
+                isStall=true;
     			if(prev3.rd==10 || prev3.rd==17) {
                     if(prev3.rd==10 && curr.pipeline_reg[0]==null){
                         curr.pipeline_reg[0]=prev3.result;
                         curr.isfowarded=true;
-                        return 0;
+                        // return 0;
+                        isStall=false;
                     }
                     else if(prev3.rd==17 && curr.pipeline_reg[1]==null){
                         curr.pipeline_reg[1]=prev3.result;
                         curr.isfowarded=true;
-                        return 0;
+                        // return 0;
+                        isStall=false;
                     }
                     else if(curr.isfowarded){
-                        return 0;
+                        // return 0;
+                        isStall=false;
                     }
-        			return 1;
+        			// return 1;
+                    if(isStall){
+                        stall++;
+                    }
         		}
     		}
     		
     	}
     	
     	if(!prev1.isDummy && prev1.rd!=-1) {
+            isStall=true;
     		if(curr.rs1==prev1.rd || curr.rs2==prev1.rd) {
     			if(prev1.result!=null && curr.rs1==prev1.rd && curr.rs2==prev1.rd && curr.pipeline_reg[0]==null && curr.pipeline_reg[1]==null){
                     curr.pipeline_reg[0]=prev1.result;
                     curr.pipeline_reg[1]=prev1.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(prev1.result!=null && curr.rs1==prev1.rd && curr.pipeline_reg[0]==null){
+                    System.out.println("For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
                     curr.pipeline_reg[0]=prev1.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(prev1.result!=null && curr.rs2==prev1.rd && curr.pipeline_reg[1]==null){
+                    System.out.println("For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
                     curr.pipeline_reg[1]=prev1.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(curr.isfowarded){
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
-    			return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
+                if(isStall){
+                    stall++;
+                }
+    			// return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
     		}
     	}
     	if(!prev2.isDummy && prev2.rd!=-1) {
+            isStall=true;
     		if(curr.rs1==prev2.rd || curr.rs2==prev2.rd) {
     			if(prev2.result!=null && curr.rs1==prev2.rd && curr.rs2==prev2.rd && curr.pipeline_reg[0]==null && curr.pipeline_reg[1]==null){
                     curr.pipeline_reg[0]=prev2.result;
                     curr.pipeline_reg[1]=prev2.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(prev2.result!=null && curr.rs1==prev2.rd && curr.pipeline_reg[0]==null){
+                    System.out.println("2.For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
                     curr.pipeline_reg[0]=prev2.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(prev2.result!=null && curr.rs2==prev2.rd && curr.pipeline_reg[1]==null){
+                    System.out.println("2.For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
                     curr.pipeline_reg[1]=prev2.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(curr.isfowarded){
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
-    			return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
+                if(isStall){
+                    stall++;
+                }
+    			// return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
     		}
     	}
     	if(!prev3.isDummy && prev3.rd!=-1) {
+            isStall=true;
     		if(curr.rs1==prev3.rd || curr.rs2==prev3.rd) {
     			if(prev3.result!=null && curr.rs1==prev3.rd && curr.rs2==prev3.rd && curr.pipeline_reg[0]==null && curr.pipeline_reg[1]==null){
                     curr.pipeline_reg[0]=prev3.result;
                     curr.pipeline_reg[1]=prev3.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(prev3.result!=null && curr.rs1==prev3.rd && curr.pipeline_reg[0]==null){
                     curr.pipeline_reg[0]=prev3.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(prev3.result!=null && curr.rs2==prev3.rd && curr.pipeline_reg[1]==null){
                     curr.pipeline_reg[1]=prev3.result;
                     curr.isfowarded=true;
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
                 else if(curr.isfowarded){
-                    return 0;
+                    // return 0;
+                    isStall=false;
                 }
-    			return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
+                if(isStall){
+                    stall++;
+                }
+    			// return 1;  // this indicates that there is a dependency with immediate previous instruction that lead to one stall with forwarding.  
     		}
     	}
-    	return 0;
+    	return stall;
     }
 
 	public int[] registers;

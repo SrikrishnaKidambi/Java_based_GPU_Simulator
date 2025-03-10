@@ -124,24 +124,47 @@ public class SimulatorGUI {
 		JPanel buttonPanel=new JPanel(new FlowLayout(FlowLayout.LEFT));
 		
 		JButton run=new JButton("Run");
-		run.addActionListener(new ActionListener() {
+		run.addActionListener(new ActionListener() {			
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				console.append("Running the program.\n");  //printing the output after running the program
-				try{
-					java.nio.file.Files.write(java.nio.file.Paths.get("program.asm"),codeEditor.getText().getBytes());
-//					console.append("Assembly code saved to program.asm\n");
-				}catch(Exception ex){
-					console.append("Error saving file: "+ex.getMessage()+"\n");
-				}
-				test=new Test();
-				test.RunSimulator();
-				updateRegisters(0);
-				updateRegisters(1);
-				updateRegisters(2);
-				updateRegisters(3);
-//				console.append("The number of clock cycles taken for execution are "+test.sim.clock);
+				JDialog pipelineDialogBox=new JDialog((Frame)null,"Pipeline Enabling",true);
+				pipelineDialogBox.setSize(300,150);
+				pipelineDialogBox.setLayout(new FlowLayout());
+				
+				JCheckBox forwardingCheckBox = new JCheckBox("Enable Pipeline Forwarding");
+				JButton dialogRunButton = new JButton("Run");
+				
+				pipelineDialogBox.add(forwardingCheckBox);
+				pipelineDialogBox.add(dialogRunButton);
+		        
+				dialogRunButton.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						boolean isForwardingEnabled=forwardingCheckBox.isSelected();
+						try {
+		                    java.nio.file.Files.write(java.nio.file.Paths.get("program.asm"), codeEditor.getText().getBytes());
+		                } catch (Exception ex) {
+		                    console.append("Error saving file: " + ex.getMessage() + "\n");
+		                }
+						
+						 test = new Test(isForwardingEnabled);
+			             test.RunSimulator();
+//			             test.isPipelineForwardingEnabled=isForwardingEnabled;
+			             updateRegisters(0);
+			             updateRegisters(1);
+			             updateRegisters(2);
+			             updateRegisters(3);
+			             pipelineDialogBox.dispose();
+			             forwardingCheckBox.setFocusPainted(false);
+			             dialogRunButton.setFocusPainted(false);
+					}
+					
+				});
+				pipelineDialogBox.setLocationRelativeTo(null);
+		        pipelineDialogBox.setVisible(true);
+		        
 			}
 			
 		});
@@ -282,7 +305,11 @@ public class SimulatorGUI {
 		if (frame != null) {
 			frame.dispose();  // Close current window
 		}
-		SwingUtilities.invokeLater(()->new MemoryGUI(test.mem));
+		if(SimulatorGUI.test==null) {
+			JOptionPane.showMessageDialog(frame, "Memory component is not initialised. Enter the code and run it to see the memory","Memory not initialised",JOptionPane.WARNING_MESSAGE);
+		}else {
+			SwingUtilities.invokeLater(()->new MemoryGUI_Shared(test.mem));
+		}
 	}
 	private static void saveCodeToFile() {
 		JFileChooser fileChooser = new JFileChooser();

@@ -8,7 +8,7 @@ addi x9 x0 0
 addi x31 x0 25
 bne CID 0 afterSum0
 # sum of first 25
-addi x15 x0 0
+addi x15 x18 0
 addi x16 x0 0  #sum var
 addi x8 x0 0 
 Loop0:
@@ -23,7 +23,7 @@ j Loop0
 afterSum0:
 bne CID 1 afterSum1
 # sum of second 25
-addi x15 x0 100
+addi x15 x18 100
 addi x16 x0 0
 addi x8 x0 0
 Loop1:
@@ -38,7 +38,7 @@ j Loop1
 afterSum1:
 bne CID 2 afterSum2
 # sum of third 25
-addi x15 x0 200
+addi x15 x18 200
 addi x16 x0 0
 addi x8 x0 0
 Loop2:
@@ -53,7 +53,7 @@ j Loop2
 afterSum2:
 bne CID 3 afterSum3
 # sum of fourth 25
-addi x15 x0 300
+addi x15 x18 300
 addi x16 x0 0
 addi x8 x0 0
 Loop3:

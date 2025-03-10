@@ -36,7 +36,7 @@ public class InstructionState {
 		IDRF_done_once1=false;
 		IDRF_done_once2=false;
 		IDRF_done_once3=false;
-		result=null;
+		result=null;  // initialising with null
 		pipeline_reg=new Integer[8];
 		pipeline_reg[0]=null; // this refer for rs1 content in general due to forwarding
 		pipeline_reg[1]=null; // this refer for rs2 content in general due to forwarding

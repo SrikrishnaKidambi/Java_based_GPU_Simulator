@@ -12,6 +12,9 @@ import java.util.Iterator;
 
 public class Test {
 		
+	public Test(boolean isPipelineforwardingEnabled) {
+		this.isPipelineForwardingEnabled=isPipelineforwardingEnabled;
+	}
     public void RunSimulator() {
 		//initializing the latencies for the arithmetic instructions
 		latencies.put("add", 1);
@@ -30,14 +33,14 @@ public class Test {
 			int latency=scanner.nextInt();
 			latencies.put(entry.getKey(), latency); 
 		}
-		System.out.println("Enter 1 to enable pipeline forwarding else enter 0: ");
-		int input=scanner.nextInt();
-		if(input==1){
-			isPipelineForwardingEnabled=true;
-		}
-		else{
-			isPipelineForwardingEnabled=false;
-		}
+//		System.out.println("Enter 1 to enable pipeline forwarding else enter 0: ");
+//		int input=scanner.nextInt();
+//		if(input==1){
+//			isPipelineForwardingEnabled=true;
+//		}
+//		else{
+//			isPipelineForwardingEnabled=false;
+//		}
         sim=new Simulator();
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();

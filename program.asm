@@ -1,63 +1,59 @@
+
 .data
-base: .word 2 4 5 4 1 
-str1: .string "\nThe sorted array is:\n"
-str: .string " "
-
+arr: .word 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100
 .text
-la x16 base # stores the base address of the array
-li x31 4 # x31 has the value 4
-jal x1 bubbleSort
-j printArray
-
-
-bubbleSort:
-    addi x10 x0 0 # i = 0
-    addi x12 x0 5 # n = 20
-    LoopOuter:
-        addi x11 x0 0 # j = 0
-        addi x14 x12 -1
-        bge x10 x14 Exit # Exit the outer loop if i>=n-1
-        LoopInner:
-            sub x13 x12 x10 # n - i
-            addi x13 x13 -1 # n - i - 1
-            bge x11 x13 Incrementer # Exit the inner loop if j>=n-i-1
-            mul x19 x11 x31 # x19 has the value j*4
-            add x20 x16 x19 # x20 has the address x16+j
-            lw x25 0(x20) # x25 has the value of x16+j alias x20
-            addi x21 x20 4 # x21 has the address x16+j+1 or x20+1
-            lw x26 0(x21) # x26 has the value of x16+j+1 alias x26
-            blt x26 x25 Swap
-            addi x11 x11 1
-            j LoopInner
-            Swap:
-                sw x25 0(x21) # we are swapping the contents in the memory
-                sw x26 0(x20)
-                addi x11 x11 1
-                j LoopInner
-        Incrementer:
-            addi x10 x10 1
-            j LoopOuter
-    Exit:
-        jr x1
-
-printArray:
-    la x10 str1
-    li x17 4
-    ecall
-    addi x29 x0 0 #counter of the array
-    Loop:
-        beq x29 x12 Done
-        li x17 1
-        lw x30 0(x16)
-        mv x10 x30
-        ecall
-        
-        la x10 str
-        li x17 4
-        ecall
-        
-        addi x16 x16 4
-        addi x29 x29 1
-        j Loop
-     Done:
-            
+la x14 arr
+bne CID 0 after1
+addi x13 x0 0
+addi x11 x0 0
+addi x12 x0 25
+loop: beq x11 x12 after1
+lw x15 0(x14)
+add x13 x13 x15
+sw x13 512(x0)
+addi x14 x14 4
+addi x11 x11 1
+j loop
+after1: bne CID 1 after2
+addi x11 x0 0
+addi x13 x0 0
+addi x12 x0 25
+loop_1: beq x11 x12 after2
+lw x15 100(x14)
+add x13 x13 x15
+sw x13 516(x0)
+addi x14 x14 4
+addi x11 x11 1
+j loop_1
+after2: bne CID 2 after3
+addi x11 x0 0
+addi x13 x0 0
+addi x12 x0 25
+loop_2: beq x11 x12 after3
+lw x15 200(x14)
+add x13 x13 x15
+sw x13 520(x0)
+addi x14 x14 4
+addi x11 x11 1
+j loop_2
+after3: bne CID 3 after4
+addi x11 x0 0
+addi x13 x0 0
+addi x12 x0 25
+loop_3: beq x11 x12 after4
+lw x15 300(x14)
+add x13 x13 x15
+sw x13 524(x0)
+addi x14 x14 4
+addi x11 x11 1
+j loop_3
+after4: bne CID 0 nop
+lw x17 512(x0)
+lw x18 516(x0)
+lw x19 520(x0)
+lw x20 524(x0)
+add x21 x17 x18
+add x22 x21 x19
+add x23 x22 x20
+sw x23 528(x0)
+nop: addi x0 x0 0
