@@ -130,6 +130,8 @@ public class Test {
 							mem.memory[i*4+1-4*startIdx+mem.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 1
 							mem.memory[i*4+2-4*startIdx+mem.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 2 
 							mem.memory[i*4+3-4*startIdx+mem.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 3
+
+							// mem.memory[i*4+0-4*startIdx+mem.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 
 						}
 						mem.addressCounter+=4*(parsedLine.length-startIdx);
 						if(mem.addressCounter>=1024) {
