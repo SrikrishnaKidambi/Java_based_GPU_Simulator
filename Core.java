@@ -1273,15 +1273,18 @@ public class Core {
                 // }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
-                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal;
                     }
                     else if(in.pipeline_reg[0]!=null){
-                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal;
                     }
                     break;
                 }
                 
-                in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
+                // in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
+                in.addressIdx=registers[in.rs1]+in.immediateVal+0;   // loading the value that is stored in the memory of core zero
                 break;
             case "li":
                 in.result=in.immediateVal;
@@ -1393,15 +1396,18 @@ public class Core {
 				// }
                 if(in.isfowarded){
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
-                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal;    
                     }
                     else if(in.pipeline_reg[0]!=null){
-                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal;
                     }
                     System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
                 }
                 System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
-				in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
+				// in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
+                in.addressIdx=registers[in.rs1]+in.immediateVal+0;  // accessing the memory value that is stored at core 0
 				break;
 			case "jalr": 
 				in.result=pc;

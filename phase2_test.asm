@@ -30,7 +30,7 @@ Loop1:
 beq x8 x31 afterSum1
 lw x25 0(x15)
 add x16 x16 x25
-sw x16 1020(x0)
+sw x16 1024(x0)
 addi x15 x15 4
 addi x8 x8 1
 j Loop1
@@ -45,7 +45,7 @@ Loop2:
 beq x8 x31 afterSum2
 lw x25 0(x15)
 add x16 x16 x25
-sw x16 1020(x0)
+sw x16 1028(x0)
 addi x15 x15 4
 addi x8 x8 1
 j Loop2
@@ -60,7 +60,7 @@ Loop3:
 beq x8 x31 afterSum3
 lw x25 0(x15)
 add x16 x16 x25
-sw x16 1020(x0)
+sw x16 1032(x0)
 addi x15 x15 4
 addi x8 x8 1
 j Loop3
@@ -72,9 +72,9 @@ li x17 4
 ecall
 
 lw x22 1020(x0)
-lw x23 1021(x0)
-lw x24 1022(x0)
-lw x25 1023(x0)
+lw x23 1024(x0)
+lw x24 1028(x0)
+lw x25 1032(x0)
 add x23 x22 x23
 add x24 x24 x23
 add x25 x25 x24
