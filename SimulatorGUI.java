@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -14,6 +15,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 class TeeOutputStream extends OutputStream {
     private final OutputStream first;
@@ -54,6 +57,15 @@ public class SimulatorGUI {
 	private static Test test;
 	private static JComboBox<String> displayTypeSelector;
 	private static JTextPane codeEditor;
+	private static Map<String, Integer> latenciesStorage = new HashMap<>() {{
+		put("add", 1);
+		put("sub", 1);
+		put("mul", 1);
+		put("rem", 1);
+		put("addi", 1);
+		put("muli", 1);
+		put("mv", 1);
+	}};
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(SimulatorGUI::makeGUI);
 	}
@@ -79,6 +91,15 @@ public class SimulatorGUI {
         saveItem.addActionListener(e -> saveCodeToFile());
         fileMenu.add(saveItem);
         menuBar.add(fileMenu);
+
+		//creating the "Settings" menu
+		JMenu settingsMenu= new JMenu("Settings");
+		settingsMenu.setMnemonic(KeyEvent.VK_S); // Alt + S
+		JMenuItem latencySettings= new JMenuItem("Latency Settings");
+		latencySettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK)); // Ctrl + L
+		latencySettings.addActionListener(e -> openLatencySettings());
+		settingsMenu.add(latencySettings);
+		menuBar.add(settingsMenu);
         frame.setJMenuBar(menuBar);
 		
 		// implement the code editor and register view and navigation bar
@@ -149,7 +170,7 @@ public class SimulatorGUI {
 		                    console.append("Error saving file: " + ex.getMessage() + "\n");
 		                }
 						
-						 test = new Test(isForwardingEnabled);
+						 test = new Test(isForwardingEnabled,latenciesStorage);
 			             test.RunSimulator();
 //			             test.isPipelineForwardingEnabled=isForwardingEnabled;
 			             updateRegisters(0);
@@ -334,5 +355,47 @@ public class SimulatorGUI {
 			}
 		}
 	}
+	private static void openLatencySettings(){
+		JDialog latencyDialog= new JDialog(frame, "Set Arithmetic Instructions Latencies",true);
+		latencyDialog.setLayout(new BorderLayout());
 
+		JPanel panel=new JPanel(new GridLayout(8,2,10,10));
+		panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+		Map<String, JTextField> latencyFields= new HashMap<>();
+		String[] instructions = {"add", "sub","mul","rem","addi","muli","mv"};
+
+		for(String instr: instructions){
+			panel.add(new JLabel(instr.toUpperCase() + " instruction latency :"));
+			JTextField field = new JTextField(String.valueOf(latenciesStorage.get(instr)),5);
+			latencyFields.put(instr,field);
+			panel.add(field);
+		}
+
+		//save button to store the latencies
+		JButton saveButton= new JButton("Save");
+		saveButton.addActionListener(e -> {
+			for(String instr: latencyFields.keySet()){
+				try{
+					int latency = Integer.parseInt(latencyFields.get(instr).getText());
+					latenciesStorage.put(instr,latency);
+				}
+				catch(NumberFormatException ex){
+					console.append("Invalid input for " + instr + ". Using default value 1.\n");
+                	latenciesStorage.put(instr, 1);
+				}
+			}
+			latencyDialog.dispose();
+		});
+		JPanel buttonPanel = new JPanel();
+        buttonPanel.add(saveButton);
+
+		latencyDialog.add(panel,BorderLayout.CENTER);
+		latencyDialog.add(buttonPanel,BorderLayout.SOUTH); 
+		latencyDialog.setSize(350,350);
+		latencyDialog.setMinimumSize(new Dimension(350,350));
+
+		latencyDialog.setLocationRelativeTo(frame);
+		latencyDialog.setVisible(true);
+	
+	}
 }

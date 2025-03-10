@@ -1,59 +1,87 @@
-
 .data
-arr: .word 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100
+arr: .word 42 98 77 22 64 70 18 87 55 35 92 91 53 36 31 19 14 21 67 28 34 94 2 72 78 51 59 47 50 46 9 5 84 24 57 90 79 65 97 60 30 41 89 48 40 95 17 38 16 4 29 49 45 6 44 100 83 71 85 32 15 73 86 63 13 3 52 68 61 69 88 7 39 75 80 76 81 99 23 8 82 96 10 43 20 27 66 12 11 56 33 54 1 74 62 93 25 58 37 26
+str1: .string "\nThe sum of all the hundred elements is: "
+
 .text
-la x14 arr
-bne CID 0 after1
-addi x13 x0 0
-addi x11 x0 0
-addi x12 x0 25
-loop: beq x11 x12 after1
-lw x15 0(x14)
-add x13 x13 x15
-sw x13 512(x0)
-addi x14 x14 4
-addi x11 x11 1
-j loop
-after1: bne CID 1 after2
-addi x11 x0 0
-addi x13 x0 0
-addi x12 x0 25
-loop_1: beq x11 x12 after2
-lw x15 100(x14)
-add x13 x13 x15
-sw x13 516(x0)
-addi x14 x14 4
-addi x11 x11 1
-j loop_1
-after2: bne CID 2 after3
-addi x11 x0 0
-addi x13 x0 0
-addi x12 x0 25
-loop_2: beq x11 x12 after3
-lw x15 200(x14)
-add x13 x13 x15
-sw x13 520(x0)
-addi x14 x14 4
-addi x11 x11 1
-j loop_2
-after3: bne CID 3 after4
-addi x11 x0 0
-addi x13 x0 0
-addi x12 x0 25
-loop_3: beq x11 x12 after4
-lw x15 300(x14)
-add x13 x13 x15
-sw x13 524(x0)
-addi x14 x14 4
-addi x11 x11 1
-j loop_3
-after4: bne CID 0 nop
-lw x17 512(x0)
-lw x18 516(x0)
-lw x19 520(x0)
-lw x20 524(x0)
-add x21 x17 x18
-add x22 x21 x19
-add x23 x22 x20
-sw x23 528(x0)
-nop: addi x0 x0 0
+la x18 arr
+addi x9 x0 0
+addi x31 x0 25
+bne CID 0 afterSum0
+# sum of first 25
+addi x15 x18 0
+addi x16 x0 0  #sum var
+addi x8 x0 0 
+Loop0:
+beq x8 x31 afterSum0
+lw x25 0(x15)
+add x16 x16 x25
+sw x16 1020(x0)
+addi x15 x15 4
+addi x8 x8 1
+j Loop0
+
+afterSum0:
+bne CID 1 afterSum1
+# sum of second 25
+addi x15 x18 100
+addi x16 x0 0
+addi x8 x0 0
+Loop1:
+beq x8 x31 afterSum1
+lw x25 0(x15)
+add x16 x16 x25
+sw x16 1024(x0)
+addi x15 x15 4
+addi x8 x8 1
+j Loop1
+
+afterSum1:
+bne CID 2 afterSum2
+# sum of third 25
+addi x15 x18 200
+addi x16 x0 0
+addi x8 x0 0
+Loop2:
+beq x8 x31 afterSum2
+lw x25 0(x15)
+add x16 x16 x25
+sw x16 1028(x0)
+addi x15 x15 4
+addi x8 x8 1
+j Loop2
+
+afterSum2:
+bne CID 3 afterSum3
+# sum of fourth 25
+addi x15 x18 300
+addi x16 x0 0
+addi x8 x0 0
+Loop3:
+beq x8 x31 afterSum3
+lw x25 0(x15)
+add x16 x16 x25
+sw x16 1032(x0)
+addi x15 x15 4
+addi x8 x8 1
+j Loop3
+
+afterSum3:
+bne CID 0 Done
+la x10 str1
+li x17 4
+ecall
+
+lw x22 1020(x0)
+lw x23 1024(x0)
+lw x24 1028(x0)
+lw x25 1032(x0)
+add x23 x22 x23
+add x24 x24 x23
+add x25 x25 x24
+sw x25 1020(x0)
+
+mv x10 x25
+li x17 1
+ecall
+
+Done:

@@ -170,6 +170,7 @@ public class Core {
     //     	System.out.print(pipeLineQueue.get(i).pc_val+" ");
     //     }
     //     System.out.println();
+    // }
     }
     private String instructionParser(String instruction) {
 	  
