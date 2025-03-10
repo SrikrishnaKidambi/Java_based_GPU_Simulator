@@ -11,24 +11,25 @@ import java.util.Set;
 import java.util.Iterator;
 
 public class Test {
-		
-    public void RunSimulator() {
+	
+	public Test(Map<String,Integer> latencies){
 		//initializing the latencies for the arithmetic instructions
-		latencies.put("add", 1);
-		latencies.put("sub", 1);
-		latencies.put("mul", 1);
-		latencies.put("rem", 1);
-		latencies.put("addi", 1);
-		latencies.put("muli", 1);
-		latencies.put("mv", 1);
-		System.out.println("Enter the latencies for the arithmetic instructions: ");
+		this.latencies=latencies;
+	}
+    public void RunSimulator() {
+		// System.out.println("Enter the latencies for the arithmetic instructions: ");
+		System.out.println(latencies.size());
 		Iterator<Map.Entry<String, Integer>> iterator = latencies.entrySet().iterator();
 		Scanner scanner = new Scanner(System.in);
+		// while(iterator.hasNext()){
+		// 	Map.Entry<String,Integer> entry=iterator.next();
+		// 	System.out.println("Enter the latency for the instruction "+entry.getKey()+ " : ");
+		// 	int latency=scanner.nextInt();
+		// 	latencies.put(entry.getKey(), latency); 
+		// }
 		while(iterator.hasNext()){
-			Map.Entry<String,Integer> entry=iterator.next();
-			System.out.println("Enter the latency for the instruction "+entry.getKey()+ " : ");
-			int latency=scanner.nextInt();
-			latencies.put(entry.getKey(), latency); 
+			Map.Entry<String,Integer> entry =iterator.next();
+			System.out.println("The latency for the ins "+entry.getKey()+" is "+entry.getValue());
 		}
 		System.out.println("Enter 1 to enable pipeline forwarding else enter 0: ");
 		int input=scanner.nextInt();
