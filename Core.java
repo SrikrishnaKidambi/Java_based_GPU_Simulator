@@ -960,7 +960,7 @@ public class Core {
                 //Ex: beq x1 x2 label
 
             	int temp3_rs1=0,temp3_rs2=0;
-                if(!decodedInstruction[1].equals("CID")) {
+                if(!decodedInstruction[1].equals("CID") ) {
                 	in.rs1= Integer.parseInt(decodedInstruction[1].substring(1));
                     in.rs2=Integer.parseInt(decodedInstruction[2].substring(1));
                     in.labelName=decodedInstruction[3];

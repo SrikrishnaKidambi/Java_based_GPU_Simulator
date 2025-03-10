@@ -17,7 +17,8 @@ java SimulatorGUI
 
 ### Phase - 2
 
-- In this phase, all the instruction execution takes place in a pipelined fashion. 
+- In this phase, all the instruction execution takes place in a pipelined fashion. Also RAW hazard checking, pipeline forwarding were implemented. 
+- Please note that when using branch instruction with CID please use upper case CID instead of lower case CID.
 
 ---
 ### Minutes of Meeting:
