@@ -138,6 +138,23 @@ public class SimulatorGUI {
 				}
 			}
 		});
+		codeEditor.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
+				if (e.isControlDown()) { // Check if Ctrl is pressed
+					if (e.getWheelRotation() < 0) { // Scroll up to zoom in
+						if (fontSize < MAX_FONT_SIZE) {
+							fontSize += 2;
+						}
+					} else { // Scroll down to zoom out
+						if (fontSize > MIN_FONT_SIZE) {
+							fontSize -= 2;
+						}
+					}
+					codeEditor.setFont(new Font("Consolas", Font.PLAIN, fontSize));
+				}
+			}
+		});		
 		
 		
 		// creating a panel for the buttons 

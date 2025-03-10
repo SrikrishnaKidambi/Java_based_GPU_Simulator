@@ -22,7 +22,49 @@ java SimulatorGUI
 ---
 ### Minutes of Meeting:
 
-#### Date : 2
+#### Date : 10-03-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Unified the memory for all the cores(previously in phase1 we divided memory) and implemented GUI for latencies, option for pipeline forwarding and complete memory display.
+#### Date : 9-03-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Implemented single IF unit for all the cores and implenmented branch instruction with CID to decide which cores to execute.
+#### Date : 8-03-2025
+
+Members : Srikrishna , Sai krishna
+Decisions: We decided to check the previous three instructions for hazards detection and used pipeline registers in the instruction class to store the fowarded values.
+Tasks: Implemented the pipeline forwarding stalls and values fowarding using the logic similar to w/o forwarding that is checking prev 3 instructions for dependencies and forwarding them.
+#### Date : 6-03-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Fixed some bugs in raw hazards detection without pipeline fowarding. 
+#### Date : 5-03-2025
+
+Members : Srikrishna , Sai krishna
+Decisions: We realised that the previous implementation do not work out and decided to check the previous three instructions and decided to call the raw hazards detector before the execution stage and for branches before the ID/RF.
+Tasks: Implemented the control hazards after branch instructions and then implemented stalls due to raw hazards by implementing according to the decision made(now it is success 😊).
+
+#### Date : 3-03-2025
+
+Members : Srikrishna , Sai krishna
+Decision: Decided to take the asm code given by the programmer and decided to possible hazards using the program array and stored them in a map(but it failed due to loops).
+Task: Tried out to implement the above thing but things did not work out due to loops.
+#### Date : 2-03-2025
+
+Members : Srikrishna , Sai krishna
+Decision: Decided to put stalls before execute stage for simulating the latencies as execution is the bottle neck for arithmetic operations generally.
+Tasks: Implemented pipelining and as part of that we tried out various datastructures available in java and finally sticked to linked list and figured out how to push stalls into the pipeline. Worked on latencies.
+#### Date : 1-03-2025
+
+Members : Srikrishna , Sai krishna
+Decisions: We decided to use to class for instructions to store all the important meta data about an instruction. We decided mark the instructions in the pipeline that are not meant for execution like stalls as dummy instructions.
+Tasks: We broke down our phase 1 execution of our instruction into stages IF, ID/RF, EX, MEM, WB. We implemented instruction class.
+
+#### Date : 28-02-2025
+
+Members : Srikrishna , Sai krishna
+Decisions: Tried to understand the implementation of pipelining and brainstormed ideas and thought of ideas like implementing using threads etc., and finally decided to implement pipelining similar to functionality of a queue.
 
 #### Date : 24-02-2025
 
