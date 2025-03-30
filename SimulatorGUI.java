@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.undo.UndoManager;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -112,14 +113,18 @@ public class SimulatorGUI {
 		console=new JTextArea();
 		console.setEditable(false);
 		console.setFont(new Font("Monospaced", Font.PLAIN, 14));
-		JScrollPane consoleScroll=new JScrollPane(console);
-
+		JScrollPane consoleScroll=new JScrollPane(console); 
 		// text area for writing the code
 		codeEditor = new JTextPane();
 		codeEditor.setFont(new Font("Consolas",Font.PLAIN,fontSize));
 		JScrollPane codeScrollPane= new JScrollPane(codeEditor);
 		codeEditorPanel.setLayout(new BorderLayout());
 		codeEditorPanel.add(codeScrollPane,BorderLayout.CENTER);
+
+		//Undo manager for code editor
+		UndoManager undoManager = new UndoManager();
+		codeEditor.getDocument().addUndoableEditListener(e -> undoManager.addEdit(e.getEdit()));
+
 		codeEditor.addKeyListener(new java.awt.event.KeyAdapter() {
 			@Override
 			public void keyPressed(java.awt.event.KeyEvent e){
@@ -133,6 +138,10 @@ public class SimulatorGUI {
 						if (fontSize > MIN_FONT_SIZE) {
 							fontSize -= 2;
 							codeEditor.setFont(new Font("Consolas", Font.PLAIN, fontSize));
+						}
+					}else if (e.getKeyCode() == KeyEvent.VK_Z) { // Ctrl + Z
+						if (undoManager.canUndo()) {
+							undoManager.undo();
 						}
 					}
 				}
