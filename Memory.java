@@ -1,9 +1,11 @@
 public class Memory {
     public int[] memory;
     public int addressCounter;
-    public Memory(){
+    public int memoryAccessLatency;
+    public Memory(int memoryAccessLatency){
         memory=new int[4096];
         addressCounter=0; // base address is 0
+        this.memoryAccessLatency=memoryAccessLatency;
     }
     public void printMemory(){
         System.out.println("The memory of the simulator:");

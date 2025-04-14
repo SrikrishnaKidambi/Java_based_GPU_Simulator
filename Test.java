@@ -201,7 +201,13 @@ public class Test {
 	public Set<String> dataTypeNames= new HashSet<>(Set.of(".word" , ".string",".data",".text"));
 	public Map<String,String> stringVariableMapping = new HashMap<>();
 	public Map<String,Integer> numberVariableMapping=new HashMap<>();
-	public Memory mem=new Memory();
+	public CacheConfig cacheConfig = new CacheConfig("CacheInputs");
+	public Memory mem=new Memory(cacheConfig.mem_latency);
+	public Cache_L1D cache_L1D_core0=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency);
+	public Cache_L1D cache_L1D_core1=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency);
+	public Cache_L1D cache_L1D_core2=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency);
+	public Cache_L1D cache_L1D_core3=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency);
+	public Cache_L2 cache_L2=new Cache_L2(cacheConfig.CL2_associativity, cacheConfig.CL2_blockSize, cacheConfig.CL2_cacheSize, cacheConfig.CL2_latency);
 	public Simulator sim;
 	public boolean isPipelineForwardingEnabled;
 }

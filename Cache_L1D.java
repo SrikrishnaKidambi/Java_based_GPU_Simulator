@@ -5,6 +5,7 @@ public class Cache_L1D {
     public int blockSize;
     public int accessLatency;
     public int cacheSize;
+    private int latencyExtra;
 
     public Cache_L1D(int associativity,int blockSize,int cacheSize,int accessLatency){
         this.associativity=associativity;
@@ -16,16 +17,18 @@ public class Cache_L1D {
         tag=new Integer[cacheSize/blockSize];
     }
 
-    public Integer readData(int addr){
+    public MemoryResult readData(int addr){
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
         int offset=addr%blockSize;
         int numTags=cacheSize/blockSize;
         int numSets=numTags/associativity;
         int idx=tagIdx%numSets;
         int tagBits=tagIdx/numSets;
+        MemoryResult res=null;
         for(int i=idx*associativity;i<idx*associativity+associativity;i++){
             if(tag[i]==tagBits){
-                return cache[i*blockSize+offset];
+                res=new MemoryResult(this.accessLatency, cache[i*blockSize+offset]);
+                return res;
             }
         }
         return null;
@@ -36,16 +39,21 @@ public class Cache_L1D {
     public Integer[] copyFromL2(int lower_bound,int upper_bound,Cache_L2 L2Cache,Memory mem) {
     	int k=0;
     	Integer[] blockFound=new Integer[this.blockSize/4];
+        boolean firstTimeDone=false;
     	for(int i=lower_bound;i<upper_bound;i+=4) {
-    		Integer valFromL2=L2Cache.readData(i);
+    		MemoryResult valFromL2=L2Cache.readData(i);
     		if(valFromL2!=null) {
     			if(k<blockSize/4) {
-    				blockFound[k++]=valFromL2;
+    				blockFound[k++]=valFromL2.result;
+                    if(!firstTimeDone){
+                        latencyExtra+=valFromL2.latency;
+                    }
     			}
     		}
     		else {
     			valFromL2=L2Cache.fillCacheL2(i, mem);   
-    			blockFound[k++]=valFromL2;		
+    			blockFound[k++]=valFromL2.result;
+                latencyExtra+=valFromL2.latency;		
     		}
     	}
     	return blockFound;
@@ -57,7 +65,7 @@ public class Cache_L1D {
     
     // this function is called if there is cache miss in L1.
     
-    public Integer fillCacheL1(int addr,Cache_L2 L2Cache,Memory mem){
+    public MemoryResult fillCacheL1(int addr,Cache_L2 L2Cache,Memory mem){
    
     	int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
     	int numTags=cacheSize/blockSize;
@@ -65,7 +73,7 @@ public class Cache_L1D {
         int idx=tagIdx%numSets;
         int tagBits=tagIdx/numSets;
         int offset=addr%blockSize;
-        Integer valFound=null;
+        MemoryResult valFound=null;
         boolean isCacheVacant=false;
         
         for(int i=idx*associativity;i<idx*associativity+associativity;i++) {
@@ -78,7 +86,7 @@ public class Cache_L1D {
         		for(int j=0;j<blockFromL2.length;j++) {
         			cache[i*this.blockSize+j*4]=blockFromL2[j];
         		}
-        		valFound=cache[i*blockSize+offset];
+        		valFound=new MemoryResult(latencyExtra+this.accessLatency, cache[i*blockSize+offset]);
         		break;
         	}
         }

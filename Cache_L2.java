@@ -16,7 +16,7 @@ public class Cache_L2 {
     
     // this method should actually return an instance of MemoryResult Class that has the value and latency required to get the value.
 
-    public Integer readData(int addr){
+    public MemoryResult readData(int addr){
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
         int offset=addr%blockSize;
         int numTags=cacheSize/blockSize;
@@ -25,7 +25,7 @@ public class Cache_L2 {
         int tagBits=tagIdx/numSets;
         for(int i=idx*associativity;i<idx*associativity+associativity;i++){
             if(tag[i]==tagBits){
-                return cache[i*blockSize+offset];
+                return new MemoryResult(this.accessLatency, cache[i*blockSize+offset]);
             }
         }
         return null;
@@ -33,7 +33,7 @@ public class Cache_L2 {
 
     // this method should actually return an instance of MemoryResult Class that has the value and latency required to get the value.
     
-    public Integer fillCacheL2(int addr,Memory mem){
+    public MemoryResult fillCacheL2(int addr,Memory mem){
     	int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
     	int numTags=cacheSize/blockSize;
         int numSets=numTags/associativity;
@@ -59,7 +59,7 @@ public class Cache_L2 {
         if(!isCacheVacant) {
         	LRU_Policy();
         }
-        return valFound;
+        return new MemoryResult(this.accessLatency+mem.memoryAccessLatency, valFound);
     }
     
     public Integer[] tag;
