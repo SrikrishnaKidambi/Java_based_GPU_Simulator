@@ -33,7 +33,7 @@ public class Memory {
             System.out.print(memory[i]+" ");
         }
         System.out.println();
-        String hello="\nDone printing the memory\n";
-        System.out.print(hello);
+        String msg="\nDone printing the memory\n";
+        System.out.print(msg);
     }
 }

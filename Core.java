@@ -1534,7 +1534,7 @@ public class Core {
         }
         if(this.coreID==3) {
         	in.MEM_done_core3=true;
-        }
+        } 
     }
     private void WB(InstructionState in){
         	if(this.coreID==0) {
