@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Core {
 
-    public Core(int coreID){
+    public Core(int coreID,Cache_L1D L1_cache,Cache_L2 L2_cache){
         this.coreID=coreID;
         this.pc=0;
         this.registers=new int[32];
@@ -13,6 +13,7 @@ public class Core {
         this.controlStalls=0;
         this.latencyStalls=0;
         this.totalStalls=0;
+        this.memoryLatencyStalls=0;
         instructionsExecuted=new int[1];
         this.instructionsExecuted[0]=0;
         pipeLineQueue=new LinkedList<>();
@@ -27,6 +28,8 @@ public class Core {
         pipeLineQueue.addLast(in2);
         pipeLineQueue.addLast(in4);
         pipeLineQueue.addLast(in5);
+        this.L1_cache=L1_cache;
+        this.L2_cache=L2_cache;
     }
     
     public void executeUtil(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping,boolean isPipelineForwardingEnabled) {
@@ -45,6 +48,10 @@ public class Core {
         }
         if(pipeLineQueue.size()>=2){
             InstructionState in2=pipeLineQueue.get(1);
+            for(int i=0;i<memoryLatencyStalls-1;i++) {
+            	pipeLineQueue.add(1+i,new InstructionState());
+            }
+            memoryLatencyStalls=0;
             if(isPipelineForwardingEnabled){
                 int dataStalls=hazardDetectorUtil(pipeLineQueue,isPipelineForwardingEnabled,1);
                 totalStalls+=dataStalls;
@@ -1500,10 +1507,16 @@ public class Core {
         }
         if(coreID==0){
             System.out.println("The value of pc in MEM:"+this.pc+" for opcode:"+in.opcode);
-        }		
+        }	
+        MemoryAccess memAccess=new MemoryAccess(L1_cache,L2_cache,mem);
         switch (in.opcode) {
             case "lw":
-                in.result=mem.memory[in.addressIdx];
+//                in.result=mem.memory[in.addressIdx];
+            	MemoryResult memResult=memAccess.readData(in.addressIdx);
+            	in.result=memResult.result;
+            	this.memoryLatencyStalls+=memResult.latency;
+            	this.totalStalls+=this.memoryLatencyStalls;
+            	System.out.println("Memory stalls are: "+memoryLatencyStalls+" and result is "+in.result);
                 break;
             case "sw":
                 if(in.isfowarded){
@@ -2037,7 +2050,10 @@ public class Core {
     public int controlStalls;
     public int totalStalls;
     public int latencyStalls;
+    public int memoryLatencyStalls;
     public InstructionState lastInstruction;
     public LinkedList<InstructionState> pipeLineQueue;
     public int[] instructionsExecuted;
+    public Cache_L1D L1_cache;
+    public Cache_L2 L2_cache;
 }

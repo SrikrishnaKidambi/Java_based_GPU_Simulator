@@ -24,8 +24,10 @@ public class Cache_L2 {
         int idx=tagIdx%numSets;
         int tagBits=tagIdx/numSets;
         for(int i=idx*associativity;i<idx*associativity+associativity;i++){
-            if(tag[i]==tagBits){
-                return new MemoryResult(this.accessLatency, cache[i*blockSize+offset]);
+            if(tag[i]!=null) {
+            	if(tag[i]==tagBits){
+                    return new MemoryResult(this.accessLatency, cache[i*blockSize+offset]);
+                }
             }
         }
         return null;
@@ -34,6 +36,7 @@ public class Cache_L2 {
     // this method should actually return an instance of MemoryResult Class that has the value and latency required to get the value.
     
     public MemoryResult fillCacheL2(int addr,Memory mem){
+    	System.out.println("-------------------- Called fillCacheL2 function");
     	int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
     	int numTags=cacheSize/blockSize;
         int numSets=numTags/associativity;
@@ -52,6 +55,7 @@ public class Cache_L2 {
                 	cache[i*blockSize+j-lower_bound]=mem.memory[j];    
                 }
                 valFound=cache[i*blockSize+offset];
+                System.out.println("--------------The value found by after a miss in L2 cache :"+valFound);
                 isCacheVacant=true;
                 break;
         	}
@@ -59,6 +63,7 @@ public class Cache_L2 {
         if(!isCacheVacant) {
         	LRU_Policy();
         }
+        System.out.println("The memory result is returned ");
         return new MemoryResult(this.accessLatency+mem.memoryAccessLatency, valFound);
     }
     

@@ -6,11 +6,17 @@ import java.util.Map;
 import java.util.Set;
 
 public class Simulator{
-    public Simulator(){
+    public Simulator(Cache_L1D L1_Cache0,Cache_L1D L1_Cache1,Cache_L1D L1_Cache2,Cache_L1D L1_Cache3,Cache_L2 L2_cache){
         clock=0;
+        caches=new Cache_L1D[4];
+        caches[0]=L1_Cache0;
+        caches[1]=L1_Cache1;
+        caches[2]=L1_Cache2;
+        caches[3]=L1_Cache3;
+        this.L2_cache=L2_cache;
         cores=new Core[4];
         for(int i=0;i<4;i++){
-            cores[i]=new Core(i);
+            cores[i]=new Core(i,caches[i],L2_cache);
         }
         labelMapping=new HashMap<>();
         dataHazardsMapping=new HashMap<>();
@@ -19,6 +25,7 @@ public class Simulator{
         //     instructionsExecuted[i]=0;
         // }
         opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","rem","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall"));
+        
     }
 
     
@@ -100,7 +107,7 @@ public class Simulator{
         printLabels();
         System.out.println(program_Seq.length);
         System.out.println("Program execution started");
-        this.clock+=4;
+//        this.clock+=4;
         boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
         while(!isDone){
             // isInstruction=true;
@@ -108,6 +115,7 @@ public class Simulator{
                 if(cores[i].pc>=program_Seq.length){
                     continue;
                 }
+                
                 this.cores[i].executeUtil(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
             } 
             // if(pipeLineQueue.isEmpty()){
@@ -136,8 +144,10 @@ public class Simulator{
         boolean secondPipelineDone=false;
         boolean thirdPipelineDone=false;
         boolean fourthPipelineDone=false;
+        System.out.println("------------------------------- The length of the pipline is "+cores[0].pipeLineQueue.size());
         
         while(!firstPipelineDone || !secondPipelineDone || !thirdPipelineDone || !fourthPipelineDone){
+        	this.clock++;
             System.out.println("The values in core 0");
             for(int i=0;i<32;i++){
                 System.out.print(cores[0].registers[i]+" ");
@@ -243,5 +253,7 @@ public class Simulator{
     public Set<String> opcodes;
     public static boolean isInstruction;
     public Map<Integer,Integer> dataHazardsMapping;
+    public Cache_L1D[] caches;
+    public Cache_L2 L2_cache;
     // public int[] instructionsExecuted;
 }

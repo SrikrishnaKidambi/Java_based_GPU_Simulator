@@ -40,7 +40,7 @@ public class Test {
 //		else{
 //			isPipelineForwardingEnabled=false;
 //		}
-        sim=new Simulator();
+        sim=new Simulator(cache_L1D_core0,cache_L1D_core1,cache_L1D_core2,cache_L1D_core3,cache_L2);
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();
         System.out.println("Printing parsed text segment");
@@ -51,7 +51,7 @@ public class Test {
         mem.printMemory();	
         sim.initializeProgram(textSegment);
 		printIntegerMapping();
-		
+		Cache_L1D[] caches=new Cache_L1D[4];
         sim.runProgram(mem, stringVariableMapping, numberVariableMapping,latencies,isPipelineForwardingEnabled);
         System.out.println("Final result:");
         sim.printResult(latencies);      

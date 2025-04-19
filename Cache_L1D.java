@@ -26,9 +26,11 @@ public class Cache_L1D {
         int tagBits=tagIdx/numSets;
         MemoryResult res=null;
         for(int i=idx*associativity;i<idx*associativity+associativity;i++){
-            if(tag[i]==tagBits){
-                res=new MemoryResult(this.accessLatency, cache[i*blockSize+offset]);
-                return res;
+            if(tag[i]!=null) {
+            	if(tag[i]==tagBits){
+                    res=new MemoryResult(this.accessLatency, cache[i*blockSize+offset]);
+                    return res;
+                }
             }
         }
         return null;
@@ -46,12 +48,14 @@ public class Cache_L1D {
     			if(k<blockSize/4) {
     				blockFound[k++]=valFromL2.result;
                     if(!firstTimeDone){
+                    	firstTimeDone=true;
                         latencyExtra+=valFromL2.latency;
                     }
     			}
     		}
     		else {
-    			valFromL2=L2Cache.fillCacheL2(i, mem);   
+    			firstTimeDone=true;
+    			valFromL2=L2Cache.fillCacheL2(i, mem); 
     			blockFound[k++]=valFromL2.result;
                 latencyExtra+=valFromL2.latency;		
     		}
@@ -83,16 +87,23 @@ public class Cache_L1D {
         		int lower_bound=addr-(addr%this.blockSize);
         		int upper_bound=addr+(this.blockSize-addr%this.blockSize);
         		Integer[] blockFromL2=copyFromL2(lower_bound,upper_bound,L2Cache,mem);
+        		System.out.println("----------- The block obtained from L2 cache is:");
+        		for(int k=0;k<blockFromL2.length;k++) {
+        			System.out.print(blockFromL2[i]+" ");
+        		}
         		for(int j=0;j<blockFromL2.length;j++) {
         			cache[i*this.blockSize+j*4]=blockFromL2[j];
         		}
+        		System.out.println("The required value is:"+cache[i*blockSize+offset]);
         		valFound=new MemoryResult(latencyExtra+this.accessLatency, cache[i*blockSize+offset]);
+        		
         		break;
         	}
         }
         if(!isCacheVacant) {
         	LRU_Policy();
         }
+        System.out.println("------------ The memory result in L1 cache is returned "+valFound.result);
         return valFound;
     }
 }
