@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Core {
 
-    public Core(int coreID,Cache_L1D L1_cache,Cache_L2 L2_cache){
+    public Core(int coreID,Cache_L1D L1_cache,Cache_L1I L1_cache_I,Cache_L2 L2_cache){
         this.coreID=coreID;
         this.pc=0;
         this.registers=new int[32];
@@ -33,6 +33,7 @@ public class Core {
         pipeLineQueue.addLast(in4);
         pipeLineQueue.addLast(in5);
         this.L1_cache=L1_cache;
+        this.L1_cache_I=L1_cache_I;
         this.L2_cache=L2_cache;
     }
     
@@ -167,7 +168,13 @@ public class Core {
             	System.out.println("The instruction is dummy:"+in5.isDummy);
             }
 //            IF(program, in5);
-            FetcherResult temp=Simulator.IF(pc, in5, coreID, program, lastInstruction,instructionsExecuted);
+            FetcherResult temp=Simulator.IF(pc, in5, coreID, program, lastInstruction,instructionsExecuted,L1_cache,L2_cache,L1_cache_I,mem);
+            memoryLatencyStalls+=temp.memoryStalls;
+            totalStalls+=temp.memoryStalls;
+            for(int i=0;i<memoryLatencyStalls-1;i++){
+                pipeLineQueue.add(4+i, new InstructionState());
+            }
+            memoryLatencyStalls=0;
             this.pc=temp.pc_val;
             lastInstruction=temp.lastInstruction;
             System.out.println("Printing the pipeline:");
@@ -1512,7 +1519,7 @@ public class Core {
         if(coreID==0){
             System.out.println("The value of pc in MEM:"+this.pc+" for opcode:"+in.opcode);
         }	
-        MemoryAccess memAccess=new MemoryAccess(L1_cache,L2_cache,mem);
+        MemoryAccess memAccess=new MemoryAccess(L1_cache,L2_cache,L1_cache_I,mem);
         switch (in.opcode) {
             case "lw":
 //                in.result=mem.memory[in.addressIdx];
@@ -2095,5 +2102,6 @@ public class Core {
     public LinkedList<InstructionState> pipeLineQueue;
     public int[] instructionsExecuted;
     public Cache_L1D L1_cache;
+    public Cache_L1I L1_cache_I;
     public Cache_L2 L2_cache;
 }

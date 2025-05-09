@@ -6,17 +6,23 @@ import java.util.Map;
 import java.util.Set;
 
 public class Simulator{
-    public Simulator(Cache_L1D L1_Cache0,Cache_L1D L1_Cache1,Cache_L1D L1_Cache2,Cache_L1D L1_Cache3,Cache_L2 L2_cache){
+    public Simulator(Cache_L1D L1_Cache0,Cache_L1D L1_Cache1,Cache_L1D L1_Cache2,Cache_L1D L1_Cache3,Cache_L1I L1_Cache0_I,Cache_L1I L1_Cache1_I,Cache_L1I L1_Cache2_I,Cache_L1I L1_Cache3_I,Cache_L2 L2_cache){
         clock=0;
         caches=new Cache_L1D[4];
+        caches_I=new Cache_L1I[4];
         caches[0]=L1_Cache0;
         caches[1]=L1_Cache1;
         caches[2]=L1_Cache2;
         caches[3]=L1_Cache3;
+        caches_I[0]=L1_Cache0_I;
+        caches_I[1]=L1_Cache1_I;
+        caches_I[2]=L1_Cache2_I;
+        caches_I[3]=L1_Cache3_I;
+        
         this.L2_cache=L2_cache;
         cores=new Core[4];
         for(int i=0;i<4;i++){
-            cores[i]=new Core(i,caches[i],L2_cache);
+            cores[i]=new Core(i,caches[i],caches_I[i],L2_cache);
         }
         labelMapping=new HashMap<>();
         dataHazardsMapping=new HashMap<>();
@@ -29,27 +35,32 @@ public class Simulator{
     }
 
     
-    public static FetcherResult IF(int pc,InstructionState in,int coreID,String[] program,InstructionState last,int[] instructionsExecuted) {
+    public static FetcherResult IF(int pc,InstructionState in,int coreID,String[] program,InstructionState last,int[] instructionsExecuted,Cache_L1D L1_Cache,Cache_L2 L2_Cache,Cache_L1I L1_Cache_I,Memory mem) {
     	if(coreID==0) {
         	if(in.isDummy || in==null || in.IF_done_core0==true){
-                return new FetcherResult(last,pc);
+                return new FetcherResult(last,pc,0);
             }
         }else if(coreID==1) {
         	if(in.isDummy || in==null || in.IF_done_core1==true){
-        		return new FetcherResult(last,pc);
+        		return new FetcherResult(last,pc,0);
             }
         }else if(coreID==2) {
         	if(in.isDummy || in==null || in.IF_done_core2==true){
-        		return new FetcherResult(last,pc);
+        		return new FetcherResult(last,pc,0);
             }
         }else if(coreID==3) {
         	if(in.isDummy || in==null || in.IF_done_core3==true){
-        		return new FetcherResult(last,pc);
+        		return new FetcherResult(last,pc,0);
             }
         }
+    	MemoryAccess memAccess=null;
+    	memAccess=new MemoryAccess(L1_Cache,L2_Cache,L1_Cache_I,mem);
+        MemoryResult res=memAccess.readInstruction(4092-4*pc);
+        // pc=res.result;
     	if(program[pc].contains(":")) {
-    		pc++;
+            pc++;
     	}
+    	
     	in.instruction=program[pc];
     	in.pc_val=pc;
     	pc++;
@@ -71,7 +82,7 @@ public class Simulator{
         if(coreID==3) {
         	in.IF_done_core3=true;
         }	
-        return new FetcherResult(last,pc);
+        return new FetcherResult(last,pc,res.latency);
     }
     
     //function for mapping all the labels with proper instruction number. 
@@ -254,6 +265,7 @@ public class Simulator{
     public static boolean isInstruction;
     public Map<Integer,Integer> dataHazardsMapping;
     public Cache_L1D[] caches;
+    public Cache_L1I[] caches_I;
     public Cache_L2 L2_cache;
     // public int[] instructionsExecuted;
 }

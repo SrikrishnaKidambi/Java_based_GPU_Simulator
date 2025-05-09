@@ -12,10 +12,12 @@ import java.util.Iterator;
 
 public class Test {
 		
-	public Test(boolean isPipelineforwardingEnabled,Map<String,Integer> latencies) {
-		this.isPipelineForwardingEnabled=isPipelineforwardingEnabled;
-		//initializing the latencies for the arithmetic instructions
-		this.latencies=latencies;
+	
+	
+	public void LoadInstructionsIntoMemory(String[] program) {
+		for(int i=0;i<program.length;i++) {
+			mem.memory[4092-i*4]=i;         // loading the instruction pc value from the last of the memory.
+		}
 	}
     public void RunSimulator() {
 		// System.out.println("Enter the latencies for the arithmetic instructions: ");
@@ -40,7 +42,7 @@ public class Test {
 //		else{
 //			isPipelineForwardingEnabled=false;
 //		}
-        sim=new Simulator(cache_L1D_core0,cache_L1D_core1,cache_L1D_core2,cache_L1D_core3,cache_L2);
+        sim=new Simulator(cache_L1D_core0,cache_L1D_core1,cache_L1D_core2,cache_L1D_core3,cache_L1I_core0,cache_L1I_core1,cache_L1I_core2,cache_L1I_core3,cache_L2);
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();
         System.out.println("Printing parsed text segment");
@@ -205,6 +207,15 @@ public class Test {
 			System.out.println("Var name: "+ele.getKey()+" and index: "+ele.getValue());
 		}
 	}
+	
+	// constructor 
+	public Test(boolean isPipelineforwardingEnabled,Map<String,Integer> latencies) {
+		this.isPipelineForwardingEnabled=isPipelineforwardingEnabled;
+		//initializing the latencies for the arithmetic instructions
+		this.latencies=latencies;
+	}
+	
+	// fields 
 	public Map<String,Integer> latencies=new HashMap<>();
 	public ArrayList<String> programArray= new ArrayList<>();
 	public ArrayList<String> programCode=new ArrayList<>();
@@ -217,6 +228,12 @@ public class Test {
 	public Cache_L1D cache_L1D_core1=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
 	public Cache_L1D cache_L1D_core2=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
 	public Cache_L1D cache_L1D_core3=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	
+	public Cache_L1I cache_L1I_core0=new Cache_L1I(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	public Cache_L1I cache_L1I_core1=new Cache_L1I(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	public Cache_L1I cache_L1I_core2=new Cache_L1I(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	public Cache_L1I cache_L1I_core3=new Cache_L1I(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	
 	public Cache_L2 cache_L2=new Cache_L2(cacheConfig.CL2_associativity, cacheConfig.CL2_blockSize, cacheConfig.CL2_cacheSize, cacheConfig.CL2_latency,cacheConfig.CL2_policy);
 	public Simulator sim;
 	public boolean isPipelineForwardingEnabled;
