@@ -216,6 +216,7 @@ public class Cache_L1D {
         // System.out.println("tag[3] became "+tag[3]);
         // System.out.println("****The address to be updated "+addrToBeUpdated);
         MemoryResult res=fillCacheL1(addr, L2_cache, mem);
+        res.latency+=L2_cache.accessLatency;
         return res;
     }
 
@@ -263,6 +264,7 @@ public class Cache_L1D {
         // System.out.println("tag[3] became "+tag[3]);
         // System.out.println("****The address to be updated "+addrToBeUpdated);
         MemoryResult res=fillCacheL1(addr, L2_cache, mem);
+        res.latency+=L2_cache.accessLatency;
         return res;
     }
 }
