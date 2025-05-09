@@ -196,6 +196,7 @@ public class Cache_L2 {
         updateMem(lower_bound, upper_bound, mem, evictedBlock);
         tag[idx*associativity+blockEvicted]=null;
         MemoryResult res=fillCacheL2(addr, mem);
+        res.latency+=mem.memoryAccessLatency;
         return res;
     }
 
@@ -241,6 +242,7 @@ public class Cache_L2 {
         updateMem(lower_bound, upper_bound, mem, evictedBlock);
         tag[idx*associativity+blockEvicted]=null;
         MemoryResult res=fillCacheL2(addr, mem);
+        res.latency+=mem.memoryAccessLatency;
         return res;
     }
 }
