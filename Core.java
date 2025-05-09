@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -1516,12 +1520,46 @@ public class Core {
             	in.result=memResult.result;
             	this.memoryLatencyStalls+=memResult.latency;
             	this.totalStalls+=this.memoryLatencyStalls;
+                
             	System.out.println("Memory stalls are: "+memoryLatencyStalls+" and result is "+in.result);
+                // if(coreID==0){
+                //     SimulatorGUI.console.append("L1 Cache:\n");
+                //     SimulatorGUI.console.append("Address:\t");
+                //     for (int i = 0; i < L1_cache.tag.length; i++) {
+                //         if(L1_cache.tag[i]!=null)
+                //         SimulatorGUI.console.append(L1_cache.tag[i]*(L1_cache.cacheSize/L1_cache.associativity) + "\t");
+                //         else{
+                //             SimulatorGUI.console.append("null\t");
+                //         }
+                //     }
+                //     SimulatorGUI.console.append("\nValue:\t\t");
+                //     for (int i = 0; i < L1_cache.cache.length; i+=4) {
+                //         SimulatorGUI.console.append(L1_cache.cache[i] + "\t");
+                //     }
+                //     SimulatorGUI.console.append("\n\n");
+                //     SimulatorGUI.console.append("L2 Cache:\n");
+                //     SimulatorGUI.console.append("Address:\t");
+                //     for (int i = 0; i < L2_cache.tag.length; i += 1) {
+                //         if(L2_cache.tag[i]!=null)
+                //         SimulatorGUI.console.append(L2_cache.tag[i]*(L2_cache.cacheSize/L2_cache.associativity) + "\t");
+                //         else{
+                //             SimulatorGUI.console.append("null\t");
+                //         }
+                //     }
+                //     SimulatorGUI.console.append("\nValue:\t\t");
+                //     for (int i = 0; i < L2_cache.cache.length; i += 4) {
+                //         SimulatorGUI.console.append(L2_cache.cache[i] + "\t");
+                //     }
+                //     SimulatorGUI.console.append("\n--- End ---\n");
+                // }
                 break;
             case "sw":
+                MemoryResult memResult_sw=null;
                 if(in.isfowarded){
                     if(in.pipeline_reg[1]!=null){
-                        mem.memory[in.addressIdx]=in.pipeline_reg[1];
+                        memResult_sw=memAccess.writeData(in.addressIdx, in.pipeline_reg[1]);
+                        this.memoryLatencyStalls+=memResult_sw.latency;
+                        this.totalStalls+=this.memoryLatencyStalls;
                         System.out.println("The value that is stored in registers[16]:"+registers[16]);
                         System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
                         break;
@@ -1529,7 +1567,9 @@ public class Core {
                 }
                 System.out.println("The value that is stored in registers[16]:"+registers[16]);
                 System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
-                mem.memory[in.addressIdx]=registers[in.rs2];
+                memResult_sw=memAccess.writeData(in.addressIdx, registers[in.rs2]);
+                this.memoryLatencyStalls+=memResult_sw.latency;
+                this.totalStalls+=this.memoryLatencyStalls;
                 if(coreID==0)
                     mem.printMemory();
                 break;

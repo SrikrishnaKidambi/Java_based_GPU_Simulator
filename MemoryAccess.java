@@ -22,5 +22,18 @@ public class MemoryAccess {
 		System.out.println("The memory result is returned "+res);
 		return res;
 	}
+
+	public MemoryResult writeData(int addr,int updatedVal){
+		MemoryResult res=null;
+		res=L1Cache.writeData(addr, updatedVal);
+		if(res!=null){
+			return res;
+		}
+		System.out.println("The address fetch "+addr+" is a miss in L1 cache");
+		res=L1Cache.fillCacheL1(addr, L2Cache, mem);
+		MemoryResult res1=L1Cache.writeData(addr, updatedVal);
+		res.result=res1.result;
+		return res;
+	}
 	
 }

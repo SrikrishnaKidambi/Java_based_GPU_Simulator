@@ -8,6 +8,10 @@ This is a project to simulate the GPU architecture .
 javac SimulatorGUI.java
 java SimulatorGUI
 ```
+
+## Assumptions:
+- Block size of L1 and L2 caches are same.
+- Bandwidth is sufficient to get the block completely into cache(L1 and L2 too).
 ### Phase - 1
 - Check the java output in teminal and GUI is also implemented for displaying the registers of cores and memory of the simulator.
 - Use the drop down to see the registers of each cores and the memory accessed by each core . You can also use the drop down to switch between the display type among hex, binary and signed.

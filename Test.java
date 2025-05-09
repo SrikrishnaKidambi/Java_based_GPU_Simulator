@@ -56,6 +56,16 @@ public class Test {
         System.out.println("Final result:");
         sim.printResult(latencies);      
         mem.printMemory();
+		System.out.println("Printing the L1 cache for core 0");
+		for(int i=0;i<cache_L1D_core0.cache.length;i+=4){
+			System.out.print(cache_L1D_core0.cache[i]+" ");
+		}
+		System.out.println();
+		System.out.println("Printing the L2 cache");
+		for(int i=0;i<cache_L2.cache.length;i+=4){
+			System.out.print(cache_L2.cache[i]+" ");
+		}
+		System.out.println();
     }
     
     
@@ -203,11 +213,11 @@ public class Test {
 	public Map<String,Integer> numberVariableMapping=new HashMap<>();
 	public CacheConfig cacheConfig = new CacheConfig("CacheInputs");
 	public Memory mem=new Memory(cacheConfig.mem_latency);
-	public Cache_L1D cache_L1D_core0=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency);
-	public Cache_L1D cache_L1D_core1=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency);
-	public Cache_L1D cache_L1D_core2=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency);
-	public Cache_L1D cache_L1D_core3=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency);
-	public Cache_L2 cache_L2=new Cache_L2(cacheConfig.CL2_associativity, cacheConfig.CL2_blockSize, cacheConfig.CL2_cacheSize, cacheConfig.CL2_latency);
+	public Cache_L1D cache_L1D_core0=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	public Cache_L1D cache_L1D_core1=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	public Cache_L1D cache_L1D_core2=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	public Cache_L1D cache_L1D_core3=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	public Cache_L2 cache_L2=new Cache_L2(cacheConfig.CL2_associativity, cacheConfig.CL2_blockSize, cacheConfig.CL2_cacheSize, cacheConfig.CL2_latency,cacheConfig.CL2_policy);
 	public Simulator sim;
 	public boolean isPipelineForwardingEnabled;
 }
