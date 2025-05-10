@@ -1,7 +1,3 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -53,9 +49,7 @@ public class Core {
         }
         if(pipeLineQueue.size()>=2){
             InstructionState in2=pipeLineQueue.get(1);
-            for(int i=0;i<memoryLatencyStalls-1;i++) {
-            	pipeLineQueue.add(1+i,new InstructionState());
-            }
+            
             memoryLatencyStalls=0;
             if(isPipelineForwardingEnabled){
                 int dataStalls=hazardDetectorUtil(pipeLineQueue,isPipelineForwardingEnabled,1);
@@ -67,6 +61,9 @@ public class Core {
             in2=pipeLineQueue.get(1);
             System.out.println("@@@@Calling mem for the opcode "+in2.opcode);
             MEM(in2, mem);
+            for(int i=0;i<memoryLatencyStalls-1;i++) {
+            	pipeLineQueue.add(1+i,new InstructionState());
+            }
         }
         if(pipeLineQueue.size()>=3){
             if(this.coreID==0){
@@ -169,13 +166,17 @@ public class Core {
             }
 //            IF(program, in5);
             FetcherResult temp=Simulator.IF(pc, in5, coreID, program, lastInstruction,instructionsExecuted,L1_cache,L2_cache,L1_cache_I,mem);
+            for(int i=0;i<temp.stall;i++) {
+            	pipeLineQueue.add(4+i,new InstructionState());
+            }
             memoryLatencyStalls+=temp.memoryStalls;
-            totalStalls+=temp.memoryStalls;
+            totalStalls+=temp.memoryStalls+temp.stall;
             for(int i=0;i<memoryLatencyStalls-1;i++){
                 pipeLineQueue.add(4+i, new InstructionState());
             }
             memoryLatencyStalls=0;
             this.pc=temp.pc_val;
+            
             lastInstruction=temp.lastInstruction;
             System.out.println("Printing the pipeline:");
            for(int i=0;i<5;i++) {
@@ -1140,6 +1141,8 @@ public class Core {
             System.out.println("You entered ecall in ID/RF");
 				// nee time inka raledu bro
 				break;
+            case "SYNC":
+            break;
             default:
 			Simulator.isInstruction=false;
 			if(!labelMapping.containsKey(in.opcode.trim().replace(":", "")) && !in.opcode.equals("")) {

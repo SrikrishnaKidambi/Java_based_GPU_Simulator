@@ -1,7 +1,5 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,29 +28,32 @@ public class Simulator{
         // for(int i=0;i<4;i++){
         //     instructionsExecuted[i]=0;
         // }
-        opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","rem","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall"));
-        
+        opcodes=new HashSet<>(Set.of("add","sub","mul","mv","addi","muli","and","or","xor","andi","ori","xori","rem","bne","beq","jal","jalr","lw","sw","la","li","bge","blt","j","jr","ecall","SYNC","lw_spm","sw_spm"));
+        global_PC=0;
+        global_sync_counter=0;
+        synced=new int[4];
     }
 
     
     public static FetcherResult IF(int pc,InstructionState in,int coreID,String[] program,InstructionState last,int[] instructionsExecuted,Cache_L1D L1_Cache,Cache_L2 L2_Cache,Cache_L1I L1_Cache_I,Memory mem) {
     	if(coreID==0) {
         	if(in.isDummy || in==null || in.IF_done_core0==true){
-                return new FetcherResult(last,pc,0);
+                return new FetcherResult(last,pc,0,0);
             }
         }else if(coreID==1) {
         	if(in.isDummy || in==null || in.IF_done_core1==true){
-        		return new FetcherResult(last,pc,0);
+        		return new FetcherResult(last,pc,0,0);
             }
         }else if(coreID==2) {
         	if(in.isDummy || in==null || in.IF_done_core2==true){
-        		return new FetcherResult(last,pc,0);
+        		return new FetcherResult(last,pc,0,0);
             }
         }else if(coreID==3) {
         	if(in.isDummy || in==null || in.IF_done_core3==true){
-        		return new FetcherResult(last,pc,0);
+        		return new FetcherResult(last,pc,0,0);
             }
         }
+    	
     	MemoryAccess memAccess=null;
     	memAccess=new MemoryAccess(L1_Cache,L2_Cache,L1_Cache_I,mem);
         MemoryResult res=memAccess.readInstruction(4092-4*pc);
@@ -60,29 +61,63 @@ public class Simulator{
     	if(program[pc].contains(":")) {
             pc++;
     	}
-    	
-    	in.instruction=program[pc];
-    	in.pc_val=pc;
-    	pc++;
-        instructionsExecuted[0]++;
-        // instructionsExecuted[coreID]++;
-//    	in.isDummy=false;
-    	if(pc==program.length) {
-    		last=in;
+//    	global_PC=Math.min(pc, global_PC);
+    	if(global_PC==pc) {
+            in.instruction=program[pc];
+            in.pc_val=pc;
+    		if(in.instruction.equals("SYNC") && synced[coreID]==1){
+                pc++;
+                in.instruction=program[pc];
+                in.pc_val=pc;
+                memAccess.readInstruction(4092-4*pc);
+                synced[coreID]=0;
+            }
+            if(in.instruction.equals("SYNC")){
+                global_sync_counter++;
+                if(global_sync_counter%4!=0){
+                    L1_Cache.flushCache(L2_Cache, mem, coreID);
+                    return new FetcherResult(last, pc,0, 0);
+                }
+                else if(global_sync_counter%4==0){
+                    synced[0]=1;
+                    synced[1]=1;
+                    synced[2]=1;
+                    synced[3]=1;
+                    synced[coreID]=0;
+                    L1_Cache.flushCache(L2_Cache, mem,coreID);
+                    SimulatorGUI.console.append("Instructions got synced!!!!!!!!!!!\n");
+                    SimulatorGUI.console.append("The values at memory[1020]="+mem.memory[1020]+"\n");
+                    SimulatorGUI.console.append("The values at memory[1024]="+mem.memory[1024]+"\n");
+                    SimulatorGUI.console.append("The values at memory[1028]="+mem.memory[1028]+"\n");
+                    SimulatorGUI.console.append("The values at memory[1032]="+mem.memory[1032]+"\n");
+                    global_sync_counter=0;
+                    // return new FetcherResult(last, pc,0, 0);
+                }
+                
+            }
+        	pc++;
+            instructionsExecuted[0]++;
+            // instructionsExecuted[coreID]++;
+//        	in.isDummy=false;
+        	if(pc==program.length) {
+        		last=in;
+        	}
+        	if(coreID==0) {
+            	in.IF_done_core0=true;
+            }
+            if(coreID==1) {
+            	in.IF_done_core1=true;
+            }
+            if(coreID==2) {
+            	in.IF_done_core2=true;
+            }
+            if(coreID==3) {
+            	in.IF_done_core3=true;
+            }	
+            return new FetcherResult(last,pc,res.latency,0);
+    	}else {
+    		return new FetcherResult(last,pc,0,1);
     	}
-    	if(coreID==0) {
-        	in.IF_done_core0=true;
-        }
-        if(coreID==1) {
-        	in.IF_done_core1=true;
-        }
-        if(coreID==2) {
-        	in.IF_done_core2=true;
-        }
-        if(coreID==3) {
-        	in.IF_done_core3=true;
-        }	
-        return new FetcherResult(last,pc,res.latency);
     }
     
     //function for mapping all the labels with proper instruction number. 
@@ -121,6 +156,7 @@ public class Simulator{
 //        this.clock+=4;
         boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
         while(!isDone){
+        	global_PC=Math.min(cores[0].pc, Math.min(cores[1].pc, Math.min(cores[2].pc, cores[3].pc)));
             // isInstruction=true;
             for(int i=0;i<4;i++){
                 if(cores[i].pc>=program_Seq.length){
@@ -158,6 +194,7 @@ public class Simulator{
         System.out.println("------------------------------- The length of the pipline is "+cores[0].pipeLineQueue.size());
         
         while(!firstPipelineDone || !secondPipelineDone || !thirdPipelineDone || !fourthPipelineDone){
+        	global_PC=Math.min(cores[0].pc, Math.min(cores[1].pc, Math.min(cores[2].pc, cores[3].pc)));
         	this.clock++;
             System.out.println("The values in core 0");
             for(int i=0;i<32;i++){
@@ -230,6 +267,7 @@ public class Simulator{
             }
             System.out.println();
         }
+        SimulatorGUI.console.append("\n");
         System.out.println("The number of clock cycles taken are:"+(this.clock-this.labelMapping.size()));
         SimulatorGUI.console.append("\nThe number of clock cycles taken for execution are "+(this.clock-1));
         // labelMapping.clear();
@@ -257,6 +295,7 @@ public class Simulator{
         SimulatorGUI.console.append("IPC of core 3: "+IPC3+"\n");
     }
 
+
     public int clock;
     public Core[] cores;
     public String[] program_Seq;
@@ -267,5 +306,8 @@ public class Simulator{
     public Cache_L1D[] caches;
     public Cache_L1I[] caches_I;
     public Cache_L2 L2_cache;
+    public static int global_PC;
+    public static int global_sync_counter;
+    public static int[] synced;
     // public int[] instructionsExecuted;
 }

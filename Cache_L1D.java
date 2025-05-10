@@ -1,3 +1,5 @@
+import java.io.BufferedWriter;
+
 public class Cache_L1D {
     public Integer[] tag;
     public Integer[] cache;
@@ -31,6 +33,34 @@ public class Cache_L1D {
             for(int j=0;j<associativity;j++){
                 srrip[i][j]=maxRRPV;
             }
+        }
+    }
+
+    public void flushCache(Cache_L2 L2_Cache,Memory mem,int coreID){
+        SimulatorGUI.console.append("L1 cache for Core"+coreID+":\n");
+        for(int i=0;i<cache.length;i++){
+            SimulatorGUI.console.append(cache[i]+" ");
+        }
+        int idx=0;
+        for(int i=0;i<tag.length;i++){
+            if(i!=0 && i%associativity==0){
+                idx++;
+            }
+            if(tag[i]!=null){
+                int numSets=cacheSize/(blockSize*associativity);
+                // int addr=tag[i]*numSets*blockSize+idx*blockSize;
+                for(int j=i*blockSize;j<i*blockSize+blockSize;j+=4){
+                    int addr=tag[i]*numSets*blockSize+idx*blockSize+j-i*blockSize;
+                    
+                    // if(cache[j]==null){
+                    //     SimulatorGUI.console.append("The value of j at which it is null is:"+j+" and the value of the tag for this is "+tag[i]);
+                    // }
+                    mem.memory[addr]=cache[j];
+                    L2_Cache.writeData(addr, mem, cache[j]);
+                }
+                tag[i]=null;
+            }
+            
         }
     }
 
