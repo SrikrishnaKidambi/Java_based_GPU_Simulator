@@ -3,7 +3,7 @@ public class MemoryResult {
     public Integer result;
 
     public MemoryResult(int latency,Integer result){
-    	System.out.println("Executed the memory result function");
+    	// System.out.println("Executed the memory result function");
         this.latency=latency;
         this.result=result;
     }

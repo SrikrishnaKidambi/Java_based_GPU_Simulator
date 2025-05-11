@@ -1,13 +1,15 @@
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Simulator{
-    public Simulator(Cache_L1D L1_Cache0,Cache_L1D L1_Cache1,Cache_L1D L1_Cache2,Cache_L1D L1_Cache3,Cache_L1I L1_Cache0_I,Cache_L1I L1_Cache1_I,Cache_L1I L1_Cache2_I,Cache_L1I L1_Cache3_I,Cache_L2 L2_cache){
+    public Simulator(Cache_L1D L1_Cache0,Cache_L1D L1_Cache1,Cache_L1D L1_Cache2,Cache_L1D L1_Cache3,Cache_L1I L1_Cache0_I,Cache_L1I L1_Cache1_I,Cache_L1I L1_Cache2_I,Cache_L1I L1_Cache3_I,Cache_L2 L2_cache,ScratchPadMemory spm0,ScratchPadMemory spm1,ScratchPadMemory spm2,ScratchPadMemory spm3){
         clock=0;
         caches=new Cache_L1D[4];
         caches_I=new Cache_L1I[4];
+        spms = new ScratchPadMemory[4];
         caches[0]=L1_Cache0;
         caches[1]=L1_Cache1;
         caches[2]=L1_Cache2;
@@ -16,11 +18,14 @@ public class Simulator{
         caches_I[1]=L1_Cache1_I;
         caches_I[2]=L1_Cache2_I;
         caches_I[3]=L1_Cache3_I;
-        
+        spms[0]=spm0;
+        spms[1]=spm1;
+        spms[2]=spm2;
+        spms[3]=spm3;
         this.L2_cache=L2_cache;
         cores=new Core[4];
         for(int i=0;i<4;i++){
-            cores[i]=new Core(i,caches[i],caches_I[i],L2_cache);
+            cores[i]=new Core(i,caches[i],caches_I[i],L2_cache,spms[i]);
         }
         labelMapping=new HashMap<>();
         dataHazardsMapping=new HashMap<>();
@@ -56,7 +61,7 @@ public class Simulator{
     	
     	MemoryAccess memAccess=null;
     	memAccess=new MemoryAccess(L1_Cache,L2_Cache,L1_Cache_I,mem);
-        MemoryResult res=memAccess.readInstruction(4092-4*pc);
+        MemoryResult res=memAccess.readInstruction(16380-4*pc); //now our memory is 16KB.
         pc=res.result;
     	if(program[pc].contains(":")) {
             pc++;
@@ -69,7 +74,7 @@ public class Simulator{
                 pc++;
                 in.instruction=program[pc];
                 in.pc_val=pc;
-                memAccess.readInstruction(4092-4*pc);
+                memAccess.readInstruction(16380-4*pc);
                 synced[coreID]=0;
             }
             if(in.instruction.equals("SYNC")){
@@ -127,7 +132,7 @@ public class Simulator{
             if(!opcodes.contains(decodedInstruction[0].toUpperCase()) && decodedInstruction[0].contains(":")){
                 String label=decodedInstruction[0].trim().replace(":", "");
                 if(labelMapping.containsKey(label) && label!="" && !label.contains("#")) {
-                	System.out.println("The label is that is already present is "+label+". yeah!!");
+                	// System.out.println("The label is that is already present is "+label+". yeah!!");
                 	SimulatorGUI.console.append(label+"has already been used. Hence stopping the execution of program");
                 	throw new IllegalArgumentException("Duplicate label found");
                 }
@@ -153,6 +158,7 @@ public class Simulator{
         printLabels();
         System.out.println(program_Seq.length);
         System.out.println("Program execution started");
+        SimulatorGUI.console.append("Program execution started\n");
 //        this.clock+=4;
         boolean isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
         while(!isDone){
@@ -179,28 +185,28 @@ public class Simulator{
 //            for(int i=0;i<32;i++){
 //                System.out.print(cores[0].registers[i]+" ");
 //            } 
-            System.out.println();
-            System.out.println("The value of pc in core 0 is :"+cores[0].pc);
-            System.out.println("The value of pc in core 1 is :"+cores[1].pc);
-            System.out.println("The value of pc in core 2 is :"+cores[2].pc);
-            System.out.println("The value of pc in core 3 is :"+cores[3].pc);
+            // System.out.println();
+            // System.out.println("The value of pc in core 0 is :"+cores[0].pc);
+            // System.out.println("The value of pc in core 1 is :"+cores[1].pc);
+            // System.out.println("The value of pc in core 2 is :"+cores[2].pc);
+            // System.out.println("The value of pc in core 3 is :"+cores[3].pc);
             isDone=(cores[0].pc==program_Seq.length && cores[1].pc==program_Seq.length && cores[2].pc==program_Seq.length && cores[3].pc==program_Seq.length);
-            System.out.println();
+            // System.out.println();
         }
         boolean firstPipelineDone=false;
         boolean secondPipelineDone=false;
         boolean thirdPipelineDone=false;
         boolean fourthPipelineDone=false;
-        System.out.println("------------------------------- The length of the pipline is "+cores[0].pipeLineQueue.size());
+        // System.out.println("------------------------------- The length of the pipline is "+cores[0].pipeLineQueue.size());
         
         while(!firstPipelineDone || !secondPipelineDone || !thirdPipelineDone || !fourthPipelineDone){
         	global_PC=Math.min(cores[0].pc, Math.min(cores[1].pc, Math.min(cores[2].pc, cores[3].pc)));
         	this.clock++;
-            System.out.println("The values in core 0");
-            for(int i=0;i<32;i++){
-                System.out.print(cores[0].registers[i]+" ");
-            } 
-            System.out.println();
+            // System.out.println("The values in core 0");
+            // for(int i=0;i<32;i++){
+            //     System.out.print(cores[0].registers[i]+" ");
+            // } 
+            // System.out.println();
         	if(!firstPipelineDone) {
         		cores[0].execute(program_Seq, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
         	}
@@ -219,7 +225,7 @@ public class Simulator{
 //            	System.out.println("the last instruction in core 0 is:"+first_top.pc_val);
             	
                 if(first_top==cores[0].lastInstruction) {
-                	System.out.println("the last instruction in core 0 is:"+cores[0].lastInstruction.pc_val);
+                	// System.out.println("the last instruction in core 0 is:"+cores[0].lastInstruction.pc_val);
                 	firstPipelineDone=true;
                 	cores[0].pipeLineQueue.removeFirst();
                 }else {
@@ -229,7 +235,7 @@ public class Simulator{
             if(!secondPipelineDone) {
             	InstructionState second_top=cores[1].pipeLineQueue.getFirst();
                 if(second_top==cores[1].lastInstruction) {
-                	System.out.println("the last instruction in core 1 is:"+cores[1].lastInstruction.pc_val);
+                	// System.out.println("the last instruction in core 1 is:"+cores[1].lastInstruction.pc_val);
                 	secondPipelineDone=true;
                 	cores[1].pipeLineQueue.removeFirst();
                 }else {
@@ -239,7 +245,7 @@ public class Simulator{
             if(!thirdPipelineDone) {
             	InstructionState third_top=cores[2].pipeLineQueue.getFirst();
                 if(third_top==cores[2].lastInstruction) {
-                	System.out.println("the last instruction in core 2 is:"+cores[2].lastInstruction.pc_val);
+                	// System.out.println("the last instruction in core 2 is:"+cores[2].lastInstruction.pc_val);
                 	thirdPipelineDone=true;
                 	cores[2].pipeLineQueue.removeFirst();
                 }else {
@@ -249,7 +255,7 @@ public class Simulator{
             if(!fourthPipelineDone) {
             	InstructionState fourth_top=cores[3].pipeLineQueue.getFirst();
                 if(fourth_top==cores[3].lastInstruction) {
-                	System.out.println("the last instruction in core 3 is:"+cores[3].lastInstruction.pc_val);
+                	// System.out.println("the last instruction in core 3 is:"+cores[3].lastInstruction.pc_val);
                 	fourthPipelineDone=true;
                 	cores[3].pipeLineQueue.removeFirst();
                 }else {
@@ -265,8 +271,14 @@ public class Simulator{
             for(int j=0;j<32;j++){
                 System.out.print(cores[i].registers[j]+" ");
             }
+
             System.out.println();
+
+            //printing the scratch pad memory
+            System.out.println("The scratchpad memory for the core "+i);
+            cores[i].spm.printScratchPad();
         }
+
         SimulatorGUI.console.append("\n");
         System.out.println("The number of clock cycles taken are:"+(this.clock-this.labelMapping.size()));
         SimulatorGUI.console.append("\nThe number of clock cycles taken for execution are "+(this.clock-1));
@@ -320,6 +332,7 @@ public class Simulator{
     public Map<Integer,Integer> dataHazardsMapping;
     public Cache_L1D[] caches;
     public Cache_L1I[] caches_I;
+    public ScratchPadMemory[] spms;
     public Cache_L2 L2_cache;
     public static int global_PC;
     public static int global_sync_counter;

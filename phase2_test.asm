@@ -21,6 +21,7 @@ addi x8 x8 1
 j Loop0
 
 afterSum0:
+SYNC
 bne CID 1 afterSum1
 # sum of second 25
 addi x15 x18 100
@@ -36,6 +37,7 @@ addi x8 x8 1
 j Loop1
 
 afterSum1:
+SYNC
 bne CID 2 afterSum2
 # sum of third 25
 addi x15 x18 200
@@ -51,6 +53,7 @@ addi x8 x8 1
 j Loop2
 
 afterSum2:
+SYNC
 bne CID 3 afterSum3
 # sum of fourth 25
 addi x15 x18 300
@@ -66,6 +69,7 @@ addi x8 x8 1
 j Loop3
 
 afterSum3:
+SYNC
 bne CID 0 Done
 la x10 str1
 li x17 4

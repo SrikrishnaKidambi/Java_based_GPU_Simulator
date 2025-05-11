@@ -16,12 +16,12 @@ public class Test {
 	
 	public void LoadInstructionsIntoMemory(String[] program) {
 		for(int i=0;i<program.length;i++) {
-			mem.memory[4092-i*4]=i;         // loading the instruction pc value from the last of the memory.
+			mem.memory[16380-i*4]=i;         // loading the instruction pc value from the last of the memory.
 		}
 	}
     public void RunSimulator() {
 		// System.out.println("Enter the latencies for the arithmetic instructions: ");
-		System.out.println(latencies.size());
+		// System.out.println(latencies.size());
 		Iterator<Map.Entry<String, Integer>> iterator = latencies.entrySet().iterator();
 		Scanner scanner = new Scanner(System.in);
 		// while(iterator.hasNext()){
@@ -30,10 +30,10 @@ public class Test {
 		// 	int latency=scanner.nextInt();
 		// 	latencies.put(entry.getKey(), latency); 
 		// }
-		while(iterator.hasNext()){
-			Map.Entry<String,Integer> entry =iterator.next();
-			System.out.println("The latency for the ins "+entry.getKey()+" is "+entry.getValue());
-		}
+		// while(iterator.hasNext()){
+		// 	Map.Entry<String,Integer> entry =iterator.next();
+		// 	// System.out.println("The latency for the ins "+entry.getKey()+" is "+entry.getValue());
+		// }
 //		System.out.println("Enter 1 to enable pipeline forwarding else enter 0: ");
 //		int input=scanner.nextInt();
 //		if(input==1){
@@ -42,7 +42,7 @@ public class Test {
 //		else{
 //			isPipelineForwardingEnabled=false;
 //		}
-        sim=new Simulator(cache_L1D_core0,cache_L1D_core1,cache_L1D_core2,cache_L1D_core3,cache_L1I_core0,cache_L1I_core1,cache_L1I_core2,cache_L1I_core3,cache_L2);
+        sim=new Simulator(cache_L1D_core0,cache_L1D_core1,cache_L1D_core2,cache_L1D_core3,cache_L1I_core0,cache_L1I_core1,cache_L1I_core2,cache_L1I_core3,cache_L2,spm0,spm1,spm2,spm3);
         readAssemblyFile();
         String[] textSegment=parseAssemblyCode();
         System.out.println("Printing parsed text segment");
@@ -127,7 +127,7 @@ public class Test {
 						dataType = parsedLine[1];
 					}
 					catch(Exception e){
-						System.out.println("Exception occured: ------------------------");
+						System.out.println("Exception occured:");
 						System.out.println(parsedLine[0]);
 					}
 				}
@@ -147,8 +147,8 @@ public class Test {
 							// mem.memory[i*4+3-4*startIdx+mem.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 3
 						}
 						mem.addressCounter+=4*(parsedLine.length-startIdx);
-						if(mem.addressCounter>=1024) {
-							System.out.println("Memory is being accessed out of bounds");
+						if(mem.addressCounter>=16384) {
+							System.out.println("Memory is being accessed out of bounds for memory address:"+mem.addressCounter);
 							System.exit(0);
 						}
 						break;
@@ -236,6 +236,12 @@ public class Test {
 	public Cache_L1I cache_L1I_core3=new Cache_L1I(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
 	
 	public Cache_L2 cache_L2=new Cache_L2(cacheConfig.CL2_associativity, cacheConfig.CL2_blockSize, cacheConfig.CL2_cacheSize, cacheConfig.CL2_latency,cacheConfig.CL2_policy);
+
+	public ScratchPadMemory spm0=new ScratchPadMemory(cacheConfig.CL1_latency,cacheConfig.CL1_cacheSize);
+	public ScratchPadMemory spm1=new ScratchPadMemory(cacheConfig.CL1_latency,cacheConfig.CL1_cacheSize);
+	public ScratchPadMemory spm2=new ScratchPadMemory(cacheConfig.CL1_latency,cacheConfig.CL1_cacheSize);
+	public ScratchPadMemory spm3=new ScratchPadMemory(cacheConfig.CL1_latency,cacheConfig.CL1_cacheSize);
+
 	public Simulator sim;
 	public boolean isPipelineForwardingEnabled;
 }

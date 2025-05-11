@@ -124,7 +124,7 @@ public class Cache_L2 {
     }
     public MemoryResult fillCacheL2(int addr,Memory mem){
 
-    	System.out.println("-------------------- Called fillCacheL2 function");
+    	// System.out.println("-------------------- Called fillCacheL2 function");
     	int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
     	int numTags=cacheSize/blockSize;
         int numSets=numTags/associativity;
@@ -143,7 +143,7 @@ public class Cache_L2 {
                 	cache[i*blockSize+j-lower_bound]=mem.memory[j];    
                 }
                 valFound=cache[i*blockSize+offset];
-                System.out.println("--------------The value found by after a miss in L2 cache :"+valFound);
+                // System.out.println("--------------The value found by after a miss in L2 cache :"+valFound);
                 isCacheVacant=true;
                 if(policy){
                     updateLRUState(idx, i-idx*associativity);
@@ -158,7 +158,7 @@ public class Cache_L2 {
         	MemoryResult res=LRU_Policy(addr,mem);
             return res;
         }
-        System.out.println("The memory result is returned ");
+        // System.out.println("The memory result is returned ");
         return new MemoryResult(this.accessLatency+mem.memoryAccessLatency, valFound);
     }
     private int getEvictedBlockLru(int set){
@@ -172,7 +172,7 @@ public class Cache_L2 {
     }
     private void updateLRUState(int set,int way){
         for(int i=0;i<this.associativity;i++){
-            System.out.println("Saiman thopu"+way);
+            // System.out.println("Saiman thopu"+way);
             if(lru[set][i]<lru[set][way]){
                 lru[set][i]++;
             }
@@ -194,7 +194,7 @@ public class Cache_L2 {
 
         int blockEvicted=getEvictedBlockLru(idx);
         int addrToBeUpdated=(tag[idx*associativity+blockEvicted]*numSets+idx)*blockSize;
-        System.out.println("The block evicted is "+blockEvicted);
+        // System.out.println("The block evicted is "+blockEvicted);
         updateLRUState(idx, blockEvicted); // updating the lru matrix after eviction
         int lower_bound=addrToBeUpdated-(addrToBeUpdated%this.blockSize);
         int upper_bound=addrToBeUpdated+(this.blockSize-(addrToBeUpdated%this.blockSize));
@@ -240,7 +240,7 @@ public class Cache_L2 {
 
         int blockEvicted=getEvictedBlockSrrip(idx);
         int addrToBeUpdated=(tag[idx*associativity+blockEvicted]*numSets+idx)*blockSize;
-        System.out.println("The block evicted is "+blockEvicted);
+        // System.out.println("The block evicted is "+blockEvicted);
         updateSrripState(idx, blockEvicted,false); // updating the lru matrix after eviction
         int lower_bound=addrToBeUpdated-(addrToBeUpdated%this.blockSize);
         int upper_bound=addrToBeUpdated+(this.blockSize-(addrToBeUpdated%this.blockSize));

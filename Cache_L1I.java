@@ -91,16 +91,16 @@ public class Cache_L1I {
         		int lower_bound=addr-(addr%this.blockSize);
         		int upper_bound=addr+(this.blockSize-addr%this.blockSize);
         		Integer[] blockFromL2=copyFromL2(lower_bound,upper_bound,L2Cache,mem);
-        		System.out.println("----------- The block obtained from L2 cache is:");
-        		for(int k=0;k<blockFromL2.length;k++) {
-        			System.out.print(blockFromL2[k]+" ");
-        		}
+        		// System.out.println("----------- The block obtained from L2 cache is:");
+        		// for(int k=0;k<blockFromL2.length;k++) {
+        		// 	System.out.print(blockFromL2[k]+" ");
+        		// }
         		for(int j=0;j<blockFromL2.length;j++) {
         			cache[i*this.blockSize+j*4]=blockFromL2[j];
         		}
-        		System.out.println("The required value is:"+cache[i*blockSize+offset]);
+        		// System.out.println("The required value is:"+cache[i*blockSize+offset]);
         		valFound=new MemoryResult(latencyExtra+this.accessLatency, cache[i*blockSize+offset]);
-        		System.out.println("------------ The memory result in L1 cache is returned "+valFound.result);
+        		// System.out.println("------------ The memory result in L1 cache is returned "+valFound.result);
                 if(policy){
                     updateLRUState(idx, i-idx*associativity);
                 }

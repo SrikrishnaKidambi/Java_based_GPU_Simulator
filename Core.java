@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Core {
 
-    public Core(int coreID,Cache_L1D L1_cache,Cache_L1I L1_cache_I,Cache_L2 L2_cache){
+    public Core(int coreID,Cache_L1D L1_cache,Cache_L1I L1_cache_I,Cache_L2 L2_cache,ScratchPadMemory spm){
         this.coreID=coreID;
         this.pc=0;
         this.registers=new int[32];
@@ -31,11 +31,12 @@ public class Core {
         this.L1_cache=L1_cache;
         this.L1_cache_I=L1_cache_I;
         this.L2_cache=L2_cache;
+        this.spm=spm;
     }
     
     public void executeUtil(String[] program,Memory mem,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping,Map<String,Integer>latencies,Map<Integer,Integer> dataHazardsMapping,boolean isPipelineForwardingEnabled) {
     	execute(program, mem, labelMapping, stringVariableMapping, nameVariableMapping,latencies,dataHazardsMapping,isPipelineForwardingEnabled);
-    	System.out.println("Size of the pipeline queue:"+pipeLineQueue.size());
+    	// System.out.println("Size of the pipeline queue:"+pipeLineQueue.size());
     	pipeLineQueue.removeFirst();
         InstructionState new_in=new InstructionState();
         new_in.isDummy=false;
@@ -59,7 +60,7 @@ public class Core {
                 }
             }
             in2=pipeLineQueue.get(1);
-            System.out.println("@@@@Calling mem for the opcode "+in2.opcode);
+            // System.out.println("@@@@Calling mem for the opcode "+in2.opcode);
             MEM(in2, mem);
             for(int i=0;i<memoryLatencyStalls-1;i++) {
             	pipeLineQueue.add(1+i,new InstructionState());
@@ -76,7 +77,7 @@ public class Core {
             InstructionState in3=pipeLineQueue.get(2);
             if(isPipelineForwardingEnabled){
                 int dataStalls=hazardDetectorUtil(pipeLineQueue,isPipelineForwardingEnabled,2);
-                System.out.println("Total number of datastalls req by branch at pc: "+ in3.pc_val+ " are "+dataStalls);
+                // System.out.println("Total number of datastalls req by branch at pc: "+ in3.pc_val+ " are "+dataStalls);
                 totalStalls+=dataStalls;
                 for(int i=0;i<dataStalls;i++) {
                     pipeLineQueue.add(2+i, new InstructionState());
@@ -87,13 +88,13 @@ public class Core {
         }
         if(pipeLineQueue.size()>=4){
             InstructionState in4=pipeLineQueue.get(3);
-            System.out.println("PC of the instruction that is getting executed:"+in4.pc_val);
-            System.out.println("The fetched instruction is dummy:"+in4.isDummy);
+            // System.out.println("PC of the instruction that is getting executed:"+in4.pc_val);
+            // System.out.println("The fetched instruction is dummy:"+in4.isDummy);
             if(isPipelineForwardingEnabled){
                 decode(in4);
                 if(!in4.isDummy && (in4.opcode.equals("bne") || in4.opcode.equals("beq") || in4.opcode.equals("blt") || in4.opcode.equals("bge"))){
                     int dataStalls=hazardDetectorUtil(pipeLineQueue,isPipelineForwardingEnabled,3);
-                    System.out.println("Total number of datastalls req by branch at pc: "+ in4.pc_val+ " are "+dataStalls);
+                    // System.out.println("Total number of datastalls req by branch at pc: "+ in4.pc_val+ " are "+dataStalls);
                     totalStalls+=dataStalls;
                     for(int i=0;i<dataStalls;i++) {
                         pipeLineQueue.add(3+i, new InstructionState());
@@ -116,7 +117,7 @@ public class Core {
                 // System.out.println("Number of control stalls:"+this.controlStalls);
             }
             if(this.coreID==0) {
-            	System.out.println("Number of control stalls:"+this.controlStalls);
+            	// System.out.println("Number of control stalls:"+this.controlStalls);
             }
             if(this.controlStalls>0){
                 in5.isDummy=true;
@@ -161,8 +162,8 @@ public class Core {
                 // System.out.println("The instruction that is going to get executed is dummy or not:"+in5.isDummy);
             }
             if(this.coreID==0) {
-            	System.out.println("The instruction is dummy:"+in5.pc_val);
-            	System.out.println("The instruction is dummy:"+in5.isDummy);
+            	// System.out.println("The instruction is dummy:"+in5.pc_val);
+            	// System.out.println("The instruction is dummy:"+in5.isDummy);
             }
 //            IF(program, in5);
             FetcherResult temp=Simulator.IF(pc, in5, coreID, program, lastInstruction,instructionsExecuted,L1_cache,L2_cache,L1_cache_I,mem);
@@ -178,11 +179,11 @@ public class Core {
             this.pc=temp.pc_val;
             
             lastInstruction=temp.lastInstruction;
-            System.out.println("Printing the pipeline:");
-           for(int i=0;i<5;i++) {
-            System.out.print(pipeLineQueue.get(i).pc_val+" ");
-           }
-           System.out.println();
+            // System.out.println("Printing the pipeline:");
+        //    for(int i=0;i<5;i++) {
+        //     System.out.print(pipeLineQueue.get(i).pc_val+" ");
+        //    }
+        //    System.out.println();
         }
     //     System.out.println("--------------------------------Printing the Pipeline after execution for core :"+this.coreID);
     //     for(int i=0;i<Math.min(pipeLineQueue.size(), 5);i++) {
@@ -342,13 +343,13 @@ public class Core {
         try {
             parsedInstruction=instructionParser(instruction);
         }catch(IllegalArgumentException e) {
-            System.err.println("Error occured is:"+e.getMessage());
+            // System.err.println("Error occured is:"+e.getMessage());
         }
                
         String[] decodedInstruction = parsedInstruction.trim().replace(","," ").split("\\s+");  //neglecting the commas that are put between registers.
         in.opcode=decodedInstruction[0].trim();
         if(coreID==0){
-            System.out.println("The value of pc in ID/RF:"+this.pc+" for opcode:"+in.opcode);
+            // System.out.println("The value of pc in ID/RF:"+this.pc+" for opcode:"+in.opcode);
         } 
         int latency=0;
         switch (in.opcode) {
@@ -840,6 +841,12 @@ public class Core {
 				// 	System.exit(0);
 				// }
 				break;
+            case "sw_spm":
+                in.rs2=Integer.parseInt(decodedInstruction[1].substring(1));
+                String[] offsetAndRegBasesp=decodedInstruction[2].split("[()]");
+                in.immediateVal=Integer.parseInt(offsetAndRegBasesp[0]);
+                in.rs1=Integer.parseInt(offsetAndRegBasesp[1].substring(1));
+                break;
 			case "jalr":
 				// syntax : jalr x1 x2 x0 -> store the value of pc+4 in x1 and jump to x2+x0
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
@@ -906,7 +913,7 @@ public class Core {
 			case "la" :
 				in.rd=Integer.parseInt(decodedInstruction[1].substring(1));
 				in.labelName=decodedInstruction[2];  // this indicates variable name
-                System.out.println("The label name obtained is:"+in.labelName);
+                // System.out.println("The label name obtained is:"+in.labelName);
 				if((decodedInstruction[1].equals("a0") || decodedInstruction[1].equals("x10") || decodedInstruction[1].equals("X10")) && stringVariableMapping.containsKey(in.labelName)) {
 					a_0=stringVariableMapping.get(in.labelName);
 				  //   System.out.println("The string that is printed due to ecall for variable name "+variableName+" is: " + a_0);
@@ -992,7 +999,7 @@ public class Core {
                     in.labelName=decodedInstruction[3];
                 }
                 if(in.isfowarded){
-                    System.out.println("Forwarding is happening");
+                    // System.out.println("Forwarding is happening");
                     if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
                         temp3_rs1=in.pipeline_reg[0];
                         temp3_rs2=in.pipeline_reg[1];
@@ -1004,7 +1011,7 @@ public class Core {
                         temp3_rs2=in.pipeline_reg[1];
                     }
                 }
-                System.out.println("The forwarded values in beq are:"+temp3_rs1+" and "+temp3_rs2);
+                // System.out.println("The forwarded values in beq are:"+temp3_rs1+" and "+temp3_rs2);
                 if(temp3_rs1==temp3_rs2){
                     pc=labelMapping.get(in.labelName).intValue();
                 }else {
@@ -1061,6 +1068,28 @@ public class Core {
                 // }
                 in.rs1=Integer.parseInt(decodedInstruction[2].substring(paramStart+2,paramEnd));
                 break;
+            case "lw_spm":
+                //Ex: lw_spm x1 8(x2) where 8 is the offset/immediate value and x2 is the base register for the scratchpad memory
+                in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
+                int paramStartsp=0;
+                int paramEndsp=0;
+                for(int i=0;i<decodedInstruction[2].length();i++){
+                    if(decodedInstruction[2].charAt(i)=='('){
+                        paramStartsp=i;
+                    }
+                    if(decodedInstruction[2].charAt(i)==')'){
+                        paramEndsp=i;
+                        break;
+                    }
+                }
+                in.immediateVal=Integer.parseInt(decodedInstruction[2].substring(0,paramStartsp));
+                // if(in.immediateVal<-512 || in.immediateVal>512){
+                //     System.out.println("The immediate value can only be between -512 and 512"); // as the total memory the core can access is 1024 bytes so using immediate I can go 512bytes up and 512 bytes down
+                //     System.exit(0);
+                //     break;
+                // }
+                in.rs1=Integer.parseInt(decodedInstruction[2].substring(paramStartsp+2,paramEndsp));
+                break;
             case "li":
                 //Ex: li x1 8
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
@@ -1075,7 +1104,7 @@ public class Core {
                 //Ex: jal x1 label
                 in.rd= Integer.parseInt(decodedInstruction[1].substring(1));
                 in.labelName=decodedInstruction[2];
-                System.out.println("The label name in ID for : "+in.opcode+" is "+in.labelName);
+                // System.out.println("The label name in ID for : "+in.opcode+" is "+in.labelName);
                 // pipeLineQueue.add(new InstructionState());
                 // pipeLineQueue.add(new InstructionState()); 
                 if(this.coreID==0) {
@@ -1138,7 +1167,7 @@ public class Core {
                 // System.out.println("Total number of stalls in "+in.opcode+" are "+totalStalls);
                 break;
 			case "ecall":
-            System.out.println("You entered ecall in ID/RF");
+            // System.out.println("You entered ecall in ID/RF");
 				// nee time inka raledu bro
 				break;
             case "SYNC":
@@ -1146,7 +1175,7 @@ public class Core {
             default:
 			Simulator.isInstruction=false;
 			if(!labelMapping.containsKey(in.opcode.trim().replace(":", "")) && !in.opcode.equals("")) {
-				System.out.println(in.opcode.trim()+" is an invalid opcode");
+				// System.out.println(in.opcode.trim()+" is an invalid opcode");
 				SimulatorGUI.console.append(in.opcode.trim()+" is an invalid opcode. So program execution is stopped!");
 				throw new IllegalArgumentException(in.opcode.trim()+" is an invalid opcode");
 			}
@@ -1168,7 +1197,7 @@ public class Core {
     private void EX(InstructionState in,Map<String,Integer>labelMapping,Map<String,String>stringVariableMapping,Map<String,Integer>nameVariableMapping){
         if(this.coreID==0) {
         	if(in.isDummy || in==null || in.EX_done_core0==true){
-        		System.out.println("*********Returning for core0 because the instruction is dummy:"+in.isDummy);
+        		// System.out.println("*********Returning for core0 because the instruction is dummy:"+in.isDummy);
                 return;
             }
         }else if(this.coreID==1) {
@@ -1185,7 +1214,7 @@ public class Core {
             }
         }
         if(coreID==0){
-            System.out.println("The value of pc in EX:"+this.pc+" for opcode:"+in.opcode);
+            // System.out.println("The value of pc in EX:"+this.pc+" for opcode:"+in.opcode);
         }        
         switch (in.opcode) {
             case "add":
@@ -1244,11 +1273,11 @@ public class Core {
                     break;
                 }
             	in.result = registers[in.rs1];
-            	System.out.println("Printing the core values till 15 for checking in core:"+this.coreID);
-            	for(int i=0;i<11;i++) {
-            		System.out.print(registers[i]+" ");
-            	}
-            	System.out.println("Done printing the core values(debugging)");
+            	// System.out.println("Printing the core values till 15 for checking in core:"+this.coreID);
+            	// for(int i=0;i<11;i++) {
+            	// 	System.out.print(registers[i]+" ");
+            	// }
+            	// System.out.println("Done printing the core values(debugging)");
                 break;
             case "addi":
                 if(in.isfowarded){
@@ -1310,12 +1339,28 @@ public class Core {
                 // in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
                 in.addressIdx=registers[in.rs1]+in.immediateVal+0;   // loading the value that is stored in the memory of core zero
                 break;
+            case "lw_spm":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal;
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal;
+                    }
+                    break;
+                }
+                
+                // in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
+                in.addressIdx=registers[in.rs1]+in.immediateVal+0;   // loading the value that is stored in the memory of core zero
+                break;
             case "li":
                 in.result=in.immediateVal;
                 break;
             case "jal":
                 in.result=pc;
-                System.out.println("The label name is "+in.labelName);
+                // System.out.println("The label name is "+in.labelName);
                 pc=labelMapping.get(in.labelName).intValue();
                 break;
             case "j":
@@ -1427,12 +1472,28 @@ public class Core {
                         // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
                         in.addressIdx=in.pipeline_reg[0]+in.immediateVal;
                     }
-                    System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
+                    // System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
                 }
-                System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
+                // System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
 				// in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
                 in.addressIdx=registers[in.rs1]+in.immediateVal+0;  // accessing the memory value that is stored at core 0
 				break;
+            case "sw_spm":
+                if(in.isfowarded){
+                    if(in.pipeline_reg[0]!=null && in.pipeline_reg[1]!=null){
+                        // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal;    
+                    }
+                    else if(in.pipeline_reg[0]!=null){
+                        // in.addressIdx=in.pipeline_reg[0]+in.immediateVal+this.coreID;
+                        in.addressIdx=in.pipeline_reg[0]+in.immediateVal;
+                    }
+                    // System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
+                }
+                // System.out.println("-------------------------The value in x16 :"+registers[16]+" in the core "+this.coreID);
+                // in.addressIdx=registers[in.rs1]+in.immediateVal+this.coreID;
+                in.addressIdx=registers[in.rs1]+in.immediateVal+0;  // accessing the memory value that is stored at core 0
+                break;
 			case "jalr": 
 				in.result=pc;
                 if(in.isfowarded){
@@ -1468,7 +1529,7 @@ public class Core {
                                 }
                             }
         	  	  			// System.out.print(a0);
-                            System.out.println("Printing the value that has to be printed using ecall"+a0);
+                            // System.out.println("Printing the value that has to be printed using ecall"+a0);
         	  	  			if(this.coreID==0) {
         	  	  				SimulatorGUI.console.append(a0+"");
         	  	  			}
@@ -1476,7 +1537,7 @@ public class Core {
         	  	  		case 4:
                             // System.out.println("Printing as per request of mogambo");
         	  	  			// System.out.print(a_0);
-                            System.out.println("Printing the value that has to be printed using ecall"+a_0);
+                            // System.out.println("Printing the value that has to be printed using ecall"+a_0);
         	  	  			if(this.coreID==0) {
         	  	  				SimulatorGUI.console.append(a_0);
         	  	  			}
@@ -1520,7 +1581,7 @@ public class Core {
             }
         }
         if(coreID==0){
-            System.out.println("The value of pc in MEM:"+this.pc+" for opcode:"+in.opcode);
+            // System.out.println("The value of pc in MEM:"+this.pc+" for opcode:"+in.opcode);
         }	
         MemoryAccess memAccess=new MemoryAccess(L1_cache,L2_cache,L1_cache_I,mem);
         switch (in.opcode) {
@@ -1531,7 +1592,7 @@ public class Core {
             	this.memoryLatencyStalls+=memResult.latency;
             	this.totalStalls+=this.memoryLatencyStalls;
                 
-            	System.out.println("Memory stalls are: "+memoryLatencyStalls+" and result is "+in.result);
+            	// System.out.println("Memory stalls are: "+memoryLatencyStalls+" and result is "+in.result);
                 // if(coreID==0){
                 //     SimulatorGUI.console.append("L1 Cache:\n");
                 //     SimulatorGUI.console.append("Address:\t");
@@ -1563,6 +1624,14 @@ public class Core {
                 //     SimulatorGUI.console.append("\n--- End ---\n");
                 // }
                 break;
+            case "lw_spm":
+                MemoryResult spmResult=spm.readData(in.addressIdx);
+                in.result=spmResult.result;
+                this.memoryLatencyStalls+=spmResult.latency;
+                this.totalStalls+=this.memoryLatencyStalls;
+                
+                // System.out.println("Memory stalls are: "+memoryLatencyStalls+" and result is "+in.result);
+                break;
             case "sw":
                 MemoryResult memResult_sw=null;
                 if(in.isfowarded){
@@ -1570,18 +1639,38 @@ public class Core {
                         memResult_sw=memAccess.writeData(in.addressIdx, in.pipeline_reg[1]);
                         this.memoryLatencyStalls+=memResult_sw.latency;
                         this.totalStalls+=this.memoryLatencyStalls;
-                        System.out.println("The value that is stored in registers[16]:"+registers[16]);
-                        System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
+                        // System.out.println("The value that is stored in registers[16]:"+registers[16]);
+                        // System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
                         break;
                     }
                 }
-                System.out.println("The value that is stored in registers[16]:"+registers[16]);
-                System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
+                // System.out.println("The value that is stored in registers[16]:"+registers[16]);
+                // System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
                 memResult_sw=memAccess.writeData(in.addressIdx, registers[in.rs2]);
                 this.memoryLatencyStalls+=memResult_sw.latency;
                 this.totalStalls+=this.memoryLatencyStalls;
-                if(coreID==0)
-                    mem.printMemory();
+                // if(coreID==0)
+                //     mem.printMemory();
+                break;
+            case "sw_spm":
+                MemoryResult spmResultsw=null;
+                if(in.isfowarded){
+                    if(in.pipeline_reg[1]!=null){
+                        spmResultsw=spm.writeData(in.addressIdx, in.pipeline_reg[1]);
+                        this.memoryLatencyStalls+=spmResultsw.latency;
+                        this.totalStalls+=this.memoryLatencyStalls;
+                        // System.out.println("The value that is stored in registers[16]:"+registers[16]);
+                        // System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
+                        break;
+                    }
+                }
+                // System.out.println("The value that is stored in registers[16]:"+registers[16]);
+                // System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
+                spmResultsw=spm.writeData(in.addressIdx, registers[in.rs2]);
+                this.memoryLatencyStalls+=spmResultsw.latency;
+                this.totalStalls+=this.memoryLatencyStalls;
+                // if(coreID==0)
+                //     mem.printMemory();
                 break;
             default:
                 break;
@@ -1621,7 +1710,7 @@ public class Core {
                 }
             }
         if(coreID==0){
-            System.out.println("The value of pc in WB:"+this.pc+" for opcode:"+in.opcode);
+            // System.out.println("The value of pc in WB:"+this.pc+" for opcode:"+in.opcode);
         }        	
         switch (in.opcode) {
             case "add":
@@ -1649,6 +1738,9 @@ public class Core {
                 //pass for all conditional jumps
                 break;
             case "lw":
+                registers[in.rd]=in.result;
+                break;
+            case "lw_spm":
                 registers[in.rd]=in.result;
                 break;
             case "li":
@@ -1898,7 +1990,7 @@ public class Core {
     	}
         int stall=0;
         boolean isStall;
-    	System.out.println("**** IS dummy: "+curr.isDummy + " and pc val "+curr.pc_val+ " is ID done "+ curr.IDRF_done_core0+ " and IF done "+curr.IF_done_core0+" and EX done "+curr.EX_done_core0+ " and MEM done "+curr.MEM_done_core0);// for debugging
+    	// System.out.println("**** IS dummy: "+curr.isDummy + " and pc val "+curr.pc_val+ " is ID done "+ curr.IDRF_done_core0+ " and IF done "+curr.IF_done_core0+" and EX done "+curr.EX_done_core0+ " and MEM done "+curr.MEM_done_core0);// for debugging
         
         // System.out.println("Printing the pipeline ");
         // for(int i=0;i<pipeLineQueue.size();i++){
@@ -2000,14 +2092,14 @@ public class Core {
                     isStall=false;
                 }
                 else if(prev1.result!=null && curr.rs1==prev1.rd && curr.pipeline_reg[0]==null){
-                    System.out.println("For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
+                    // System.out.println("For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
                     curr.pipeline_reg[0]=prev1.result;
                     curr.isfowarded=true;
                     // return 0;
                     isStall=false;
                 }
                 else if(prev1.result!=null && curr.rs2==prev1.rd && curr.pipeline_reg[1]==null){
-                    System.out.println("For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
+                    // System.out.println("For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
                     curr.pipeline_reg[1]=prev1.result;
                     curr.isfowarded=true;
                     // return 0;
@@ -2034,14 +2126,14 @@ public class Core {
                     isStall=false;
                 }
                 else if(prev2.result!=null && curr.rs1==prev2.rd && curr.pipeline_reg[0]==null){
-                    System.out.println("2.For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
+                    // System.out.println("2.For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
                     curr.pipeline_reg[0]=prev2.result;
                     curr.isfowarded=true;
                     // return 0;
                     isStall=false;
                 }
                 else if(prev2.result!=null && curr.rs2==prev2.rd && curr.pipeline_reg[1]==null){
-                    System.out.println("2.For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
+                    // System.out.println("2.For the instruction :"+curr.opcode+" with pc value "+curr.pc_val+" the forwarding that is going to happen is "+prev1.result);
                     curr.pipeline_reg[1]=prev2.result;
                     curr.isfowarded=true;
                     // return 0;
@@ -2107,4 +2199,5 @@ public class Core {
     public Cache_L1D L1_cache;
     public Cache_L1I L1_cache_I;
     public Cache_L2 L2_cache;
+    public ScratchPadMemory spm;
 }

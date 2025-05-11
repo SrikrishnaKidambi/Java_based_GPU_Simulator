@@ -2,7 +2,7 @@ public class CacheConfig {
     public int CL1_latency=1;
     public int CL1_associativitity=1;
     public int CL1_blockSize=8;
-    public int CL1_cacheSize=64;
+    public int CL1_cacheSize=128;
     public int CL2_latency=3;
     public int CL2_associativity=1;
     public int CL2_blockSize=16;

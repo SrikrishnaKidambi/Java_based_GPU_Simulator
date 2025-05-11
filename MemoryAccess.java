@@ -22,9 +22,9 @@ public class MemoryAccess {
 			return res;
 		}
 		// L1Cache.misses++;
-		System.out.println("The address fetch while reading at "+addr+" is a miss in L1 cache");
+		// System.out.println("The address fetch while reading at "+addr+" is a miss in L1 cache");
 		res=L1Cache.fillCacheL1(addr, L2Cache, mem);
-		System.out.println("The memory result is returned "+res);
+		// System.out.println("The memory result is returned "+res);
 		return res;
 	}
 	
@@ -36,9 +36,9 @@ public class MemoryAccess {
 			return res;
 		}
 		// L1Cache_I.misses++;
-		System.out.println("The address fetch while reading at "+addr+" is a miss in L1 cache");
+		// System.out.println("The address fetch while reading at "+addr+" is a miss in L1 cache");
 		res=L1Cache_I.fillCacheL1(addr, L2Cache, mem);
-		System.out.println("The memory result is returned"+res);
+		// System.out.println("The memory result is returned"+res);
 		return res;
 	}
 
@@ -50,7 +50,7 @@ public class MemoryAccess {
 			return res;
 		}
 		// L1Cache.misses++;
-		System.out.println("The address fetch while writing to "+addr+" is a miss in L1 cache");
+		// System.out.println("The address fetch while writing to "+addr+" is a miss in L1 cache");
 		res=L1Cache.fillCacheL1(addr, L2Cache, mem);
 		MemoryResult res1=L1Cache.writeData(addr, updatedVal);
 		res.result=res1.result;
