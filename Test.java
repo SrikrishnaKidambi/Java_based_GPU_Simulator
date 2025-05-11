@@ -52,6 +52,7 @@ public class Test {
         System.out.println("Memory before executing");
         mem.printMemory();	
         sim.initializeProgram(textSegment);
+		LoadInstructionsIntoMemory(textSegment);
 		printIntegerMapping();
 		Cache_L1D[] caches=new Cache_L1D[4];
         sim.runProgram(mem, stringVariableMapping, numberVariableMapping,latencies,isPipelineForwardingEnabled);

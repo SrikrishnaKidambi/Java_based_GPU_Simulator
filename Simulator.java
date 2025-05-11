@@ -57,7 +57,7 @@ public class Simulator{
     	MemoryAccess memAccess=null;
     	memAccess=new MemoryAccess(L1_Cache,L2_Cache,L1_Cache_I,mem);
         MemoryResult res=memAccess.readInstruction(4092-4*pc);
-        // pc=res.result;
+        pc=res.result;
     	if(program[pc].contains(":")) {
             pc++;
     	}
@@ -85,11 +85,11 @@ public class Simulator{
                     synced[3]=1;
                     synced[coreID]=0;
                     L1_Cache.flushCache(L2_Cache, mem,coreID);
-                    SimulatorGUI.console.append("Instructions got synced!!!!!!!!!!!\n");
-                    SimulatorGUI.console.append("The values at memory[1020]="+mem.memory[1020]+"\n");
-                    SimulatorGUI.console.append("The values at memory[1024]="+mem.memory[1024]+"\n");
-                    SimulatorGUI.console.append("The values at memory[1028]="+mem.memory[1028]+"\n");
-                    SimulatorGUI.console.append("The values at memory[1032]="+mem.memory[1032]+"\n");
+                    // SimulatorGUI.console.append("Instructions got synced!!!!!!!!!!!\n");
+                    // SimulatorGUI.console.append("The values at memory[1020]="+mem.memory[1020]+"\n");
+                    // SimulatorGUI.console.append("The values at memory[1024]="+mem.memory[1024]+"\n");
+                    // SimulatorGUI.console.append("The values at memory[1028]="+mem.memory[1028]+"\n");
+                    // SimulatorGUI.console.append("The values at memory[1032]="+mem.memory[1032]+"\n");
                     global_sync_counter=0;
                     // return new FetcherResult(last, pc,0, 0);
                 }
@@ -293,6 +293,21 @@ public class Simulator{
         SimulatorGUI.console.append("IPC of core 1: "+IPC1+"\n");
         SimulatorGUI.console.append("IPC of core 2: "+IPC2+"\n");
         SimulatorGUI.console.append("IPC of core 3: "+IPC3+"\n");
+
+        SimulatorGUI.console.append("Stats for L1 Cache (Data):");
+        SimulatorGUI.console.append("\nMiss Rate in core 0:"+((double)(caches[0].misses)/(caches[0].accesses)));
+        SimulatorGUI.console.append("\nMiss Rate in core 1:"+((double)(caches[1].misses)/(caches[1].accesses)));
+        SimulatorGUI.console.append("\nMiss Rate in core 2:"+((double)(caches[2].misses)/(caches[2].accesses)));
+        SimulatorGUI.console.append("\nMiss Rate in core 3:"+((double)(caches[3].misses)/(caches[3].accesses)));
+
+        SimulatorGUI.console.append("\nStats for L1 Cache (Instruction):");
+        SimulatorGUI.console.append("\nMiss Rate in core 0:"+((double)(caches_I[0].misses)/(caches_I[0].accesses)));
+        SimulatorGUI.console.append("\nMiss Rate in core 1:"+((double)(caches_I[1].misses)/(caches_I[1].accesses)));
+        SimulatorGUI.console.append("\nMiss Rate in core 2:"+((double)(caches_I[2].misses)/(caches_I[2].accesses)));
+        SimulatorGUI.console.append("\nMiss Rate in core 3:"+((double)(caches_I[3].misses)/(caches_I[3].accesses)));
+
+        SimulatorGUI.console.append("\nStats for L2 Cache:");
+        SimulatorGUI.console.append("\nMiss Rate:"+((double)(L2_cache.misses)/(L2_cache.accesses)));
     }
 
 

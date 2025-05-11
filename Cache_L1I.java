@@ -11,6 +11,8 @@ public class Cache_L1I {
     private Integer[][] srrip;
     private boolean policy; //here 0 for lru and 1 for srrip
     private int maxRRPV=3;
+    public int misses;
+    public int accesses;
     
     public Cache_L1I(int associativity, int blockSize, int cacheSize, int accessLatency, boolean policy) {
     	this.associativity=associativity;
@@ -35,7 +37,8 @@ public class Cache_L1I {
                 srrip[i][j]=maxRRPV;
             }
         }
-    	
+        this.misses=0;
+        this.accesses=0;
     }
     
     public void updateL2Cache(int lower_bound,int upper_bound,Cache_L2 L2_cache,Memory mem,int[] blockUpdated){
@@ -70,7 +73,7 @@ public class Cache_L1I {
     }
     
     public MemoryResult fillCacheL1(int addr,Cache_L2 L2Cache,Memory mem){
-    	   
+
     	int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
     	int numTags=cacheSize/blockSize;
         int numSets=numTags/associativity;
@@ -118,6 +121,7 @@ public class Cache_L1I {
     }
     
     public MemoryResult readData(int addr){
+        this.accesses++;
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
         int offset=addr%blockSize;
         int numTags=cacheSize/blockSize;
@@ -139,6 +143,7 @@ public class Cache_L1I {
                 }
             }
         }
+        this.misses++;
         return null;
     }
     

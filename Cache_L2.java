@@ -11,6 +11,8 @@ public class Cache_L2 {
     private Integer[][] srrip;
     private boolean policy; //here 0 for lru and 1 for srrip
     private int maxRRPV=3;
+    public int misses;
+    public int accesses;
 
     public Cache_L2(int associativity,int blockSize,int cacheSize,int accessLatency,boolean whichPolicy){
         this.associativity=associativity;
@@ -33,6 +35,8 @@ public class Cache_L2 {
                 srrip[i][j]=maxRRPV;
             }
         }
+        this.misses=0;
+        this.accesses=0;
     }
     
     // public MemoryResult LRU_Policy(int addr,Memory mem) {
@@ -67,6 +71,7 @@ public class Cache_L2 {
     }
 
     public MemoryResult readData(int addr){
+        this.accesses++;
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
         int offset=addr%blockSize;
         int numTags=cacheSize/blockSize;
@@ -86,10 +91,12 @@ public class Cache_L2 {
                 }
             }
         }
+        this.misses++;
         return null;
     }
     
     public void writeData(int addr,Memory mem,int eleUpdated){
+        this.accesses++;
         // int lower_bound=addr-(addr%this.blockSize);
         // int upper_bound=addr+(this.blockSize-(addr%this.blockSize));
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
@@ -112,9 +119,11 @@ public class Cache_L2 {
                 }
             }
         }
+        this.misses++;
         fillCacheL2(addr, mem);
     }
     public MemoryResult fillCacheL2(int addr,Memory mem){
+
     	System.out.println("-------------------- Called fillCacheL2 function");
     	int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
     	int numTags=cacheSize/blockSize;

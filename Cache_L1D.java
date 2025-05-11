@@ -12,6 +12,8 @@ public class Cache_L1D {
     private Integer[][] srrip;
     private boolean policy; //here 0 for lru and 1 for srrip
     private int maxRRPV=3;
+    public int misses;
+    public int accesses;
 
     public Cache_L1D(int associativity,int blockSize,int cacheSize,int accessLatency,boolean whichPolicy){
         this.associativity=associativity;
@@ -34,13 +36,15 @@ public class Cache_L1D {
                 srrip[i][j]=maxRRPV;
             }
         }
+        this.misses=0;
+        this.accesses=0;
     }
 
     public void flushCache(Cache_L2 L2_Cache,Memory mem,int coreID){
-        SimulatorGUI.console.append("L1 cache for Core"+coreID+":\n");
-        for(int i=0;i<cache.length;i++){
-            SimulatorGUI.console.append(cache[i]+" ");
-        }
+        // SimulatorGUI.console.append("L1 cache for Core"+coreID+":\n");
+        // for(int i=0;i<cache.length;i++){
+        //     SimulatorGUI.console.append(cache[i]+" ");
+        // }
         int idx=0;
         for(int i=0;i<tag.length;i++){
             if(i!=0 && i%associativity==0){
@@ -65,6 +69,8 @@ public class Cache_L1D {
     }
 
     public MemoryResult readData(int addr){
+        this.accesses++;
+        
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
         int offset=addr%blockSize;
         int numTags=cacheSize/blockSize;
@@ -86,10 +92,13 @@ public class Cache_L1D {
                 }
             }
         }
+        this.misses++;
+        // SimulatorGUI.console.append("\nIncrementing the value of misses:"+this.misses);
         return null;
     }
 
     public MemoryResult writeData(int addr,int updatedVal){
+        this.accesses++;
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
         int offset=addr%blockSize;
         int numTags=cacheSize/blockSize;
@@ -113,6 +122,7 @@ public class Cache_L1D {
                 }
             }
         }
+        this.misses++;
         return null;
     }
     
@@ -146,7 +156,6 @@ public class Cache_L1D {
     // this function is called if there is cache miss in L1.
     
     public MemoryResult fillCacheL1(int addr,Cache_L2 L2Cache,Memory mem){
-   
     	int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
     	int numTags=cacheSize/blockSize;
         int numSets=numTags/associativity;
@@ -220,7 +229,7 @@ public class Cache_L1D {
         lru[set][way]=0;
     }
     public MemoryResult LRU_Policy(int addr,Cache_L2 L2_cache, Memory mem) {
-    	// implement LRU_Policy for L1
+    	
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
     	int numTags=cacheSize/blockSize;
         int numSets=numTags/associativity;
