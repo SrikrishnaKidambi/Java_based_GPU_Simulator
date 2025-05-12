@@ -1,5 +1,5 @@
 .data
-base: .word 4 1 3 5 2 3
+base: .word 4 1 3 5 2 3 4 6 7 4
 str1: .string "\nThe sorted array is:\n"
 str: .string " "
 
@@ -12,7 +12,7 @@ j printArray
 
 bubbleSort:
     addi x10 x0 0 # i = 0
-    addi x12 x0 6 # n = 6
+    addi x12 x0 10 # n = 20
     LoopOuter:
         addi x11 x0 0 # j = 0
         addi x14 x12 -1

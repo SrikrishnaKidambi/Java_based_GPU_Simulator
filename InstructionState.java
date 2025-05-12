@@ -7,7 +7,7 @@ public class InstructionState {
 		rs2=-1;
 		isDummy=true;
 		pc_val=null;
-		
+		isInsStalled=false;
 		IF_done_core0=false;
 		IDRF_done_core0=false;
 		EX_done_core0=false;
@@ -86,4 +86,6 @@ public class InstructionState {
 	public boolean IDRF_done_once3;   // these variables hold the information that control stalls already got incremented so do not do again if the instruction is undergoing ID/RF
 
 	public Integer pc_val;
+
+	public boolean isInsStalled;
 }

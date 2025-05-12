@@ -172,6 +172,8 @@ public class Core {
             }
             memoryLatencyStalls+=temp.memoryStalls;
             totalStalls+=temp.memoryStalls+temp.stall;
+            if(temp.memoryStalls>1)
+                in5.isInsStalled=true;
             for(int i=0;i<memoryLatencyStalls-1;i++){
                 pipeLineQueue.add(4+i, new InstructionState());
             }

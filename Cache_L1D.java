@@ -182,6 +182,7 @@ public class Cache_L1D {
         		}
         		// System.out.println("The required value is:"+cache[i*blockSize+offset]);
         		valFound=new MemoryResult(latencyExtra+this.accessLatency, cache[i*blockSize+offset]);
+                // this.latencyExtra=0;
         		// System.out.println("------------ The memory result in L1 cache is returned "+valFound.result);
                 if(policy){
                     updateLRUState(idx, i-idx*associativity);
