@@ -24,8 +24,48 @@ java SimulatorGUI
 - In this phase, all the instruction execution takes place in a pipelined fashion. Also RAW hazard checking, pipeline forwarding were implemented. 
 - Please note that when using branch instruction with CID please use upper case CID instead of lower case CID.
 
+### Phase - 3
+- In this phase, all the memory access take place with variable latencies. This is because of the introduction of caches at two levels L1 and L2 each having different latencies which are different from the main memory.
+- The configuration of the cache can be found in the cacheConfig.java file where we cn change the configurations manually and compile the SimulatorGUI.java file.
+- THe replacement policies implemented are SRRIP and LRU policy. Here we are using the LRU replacement policy as default which can also be changed in the same cacheConfig file.
+- Some of the assembly codes are present in the repo that can be used as sample test cases for testing the working of the simulator.
+
 ---
 ### Minutes of Meeting:
+
+
+
+#### Date : 11-05-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Tried to understand Scratch Pad Memory (SPM). Asked TA and decided to implenent the spm private for each cache. It will be an array of values similar to memory with limited capacity and less latency
+Also initialised testing process of the simulator.
+
+#### Date : 10-05-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Thought about how to implement the SYNC functionality that is hardware realisable. 
+
+#### Date : 9-05-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Resumed the project again after a long gap. This time started with implementaion of the writing to the cache using the sw. Modified the flow of the sw so that before storing into the memory the value is updated in the cache. Completed the implementation of the LRU policy that will take care of the evicting a block from the cache when there is a conflict or capacity miss. Also as a part of implementing a replacement policy of our choice we decided to implement SRRIP replacement policy.
+
+#### Date : 19-04-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Completed the implementation of the lw functionality that will try to load from the cache before going to access the main memory. Also fixed some of the bugs that were present in the previous codes.
+
+#### Date : 14-04-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Extended the implementation of the cache to handle the misses when trying to read or write to the cache. Also we decided to have a seperate class for handling all the memory access that which will act as a high level class that will take care of the cache hits and misses.
+
+
+#### Date : 13-04-2025
+
+Members : Srikrishna , Sai krishna
+Tasks: Completed the initial reading of the phase 3 document and then started the implementation of the L1 and L2 caches. Initially, decided to implement using hash maps that store the tag as key and value as the block. But to ensure the efficiecy of computation, we decided to implement the 2D cache as a single dimensional array though it is mathematically intensive. With the above design we also implemented the process of reading data from the cache.
 
 #### Date : 10-03-2025
 
