@@ -3,7 +3,7 @@ public class Memory {
     public int addressCounter;
     public int memoryAccessLatency;
     public Memory(int memoryAccessLatency){
-        memory=new int[16384]; //now our memory is increased to 16KB 😊
+        memory=new int[131072]; //now our memory is increased to 128KB 😊
         addressCounter=0; // base address is 0
         this.memoryAccessLatency=memoryAccessLatency;
     }
@@ -31,7 +31,7 @@ public class Memory {
         // for(int i=3;i<1024;i+=4){
         //     System.out.print(memory[i]+" ");
         // }
-        for(int i=0;i<16384;i+=4){
+        for(int i=0;i<131072;i+=4){
             System.out.print(memory[i]+" ");
             // if(memory[i]==2){
             //     SimulatorGUI.console.append("The index at which we found 2 is:"+i);

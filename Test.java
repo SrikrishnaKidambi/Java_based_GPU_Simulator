@@ -16,7 +16,7 @@ public class Test {
 	
 	public void LoadInstructionsIntoMemory(String[] program) {
 		for(int i=0;i<program.length;i++) {
-			mem.memory[16380-i*4]=i;         // loading the instruction pc value from the last of the memory.
+			mem.memory[131072-i*4]=i;         // loading the instruction pc value from the last of the memory.
 		}
 	}
     public void RunSimulator() {
@@ -147,7 +147,7 @@ public class Test {
 							// mem.memory[i*4+3-4*startIdx+mem.addressCounter] = Integer.parseInt(parsedLine[i].trim()); // core 3
 						}
 						mem.addressCounter+=4*(parsedLine.length-startIdx);
-						if(mem.addressCounter>=16384) {
+						if(mem.addressCounter>=131072) {
 							System.out.println("Memory is being accessed out of bounds for memory address:"+mem.addressCounter);
 							System.exit(0);
 						}

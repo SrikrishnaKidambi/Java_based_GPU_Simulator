@@ -97,7 +97,7 @@ public class Simulator{
     	
     	MemoryAccess memAccess=null;
     	memAccess=new MemoryAccess(L1_Cache,L2_Cache,L1_Cache_I,mem);
-        MemoryResult res=memAccess.readInstruction(16380-4*pc); //now our memory is 16KB.
+        MemoryResult res=memAccess.readInstruction(131072-4*pc); //now our memory is 16KB.
         pc=res.result;
     	if(program[pc].contains(":")) {
             pc++;
@@ -110,7 +110,7 @@ public class Simulator{
                 pc++;
                 in.instruction=program[pc];
                 in.pc_val=pc;
-                memAccess.readInstruction(16380-4*pc);
+                memAccess.readInstruction(131072-4*pc);
                 synced[coreID]=0;
             }
             if(in.instruction.equals("SYNC")){
