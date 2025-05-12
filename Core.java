@@ -172,8 +172,8 @@ public class Core {
             }
             memoryLatencyStalls+=temp.memoryStalls;
             totalStalls+=temp.memoryStalls+temp.stall;
-            if(temp.memoryStalls>1)
-                in5.isInsStalled=true;
+            // if(temp.memoryStalls>1)
+                // in5.isInsStalled=true;
             for(int i=0;i<memoryLatencyStalls-1;i++){
                 pipeLineQueue.add(4+i, new InstructionState());
             }
@@ -921,6 +921,11 @@ public class Core {
 				  //   System.out.println("The string that is printed due to ecall for variable name "+variableName+" is: " + a_0);
 					break;
 				}
+                // if(in==null){
+                //     System.out.println("in is null");
+                // }else if(nameVariableMapping==null){
+                //     System.out.println("namevariableMapping is null");
+                // }
                 in.immediateVal=nameVariableMapping.get(in.labelName);  // this indicates the value that has to be loaded into the register directly
 				break;
             case "bge":

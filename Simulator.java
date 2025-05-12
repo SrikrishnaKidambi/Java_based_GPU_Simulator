@@ -43,61 +43,61 @@ public class Simulator{
     public static FetcherResult IF(int pc,InstructionState in,int coreID,String[] program,InstructionState last,int[] instructionsExecuted,Cache_L1D L1_Cache,Cache_L2 L2_Cache,Cache_L1I L1_Cache_I,Memory mem) {
     	if(coreID==0) {
         	if(in.isDummy || in==null || in.IF_done_core0==true){
-                if(in.isInsStalled){
-                    pc++;
-                    if(pc==program.length) {
-                        last=in;
-                    }
-                    if(coreID==0) {
-                        in.IF_done_core0=true;
-                    }
-                }
+                // if(in.isInsStalled){
+                //     pc++;
+                //     if(pc==program.length) {
+                //         last=in;
+                //     }
+                //     if(coreID==0) {
+                //         in.IF_done_core0=true;
+                //     }
+                // }
                 return new FetcherResult(last,pc,0,0);
             }
         }else if(coreID==1) {
         	if(in.isDummy || in==null || in.IF_done_core1==true){
-                if(in.isInsStalled){
-                    pc++;
-                    if(pc==program.length) {
-                        last=in;
-                    }
-                    if(coreID==1) {
-                        in.IF_done_core1=true;
-                    }
-                }
+                // if(in.isInsStalled){
+                //     pc++;
+                //     if(pc==program.length) {
+                //         last=in;
+                //     }
+                //     if(coreID==1) {
+                //         in.IF_done_core1=true;
+                //     }
+                // }
         		return new FetcherResult(last,pc,0,0);
             }
         }else if(coreID==2) {
         	if(in.isDummy || in==null || in.IF_done_core2==true){
-                if(in.isInsStalled){
-                    pc++;
-                    if(pc==program.length) {
-                        last=in;
-                    }
-                    if(coreID==2) {
-                        in.IF_done_core2=true;
-                    }
-                }
+                // if(in.isInsStalled){
+                //     pc++;
+                //     if(pc==program.length) {
+                //         last=in;
+                //     }
+                //     if(coreID==2) {
+                //         in.IF_done_core2=true;
+                //     }
+                // }
         		return new FetcherResult(last,pc,0,0);
             }
         }else if(coreID==3) {
         	if(in.isDummy || in==null || in.IF_done_core3==true){
-                if(in.isInsStalled){
-                    pc++;
-                    if(pc==program.length) {
-                        last=in;
-                    }
-                    if(coreID==3) {
-                        in.IF_done_core3=true;
-                    }
-                }
+                // if(in.isInsStalled){
+                //     pc++;
+                //     if(pc==program.length) {
+                //         last=in;
+                //     }
+                //     if(coreID==3) {
+                //         in.IF_done_core3=true;
+                //     }
+                // }
         		return new FetcherResult(last,pc,0,0);
             }
         }
     	
     	MemoryAccess memAccess=null;
     	memAccess=new MemoryAccess(L1_Cache,L2_Cache,L1_Cache_I,mem);
-        MemoryResult res=memAccess.readInstruction(131072-4*pc); //now our memory is 16KB.
+        MemoryResult res=memAccess.readInstruction(131068-4*pc); //now our memory is 16KB.
         pc=res.result;
     	if(program[pc].contains(":")) {
             pc++;
@@ -110,7 +110,7 @@ public class Simulator{
                 pc++;
                 in.instruction=program[pc];
                 in.pc_val=pc;
-                memAccess.readInstruction(131072-4*pc);
+                memAccess.readInstruction(131068-4*pc);
                 synced[coreID]=0;
             }
             if(in.instruction.equals("SYNC")){
@@ -136,7 +136,7 @@ public class Simulator{
                 }
                 
             }
-            if(res.latency==1)
+            // if(res.latency==1)
         	    pc++;
             instructionsExecuted[0]++;
             // instructionsExecuted[coreID]++;
