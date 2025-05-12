@@ -5,7 +5,7 @@ int main(){
 
     for(int i=0;i<100;i++){
         cout<<i+1<<" ";
-        for(int j=0;j<31;j++){
+        for(int j=0;j<99;j++){
             cout<<0<<" ";
         }
     }
