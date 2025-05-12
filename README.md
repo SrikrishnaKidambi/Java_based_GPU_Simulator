@@ -33,7 +33,9 @@ java SimulatorGUI
 ---
 ### Minutes of Meeting:
 
-
+#### Date: 12-05-2025
+Members : Srikrishna , Sai krishna
+Tasks: We tried to fix the bugs of stalls printing and then tested the performance of scratchpad memory using the test cases given in the phase 3 doc.
 
 #### Date : 11-05-2025
 
