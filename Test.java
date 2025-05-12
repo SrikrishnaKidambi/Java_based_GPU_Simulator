@@ -225,10 +225,10 @@ public class Test {
 	public Map<String,Integer> numberVariableMapping=new HashMap<>();
 	public CacheConfig cacheConfig = new CacheConfig("CacheInputs");
 	public Memory mem=new Memory(cacheConfig.mem_latency);
-	public Cache_L1D cache_L1D_core0=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
-	public Cache_L1D cache_L1D_core1=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
-	public Cache_L1D cache_L1D_core2=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
-	public Cache_L1D cache_L1D_core3=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
+	public Cache_L1D cache_L1D_core0=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy,0);
+	public Cache_L1D cache_L1D_core1=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy,1);
+	public Cache_L1D cache_L1D_core2=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy,2);
+	public Cache_L1D cache_L1D_core3=new Cache_L1D(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy,3);
 	
 	public Cache_L1I cache_L1I_core0=new Cache_L1I(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);
 	public Cache_L1I cache_L1I_core1=new Cache_L1I(cacheConfig.CL1_associativitity, cacheConfig.CL1_blockSize, cacheConfig.CL1_cacheSize, cacheConfig.CL1_latency,cacheConfig.CL1_policy);

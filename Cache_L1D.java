@@ -14,8 +14,9 @@ public class Cache_L1D {
     private int maxRRPV=3;
     public int misses;
     public int accesses;
+    public int id;
 
-    public Cache_L1D(int associativity,int blockSize,int cacheSize,int accessLatency,boolean whichPolicy){
+    public Cache_L1D(int associativity,int blockSize,int cacheSize,int accessLatency,boolean whichPolicy,int ID){
         this.associativity=associativity;
         this.blockSize=blockSize;
         this.cacheSize=cacheSize;
@@ -38,6 +39,7 @@ public class Cache_L1D {
         }
         this.misses=0;
         this.accesses=0;
+        this.id=ID;
     }
 
     public void flushCache(Cache_L2 L2_Cache,Memory mem,int coreID){
@@ -70,7 +72,9 @@ public class Cache_L1D {
 
     public MemoryResult readData(int addr){
         this.accesses++;
-        
+        // if(this.id==0){
+        //     SimulatorGUI.console.append("Incrementing bro\n");
+        // }
         int tagIdx=addr/blockSize; // the tagIdx variable holds the tag and index bits
         int offset=addr%blockSize;
         int numTags=cacheSize/blockSize;

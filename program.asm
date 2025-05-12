@@ -66,7 +66,7 @@ spmLoad:
 Done_loadingSpm:
 
 addi x21 x0 0
-addi x22 x0 10
+addi x22 x0 1
 
 Loop:
     beq x21 x22 finish
@@ -76,20 +76,15 @@ Loop:
 
 Add:
     bne CID 0 afterSum0
-    li x18 0
-    li x19 40000
-    addi x26 x0 0 #i=0
-    addi x27 x0 25 #counter max val
-    lw x31 90000(x0) #sum[0]
+    addi x23 x0 0 #i=0
+    addi x24 x0 25 #first 25
+    lw x25 90000(x0) #sum
     Loop0:
-        beq x26 x27 done0
-        lw_spm x25 0(x18)
-        lw x28 0(x19)
-        add x31 x31 x25
-        add x31 x31 x28
-        addi x18 x18 4
-        addi x19 x19 400
-        addi x26 x26 1
+        beq x23 x24 done0
+        lw x30 0(x18)
+        add x25 x25 x30
+        addi x18 x18 400
+        addi x23 x23 1
         j Loop0
     done0:
         sw x31 90000(x0)
@@ -98,20 +93,16 @@ Add:
     afterSum0:
     SYNC
     bne CID 1 afterSum1
-    li x18 0
-    li x19 50000
-    addi x26 x0 0 #i=0
-    addi x27 x0 25 #counter max val
-    lw x31 90004(x0) #sum[1]
+    addi x23 x0 0 #i=0
+    addi x24 x0 25 #second 25
+    lw x25 90004(x0) #
+    addi x18 x0 10000
     Loop1:
-        beq x26 x27 done1
-        lw_spm x25 0(x18)
-        lw x28 0(x19)
-        add x31 x31 x25
-        add x31 x31 x28
-        addi x18 x18 4
-        addi x19 x19 400
-        addi x26 x26 1
+        beq x23 x24 done1
+        lw x30 0(x18)
+        add x25 x25 x30
+        addi x18 x18 400
+        addi x23 x23 1
         j Loop1
     done1:
         sw x31 90004(x0)
@@ -120,20 +111,16 @@ Add:
     afterSum1:
     SYNC
     bne CID 2 afterSum2
-    li x18 0
-    li x19 60000
-    addi x26 x0 0 #i=0
-    addi x27 x0 25 #counter max val
-    lw x31 90008(x0) #sum[2]
+    addi x23 x0 0 #i=0
+    addi x24 x0 25 #second 25
+    lw x25 90008(x0) #
+    addi x18 x0 20000
     Loop2:
-        beq x26 x27 done2
-        lw_spm x25 0(x18)
-        lw x28 0(x19)
-        add x31 x31 x25
-        add x31 x31 x28
-        addi x18 x18 4
-        addi x19 x19 400
-        addi x26 x26 1
+        beq x23 x24 done2
+        lw x30 0(x18)
+        add x25 x25 x30
+        addi x18 x18 400
+        addi x23 x23 1
         j Loop2
     done2:
         sw x31 90008(x0)
@@ -141,21 +128,17 @@ Add:
     
     afterSum2:
     SYNC
-    bne CID 3 afterSum3
-    li x18 0
-    li x19 70000
-    addi x26 x0 0 #i=0
-    addi x27 x0 25 #counter max val
-    lw x31 90012(x0) #sum[3]
+    bne CID 2 afterSum3
+    addi x23 x0 0 #i=0
+    addi x24 x0 25 #second 25
+    lw x25 90012(x0) #
+    addi x18 x0 30000
     Loop3:
-        beq x26 x27 done3
-        lw_spm x25 0(x18)
-        lw x28 0(x19)
-        add x31 x31 x25
-        add x31 x31 x28
-        addi x18 x18 4
-        addi x19 x19 400
-        addi x26 x26 1
+        beq x23 x24 done3
+        lw x30 0(x18)
+        add x25 x25 x30
+        addi x18 x18 400
+        addi x23 x23 1
         j Loop3
     done3:
         sw x31 90012(x0)
