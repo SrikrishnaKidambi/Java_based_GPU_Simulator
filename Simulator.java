@@ -348,6 +348,8 @@ public class Simulator{
         SimulatorGUI.console.append("\nMiss Rate in core 1:"+((double)(caches[1].misses)/(caches[1].accesses)));
         SimulatorGUI.console.append("\nMiss Rate in core 2:"+((double)(caches[2].misses)/(caches[2].accesses)));
         SimulatorGUI.console.append("\nMiss Rate in core 3:"+((double)(caches[3].misses)/(caches[3].accesses)));
+        SimulatorGUI.console.append("\nMiss and access in core 3:"+((double)(caches[3].misses)+(caches[3].accesses)));
+        
 
         SimulatorGUI.console.append("\nStats for L1 Cache (Instruction):");
         SimulatorGUI.console.append("\nMiss Rate in core 0:"+((double)(caches_I[0].misses)/(caches_I[0].accesses)));

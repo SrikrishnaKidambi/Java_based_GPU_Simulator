@@ -71,7 +71,7 @@ Add:
 
     afterSum2:
     SYNC
-    bne CID 2 afterSum3
+    bne CID 3 afterSum3
     addi x23 x0 0 #i=0
     addi x24 x0 25 #second 25
     lw x25 90012(x0) #
