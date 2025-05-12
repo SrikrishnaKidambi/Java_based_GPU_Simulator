@@ -66,7 +66,7 @@ spmLoad:
 Done_loadingSpm:
 
 addi x21 x0 0
-addi x22 x0 1
+addi x22 x0 10
 
 Loop:
     beq x21 x22 finish
