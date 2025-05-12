@@ -1666,6 +1666,7 @@ public class Core {
                         spmResultsw=spm.writeData(in.addressIdx, in.pipeline_reg[1]);
                         this.memoryLatencyStalls+=spmResultsw.latency;
                         this.totalStalls+=this.memoryLatencyStalls;
+                        
                         // System.out.println("The value that is stored in registers[16]:"+registers[16]);
                         // System.out.println("-----------THe address index in the core "+coreID+" is "+in.addressIdx);
                         break;
