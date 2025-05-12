@@ -15,6 +15,7 @@ public class Cache_L1D {
     public int misses;
     public int accesses;
     public int id;
+    public boolean[] dirty_arr;
 
     public Cache_L1D(int associativity,int blockSize,int cacheSize,int accessLatency,boolean whichPolicy,int ID){
         this.associativity=associativity;
@@ -40,6 +41,7 @@ public class Cache_L1D {
         this.misses=0;
         this.accesses=0;
         this.id=ID;
+        this.dirty_arr=new boolean[cacheSize/blockSize];
     }
 
     public void flushCache(Cache_L2 L2_Cache,Memory mem,int coreID){
@@ -64,7 +66,9 @@ public class Cache_L1D {
                     mem.memory[addr]=cache[j];
                     L2_Cache.writeData(addr, mem, cache[j]);
                 }
-                tag[i]=null;
+                if(dirty_arr[i]){
+                    tag[i]=null;
+                }
             }
             
         }
@@ -122,6 +126,7 @@ public class Cache_L1D {
                         updateSrripState(idx, i-idx*associativity, true);
                     }
                     res=new MemoryResult(this.accessLatency, cache[i*blockSize+offset]);
+                    dirty_arr[i]=true;
                     return res;
                 }
             }
@@ -252,7 +257,9 @@ public class Cache_L1D {
         // System.out.println("The addr is "+addr+" and the updated addr is "+addrToBeUpdated);
         int lower_bound=addrToBeUpdated-(addrToBeUpdated%this.blockSize);
         int upper_bound=addrToBeUpdated+(this.blockSize-addrToBeUpdated%this.blockSize);
-        updateL2Cache(lower_bound, upper_bound, L2_cache, mem, evictedBlock);
+        if(dirty_arr[idx*associativity+blockEvicted]){
+            updateL2Cache(lower_bound, upper_bound, L2_cache, mem, evictedBlock);
+        }
         tag[idx*associativity+blockEvicted]=null;
         // System.out.println("tag[0] became "+tag[0]);
         // System.out.println("tag[1] became "+tag[1]);
