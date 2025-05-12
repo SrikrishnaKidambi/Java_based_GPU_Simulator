@@ -80,7 +80,6 @@ Add:
     li x19 40000
     addi x26 x0 0 #i=0
     addi x27 x0 25 #counter max val
-    lw x31 90000(x0) #sum[0]
     Loop0:
         beq x26 x27 done0
         lw_spm x25 0(x18)
@@ -92,7 +91,6 @@ Add:
         addi x26 x26 1
         j Loop0
     done0:
-        sw x31 90000(x0)
         j afterSum0
 
     afterSum0:
@@ -102,7 +100,6 @@ Add:
     li x19 50000
     addi x26 x0 0 #i=0
     addi x27 x0 25 #counter max val
-    lw x31 90004(x0) #sum[1]
     Loop1:
         beq x26 x27 done1
         lw_spm x25 0(x18)
@@ -114,7 +111,6 @@ Add:
         addi x26 x26 1
         j Loop1
     done1:
-        sw x31 90004(x0)
         j afterSum1
     
     afterSum1:
@@ -124,7 +120,6 @@ Add:
     li x19 60000
     addi x26 x0 0 #i=0
     addi x27 x0 25 #counter max val
-    lw x31 90008(x0) #sum[2]
     Loop2:
         beq x26 x27 done2
         lw_spm x25 0(x18)
@@ -136,7 +131,6 @@ Add:
         addi x26 x26 1
         j Loop2
     done2:
-        sw x31 90008(x0)
         j afterSum2
     
     afterSum2:
@@ -146,7 +140,6 @@ Add:
     li x19 70000
     addi x26 x0 0 #i=0
     addi x27 x0 25 #counter max val
-    lw x31 90012(x0) #sum[3]
     Loop3:
         beq x26 x27 done3
         lw_spm x25 0(x18)
@@ -158,7 +151,6 @@ Add:
         addi x26 x26 1
         j Loop3
     done3:
-        sw x31 90012(x0)
         j afterSum3
 
     afterSum3:
@@ -168,17 +160,40 @@ Add:
 
 finish:
     SYNC
-    bne CID 0 Finish
-    lw x22 90000(x0)
-    lw x23 90004(x0)
-    lw x24 90008(x0)
-    lw x25 90012(x0)
-    add x23 x22 x23
-    add x24 x24 x23
-    add x25 x25 x24
-    sw x25 90000(x0)
-    li x17 1
-    lw x10 90000(x0)
-    ecall
+    bne CID 0 mark1
+    sw x31 90000(x0)
+
+    mark1:
+    SYNC
+    bne CID 1 mark2
+    sw x31 90004(x0)
+
+    mark2:
+    SYNC
+    bne CID 2 mark3
+    sw x31 90008(x0)
+
+    mark3:
+    SYNC
+    bne CID 3 preproces
+    sw x31 90012(x0)
+preproces:
+SYNC
+j storingDone
+
+storingDone:
+SYNC
+bne CID 0 Finish
+lw x22 90000(x0)
+lw x23 90004(x0)
+lw x24 90008(x0)
+lw x25 90012(x0)
+add x23 x22 x23
+add x24 x24 x23
+add x25 x25 x24
+sw x25 90000(x0)
+li x17 1
+lw x10 90000(x0)
+ecall
 
 Finish:

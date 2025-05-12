@@ -18,7 +18,6 @@ Add:
     bne CID 0 afterSum0
     addi x23 x0 0 #i=0
     addi x24 x0 25 #first 25
-    lw x25 90000(x0) #sum
     Loop0:
         beq x23 x24 done0
         lw x30 0(x18)
@@ -28,7 +27,6 @@ Add:
         j Loop0
 
     done0:
-        sw x25 90000(x0) #sum
         j afterSum0
     
     afterSum0:
@@ -36,7 +34,7 @@ Add:
     bne CID 1 afterSum1
     addi x23 x0 0 #i=0
     addi x24 x0 25 #second 25
-    lw x25 90004(x0) #
+    
     addi x18 x0 10000
     Loop1:
         beq x23 x24 done1
@@ -47,7 +45,6 @@ Add:
         j Loop1
     
     done1:
-        sw x25 90004(x0) #sum
         j afterSum1
     
     afterSum1:
@@ -55,7 +52,7 @@ Add:
     bne CID 2 afterSum2
     addi x23 x0 0 #i=0
     addi x24 x0 25 #second 25
-    lw x25 90008(x0) #
+    
     addi x18 x0 20000
     Loop2:
         beq x23 x24 done2
@@ -66,7 +63,6 @@ Add:
         j Loop2
     
     done2:
-        sw x25 90008(x0) #sum
         j afterSum2
 
     afterSum2:
@@ -74,7 +70,7 @@ Add:
     bne CID 3 afterSum3
     addi x23 x0 0 #i=0
     addi x24 x0 25 #second 25
-    lw x25 90012(x0) #
+    
     addi x18 x0 30000
     Loop3:
         beq x23 x24 done3
@@ -85,7 +81,6 @@ Add:
         j Loop3
     
     done3:
-        sw x25 90012(x0) #sum
         j afterSum3
 
     afterSum3:
@@ -94,18 +89,40 @@ Add:
 
 done:
     SYNC
-    bne CID 0 Finish
-    lw x22 90000(x0)
-    lw x23 90004(x0)
-    lw x24 90008(x0)
-    lw x25 90012(x0)
-    add x23 x22 x23
-    add x24 x24 x23
-    add x25 x25 x24
+    bne CID 0 mark1
     sw x25 90000(x0)
 
-    li x17 1
-    lw x10 90000(x0)
-    ecall
+    mark1:
+    SYNC
+    bne CID 1 mark2
+    sw x25 90004(x0)
+
+    mark2:
+    SYNC
+    bne CID 2 mark3
+    sw x25 90008(x0)
+
+    mark3:
+    SYNC
+    bne CID 3 preproces
+    sw x25 90012(x0)
+preproces:
+SYNC
+j storingDone
+
+storingDone:
+SYNC
+bne CID 0 Finish
+lw x22 90000(x0)
+lw x23 90004(x0)
+lw x24 90008(x0)
+lw x25 90012(x0)
+add x23 x22 x23
+add x24 x24 x23
+add x25 x25 x24
+sw x25 90000(x0)
+li x17 1
+lw x10 90000(x0)
+ecall
 
 Finish:
